@@ -1,11 +1,8 @@
 ---
 title: "My title"
-author:
-- author 1
-- other author
-date: '`r Sys.Date()`'
+author: "Authors"
+date: "Institution"
 output: word_document
-abstract: "My abstract \n"
 ---
 
 ```{r setup, include=FALSE}
@@ -20,7 +17,18 @@ knitr::opts_chunk$set(echo = FALSE)
 
 #### Heading 4
 
-##### Heading 5 - this is for the page break with MS Word
+##### Heading 5
+
+
+```{r}
+myft <- flextable::regulartable(
+  head(mtcars), 
+  col_keys = c("am", "carb", "gear", "mpg", "drat")
+)
+myft <- flextable::fontsize(myft, part = "body", size = 8)
+myft
+```
+
 
 In the MS Word document, the following modifications must be made in the 'Modify Style' menu:
 

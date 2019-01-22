@@ -1,5 +1,10 @@
 .Rhistory
 .RData
 .Rproj.user
+example.md
 /analysis/test.Rmd
-/analysis/fig/test.png
+/analysis/figures/test.png
+/manuscript/manuscript.docx
+/manuscript/manuscript.nb.html
+/manuscript/manuscript.pdf
+/manuscript/templates/draft_template.docx

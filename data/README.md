@@ -1,41 +1,22 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-candidaev
-=========
 
-This repository contains the data and code for our paper:
+# data
 
-> Authors, (YYYY). *Title of paper*. Name of journal/book <https://doi.org/xxx/xxx>
+This directory contains all of the data files used to generate results
+tables and figures.
 
-Our pre-print is online here:
+# contents
 
-> Authors, (YYYY). *Title of paper*. Name of journal/book, Accessed 20 Jan 2019. Online at <https://doi.org/xxx/xxx>
-
-### How to cite
-
-Please cite this compendium as:
-
-> Authors, (2019). *Compendium of R code and data for 'Title of paper'*. Accessed 20 Jan 2019. Online at <https://doi.org/xxx/xxx>
-
-### How to download or install
-
-You can download the compendium as a zip from from this URL: <https://github.com/csdaw/candidaev/archive/master.zip>
-
-Or you can install this compendium as an R package, candidaev, from GitHub with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("csdaw/candidaev")
+``` 
+    .
+    ├── ...
+    ├── /data
+    │    ├── /raw            # Contains raw untouched data files
+    │    ├── /external       # Contains data from other papers
+    │    ├── /clean          # Contains cleaned reference tables
+    │    ├── /results        # Contains final results tables
+    │    ├── README.Rmd      # R markdown file to produce README.md
+    │    └── README.md       # Description of /data directory
+    └── ...
 ```
-
-### Licenses
-
-**Text and figures :** [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-
-**Code :** See the [DESCRIPTION](DESCRIPTION) file
-
-**Data :** [CC-0](http://creativecommons.org/publicdomain/zero/1.0/) attribution requested in reuse
-
-### Contributions
-
-We welcome contributions from everyone. Before you get started, please see our [contributor guidelines](CONTRIBUTING.md). Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
