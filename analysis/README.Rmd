@@ -14,11 +14,9 @@ knitr::opts_chunk$set(
 
 # analysis
 
-This directory contains the complete data analysis workflow upon which the paper
+This directory contains the complete data analysis workflow upon which this paper is based.
 
 > Authors, (YYYY). _Title of paper_. Name of journal/book <https://doi.org/xxx/xxx>
-
-is based upon.
 
 # contents
 ```

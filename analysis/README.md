@@ -4,12 +4,10 @@
 # analysis
 
 This directory contains the complete data analysis workflow upon which
-the paper
+this paper is based.
 
 > Authors, (YYYY). *Title of paper*. Name of journal/book
 > <https://doi.org/xxx/xxx>
-
-is based upon.
 
 # contents
 
