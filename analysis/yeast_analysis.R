@@ -7,6 +7,7 @@
 
 #### Load required packages and scripts ----
 library(dplyr)
+library(tibble)
 source("R/util.R")
 
 #### Import data and reference tables ----
@@ -29,6 +30,22 @@ cgd_table <- read.table(file = "data/clean/cgd-table.txt", sep = "\t", header = 
 pg <- pg_orig %>%
   filter(Reverse != "+", Potential.contaminant != "+")
 
-# keep only proteins with min 2 unique peptides
-pg <- val_filter(df = pg, pattern = "Unique.peptides", value = 2)
+# keep only proteins identified by min 2 unique peptides
+pg <- pg %>%
+  filter(Unique.peptides >= 2)
 
+
+#### Prepare LFQ data frame for analysis ----
+# separate protein LFQ data from other data
+lfq <- pg %>%
+  select(Majority.protein.IDs, matches("LFQ.intensity.*EV"), matches("LFQ.intensity.*W"))
+
+# convert to matrix
+lfq <- lfq %>%
+  remove_rownames() %>%
+  column_to_rownames(var = "Majority.protein.IDs") %>%
+  as.matrix()
+
+# convert zero to NA and log2 transform LFQ data
+lfq[lfq == 0] <- NA
+lfq <- log2(lfq)
