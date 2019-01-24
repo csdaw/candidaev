@@ -6,7 +6,7 @@ fill_blank <- function(df, blank_col, fill_col) {
 }
 
 val_filter <- function(df, pattern, value) {
-  df[apply(df[ , c(grep(pattern, colnames(df)))]), 1, sum >= value, ]
+  df[apply(df[ , c(grep(pattern, colnames(df)))], 1, sum) >= value, ]
 }
 
 val_filter2 <- function(df, pattern1, value1, pattern2, value2) {
