@@ -1,0 +1,27 @@
+---
+title: "Analysis"
+author: "Charlotte Dawson"
+date: "2018-01-20"
+output:
+  html_notebook: default
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: kable
+    code_folding: hide
+  bookdown::html_document2:
+    toc: true
+    toc_float: true
+    keep_md: true
+  md_document:
+    variant: markdown_github
+    toc: true
+    toc_float: true
+---
+
+# This is a first level heading
+
+
+
+
