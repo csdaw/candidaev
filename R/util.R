@@ -6,28 +6,28 @@ fill_blank <- function(df, blank_col, fill_col) {
 }
 
 val_filter <- function(df, pattern, value) {
-  df[apply(df[ , c(grep(pattern, colnames(df)))], 1, sum) >= value, ]
+  df[apply(df[, c(grep(pattern, colnames(df)))], 1, sum) >= value, ]
 }
 
 val_filter2 <- function(df, pattern1, value1, pattern2, value2) {
-  df[apply(df[ , c(grep(pattern1, colnames(df)))] > 1, 1, sum) >= value1 |
-       apply(df[ , c(grep(pattern2, colnames(df)))] > 1, 1, sum) >= value2, ]
+  df[apply(df[, c(grep(pattern1, colnames(df)))] > 1, 1, sum) >= value1 |
+       apply(df[, c(grep(pattern2, colnames(df)))] > 1, 1, sum) >= value2, ]
 }
 
 na_filter <- function(df, pattern, value) {
-  df[apply(is.na(df[ , c(grep(pattern, colnames(df)))]), 1, sum) < value, ]
+  df[apply(is.na(df[, c(grep(pattern, colnames(df)))]), 1, sum) < value, ]
 }
 
 na_filter2 <- function(df, pattern1, value1, pattern2, value2) {
-  df[apply(is.na(df[ , c(grep(pattern1, colnames(df)))]), 1, sum) < value1 &
-       apply(is.na(df[ , c(grep(pattern2, colnames(df)))]), 1, sum) < value2, ]
+  df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) < value1 &
+       apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) < value2, ]
 }
 
 add_newcol <- function(value_col, lookup_col, match_col) {
   value_col[match(match_col, lookup_col)]
 }
 
-colClean <- function(df) {
+col_clean <- function(df) {
   colnames(df) <- gsub("\\.\\.+", ".", colnames(df))
   colnames(df) <- gsub("\\.$", "", colnames(df))
   return(df)
