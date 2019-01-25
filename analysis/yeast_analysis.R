@@ -22,7 +22,7 @@ pg_orig <- read.table("data/raw/yeast-proteinGroups.txt", sep = "\t", header = T
 pg_orig <- col_clean(pg_orig)
 
 # load experimental design
-expd <- read.table("data/raw/yeast-expdesign2.txt", sep = "\t", header = TRUE,
+expd <- read.table("data/raw/yeast-expdesign.txt", sep = "\t", header = TRUE,
                    stringsAsFactors = FALSE)
 
 # load clean UniProt reference table
@@ -45,21 +45,7 @@ pg <- pg %>%
 # pg <- val_filter2(pg, pattern1 = "LFQ.*EV", value1 = 2, pattern2 = "LFQ.*W", value2 = 2)
 
 #### Prepare LFQ data frame for analysis ----
-# separate protein LFQ data from other data
-lfq <- pg %>%
-  select(Majority.protein.IDs, matches("LFQ.intensity.*EV"), matches("LFQ.intensity.*W"))
-
-# convert to matrix
-lfq <- lfq %>%
-  remove_rownames() %>%
-  column_to_rownames(var = "Majority.protein.IDs") %>%
-  as.matrix()
-
-colnames(lfq) <- expd$ID
-
-# convert zero to NA and log2 transform LFQ data
-lfq[lfq == 0] <- NA
-lfq <- log2(lfq)
+lfq <- convert_lfq(pg, expd)
 
 plot_numbers2(lfq, expd, plot = FALSE)
 

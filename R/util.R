@@ -32,3 +32,28 @@ col_clean <- function(df) {
   colnames(df) <- gsub("\\.$", "", colnames(df))
   return(df)
 }
+
+
+convert_lfq <- function(pg, exd) {
+  # define vector of labels from experimental design
+  lfq_cols <- exd[["label"]]
+
+  # show error if inputs are not correct class, structure or if number of
+  # LFQ columns in pg does not match number of labels in experimental design.
+  assertthat::assert_that(is.data.frame(pg),
+                          is.data.frame(exd),
+                          assert_exd(exd),
+                          length(rownames(exd)) == length(select(pg, one_of(lfq_cols))))
+  # select LFQ data and convert to matrix with UniProt accessions as rownames
+  df <- pg %>%
+    select(Majority.protein.IDs, one_of(lfq_cols)) %>%
+    remove_rownames() %>%
+    column_to_rownames(var = "Majority.protein.IDs") %>%
+    as.matrix()
+
+  # give columns shorter names and log2 transform LFQ intensities
+  colnames(df) <- exd[["ID"]]
+  df[df == 0] <- NA
+  df <- log2(df)
+  return(df)
+}
