@@ -154,14 +154,14 @@ plot_frequency2 <- function(lfq_mat, plot = TRUE) {
 #' filt <- filter_missval(se, thr = 0)
 #' plot_coverage(filt)
 #' @export
-plot_coverage <- function(se, plot = TRUE) {
+plot_coverage2 <- function(lfq_mat, plot = TRUE) {
   # Show error if input is not the required classes
-  assertthat::assert_that(inherits(se, "SummarizedExperiment"),
+  assertthat::assert_that(is.matrix(lfq_mat),
                           is.logical(plot),
                           length(plot) == 1)
 
   # Make a binary long data.frame (1 = valid value, 0 = missing value)
-  df <- assay(se) %>%
+  df <- lfq_mat %>%
     data.frame() %>%
     rownames_to_column() %>%
     gather(ID, bin, -rowname) %>%
@@ -181,7 +181,7 @@ plot_coverage <- function(se, plot = TRUE) {
          x = "",
          y = "Number of proteins",
          fill = "Samples") +
-    theme_DEP1()
+    theme_bw()
   if(plot) {
     return(p)
   } else {
