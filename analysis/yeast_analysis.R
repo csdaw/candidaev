@@ -12,6 +12,8 @@ library(limma)
 library(tibble)
 library(tidyr)
 source("R/util.R")
+source("R/assert_functions.R")
+source("R/DEP_plot_functions_freq.R")
 
 #### Import data and reference tables ----
 # load proteinGroups.txt
@@ -44,9 +46,19 @@ pg <- pg %>%
 
 # pg <- val_filter2(pg, pattern1 = "LFQ.*EV", value1 = 2, pattern2 = "LFQ.*W", value2 = 2)
 
-#### Prepare LFQ data frame for analysis ----
+#### Prepare LFQ data frame for initial analysis ----
 lfq <- convert_lfq(pg, expd)
 
-plot_numbers2(lfq, expd, plot = FALSE)
+plot_frequency2(lfq)
 
-plot_frequency2(lfq, plot = FALSE)
+# Filter proteins with too many missing values
+test <- na_filter2(lfq, "or", pattern1 = "EV.*", value1 = 1, pattern2 = "W.*", value2 = 1)
+
+plot_frequency2(test)
+
+plot_numbers2(lfq, expd)
+
+
+
+
+
