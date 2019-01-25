@@ -27,14 +27,16 @@
 #' filt <- filter_missval(se, thr = 0)
 #' plot_numbers(filt)
 #' @export
-plot_numbers <- function(se, plot = TRUE) {
+plot_numbers2 <- function(lfq_mat, exd, plot = TRUE) {
   # Show error if input is not the required classes
-  assertthat::assert_that(inherits(se, "SummarizedExperiment"),
+  assertthat::assert_that(is.matrix(lfq_mat),
+                          is.data.frame(exd),
+                          assert_exd(exd),
                           is.logical(plot),
                           length(plot) == 1)
 
   # Make a binary long data.frame (1 = valid value, 0 = missing value)
-  df <- assay(se) %>%
+  df <- lfq_mat %>%
     data.frame() %>%
     rownames_to_column() %>%
     gather(ID, bin, -rowname) %>%
@@ -44,13 +46,13 @@ plot_numbers <- function(se, plot = TRUE) {
   stat <- df %>%
     group_by(ID) %>%
     summarize(n = n(), sum = sum(bin)) %>%
-    left_join(., data.frame(colData(se)), by = "ID")
+    left_join(., exd, by = "ID")
   p <- ggplot(stat, aes(x = ID, y = sum, fill = condition)) +
     geom_col() +
     geom_hline(yintercept = unique(stat$n)) +
     labs(title = "Proteins per sample", x = "",
          y = "Number of proteins") +
-    theme_DEP2()
+    theme_bw()
   if(plot) {
     return(p)
   } else {
@@ -88,14 +90,14 @@ plot_numbers <- function(se, plot = TRUE) {
 #' filt <- filter_missval(se, thr = 0)
 #' plot_frequency(filt)
 #' @export
-plot_frequency <- function(se, plot = TRUE) {
+plot_frequency2 <- function(lfq_mat, plot = TRUE) {
   # Show error if input is not the required classes
-  assertthat::assert_that(inherits(se, "SummarizedExperiment"),
+  assertthat::assert_that(is.matrix(lfq_mat),
                           is.logical(plot),
                           length(plot) == 1)
 
   # Make a binary long data.frame (1 = valid value, 0 = missing value)
-  df <- assay(se) %>%
+  df <- lfq_mat %>%
     data.frame() %>%
     rownames_to_column() %>%
     gather(ID, bin, -rowname) %>%
@@ -113,7 +115,7 @@ plot_frequency <- function(se, plot = TRUE) {
     labs(title = "Protein identifications overlap",
          x = "Identified in number of samples",
          y = "Number of proteins") +
-    theme_DEP2() +
+    theme_bw() +
     theme(legend.position="none")
   if(plot) {
     return(p)
