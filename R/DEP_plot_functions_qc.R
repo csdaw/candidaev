@@ -168,37 +168,31 @@ plot_normalization <- function(se, ...) {
 #' # Plot imputation
 #' plot_imputation(filt, norm, imputed)
 #' @export
-plot_imputation <- function(se, ...) {
+plot_imputation2 <- function(exd, lfq_mat, ...) {
   # Get arguments from call
   call <- match.call()
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
   arglist <- lapply(arglist, eval.parent, n = 2)
   names(arglist) <- var.names
+  arglist <- arglist[-1]
 
   # Show error if inputs are not the required classes
+  assertthat::assert_that(is.data.frame(exd),
+                          assert_exd(exd))
   lapply(arglist, function(x) {
-    assertthat::assert_that(inherits(x,
-                                     "SummarizedExperiment"),
-                            msg = "input objects need to be of class 'SummarizedExperiment'")
-    if (any(!c("label", "ID", "condition", "replicate") %in% colnames(colData(x)))) {
-      stop("'label', 'ID', 'condition' and/or 'replicate' ",
-           "columns are not present in (one of) the input object(s)",
-           "\nRun make_se() or make_se_parse() to obtain the required columns",
-           call. = FALSE)
-    }
+    assertthat::assert_that(is.matrix(x))
   })
 
   # Function to get a long data.frame of the assay data
   # annotated with sample info
-  gather_join <- function(se) {
-    assay(se) %>%
-      data.frame() %>%
+  gather_join <- function(lfq_mat) {
+      data.frame(lfq_mat) %>%
       gather(ID, val) %>%
-      left_join(., data.frame(colData(se)), by = "ID")
+      left_join(., data.frame(exd), by = "ID")
   }
 
-  df <- map_df(arglist, gather_join, .id = "var") %>%
+  df <- purrr::map_df(arglist, gather_join, .id = "var") %>%
     mutate(var = factor(var, levels = names(arglist)))
 
   # Density plots for different conditions with facet_wrap
@@ -207,7 +201,7 @@ plot_imputation <- function(se, ...) {
     geom_density(na.rm = TRUE) +
     facet_wrap(~var, ncol = 1) +
     labs(x = expression(log[2]~"Intensity"), y = "Density") +
-    theme_DEP1()
+    theme_bw()
 }
 
 #' Visualize intensities of proteins with missing values
@@ -237,19 +231,18 @@ plot_imputation <- function(se, ...) {
 #' # Plot intensities of proteins with missing values
 #' plot_detect(filt)
 #' @export
-plot_detect <- function(se) {
+plot_detect2 <- function(lfq_mat) {
   # Show error if inputs are not the required classes
-  assertthat::assert_that(inherits(se, "SummarizedExperiment"))
+  assertthat::assert_that(is.matrix(lfq_mat))
 
-  se_assay <- assay(se)
   # Show error if there are no missing values
-  if(!any(is.na(se_assay))) {
-    stop("No missing values in '", deparse(substitute(se)), "'",
+  if(!any(is.na(lfq_mat))) {
+    stop("No missing values in '", deparse(substitute(lfq_mat)), "'",
          call. = FALSE)
   }
 
   # Get a long data.frame of the assay data annotated with sample info
-  df <- se_assay %>%
+  df <- lfq_mat %>%
     data.frame() %>%
     rownames_to_column() %>%
     gather(ID, val, -rowname)
@@ -272,12 +265,12 @@ plot_detect <- function(se) {
     geom_density(na.rm = TRUE) +
     labs(x = expression(log[2]~"Intensity"), y = "Density") +
     guides(col = guide_legend(title = "Missing values")) +
-    theme_DEP1()
+    theme_bw()
   p2 <- ggplot(cumsum, aes(mean, cs_frac, col = missval)) +
     geom_line() +
     labs(x = expression(log[2]~"Intensity"), y = "Cumulative fraction") +
     guides(col = guide_legend(title = "Missing values")) +
-    theme_DEP1()
+    theme_bw()
   gridExtra::grid.arrange(p1, p2, ncol = 1)
 }
 
@@ -307,32 +300,32 @@ plot_detect <- function(se) {
 #' # Plot missing values heatmap
 #' plot_missval(filt)
 #' @export
-plot_missval <- function(se) {
+plot_missval2 <- function(lfq_mat) {
   # Show error if input is not the required classes
-  assertthat::assert_that(inherits(se, "SummarizedExperiment"))
+  assertthat::assert_that(is.matrix(lfq_mat))
 
-  se_assay <- assay(se)
   # Show error if there are no missing values
-  if(!any(is.na(se_assay))) {
-    stop("No missing values in '", deparse(substitute(se)), "'",
+  if(!any(is.na(lfq_mat))) {
+    stop("No missing values in '", deparse(substitute(lfq_mat)), "'",
          call. = FALSE)
   }
 
   # Make assay data binary (1 = valid value, 0 = missing value)
-  df <- se_assay %>% data.frame(.)
+  df <- lfq_mat %>%
+    data.frame()
   missval <- df[apply(df, 1, function(x) any(is.na(x))), ]
   missval <- ifelse(is.na(missval), 0, 1)
   # Plot binary heatmap
-  ht2 = Heatmap(missval,
-                col = c("white", "black"),
-                column_names_side = "top",
-                show_row_names = FALSE,
-                show_column_names = TRUE,
-                name = "Missing values pattern",
-                column_names_gp = gpar(fontsize = 16),
-                heatmap_legend_param = list(at = c(0, 1),
-                                            labels = c("Missing value", "Valid value")))
-  draw(ht2, heatmap_legend_side = "top")
+  ht2 = ComplexHeatmap::Heatmap(missval,
+                                col = c("white", "black"),
+                                column_names_side = "top",
+                                show_row_names = FALSE,
+                                show_column_names = TRUE,
+                                name = "Missing values pattern",
+                                column_names_gp = grid::gpar(fontsize = 16),
+                                heatmap_legend_param = list(at = c(0, 1),
+                                labels = c("Missing value", "Valid value")))
+  ComplexHeatmap::draw(ht2, heatmap_legend_side = "top")
 }
 
 #' Plot a P value histogram
