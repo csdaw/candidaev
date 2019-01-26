@@ -62,3 +62,25 @@ convert_lfq <- function(pg, exd) {
   df <- log2(df)
   return(df)
 }
+
+# don't export this function
+lfq_summary <- function(lfq_mat) {
+  result <- list(Mean = mean(lfq_mat, na.rm = TRUE),
+              Median = median(lfq_mat, na.rm = TRUE),
+              Std.dev = sd(lfq_mat, na.rm = TRUE),
+              Coeff.var = sd(lfq_mat, na.rm = TRUE)/mean(lfq_mat, na.rm = TRUE)*100,
+              Min = min(lfq_mat, na.rm = TRUE),
+              Max = max(lfq_mat, na.rm = TRUE),
+              Range = max(lfq_mat, na.rm = TRUE) - min(lfq_mat, na.rm = TRUE),
+              Valid.vals = length(na.omit(lfq_mat)),
+              Num.na = sum(is.na(lfq_mat)),
+              Prcnt.na = sum(is.na(lfq_mat))/length(lfq_mat)*100
+              )
+}
+
+lfq_summarise <- function(lfq_mat) {
+  df <- as.data.frame(lfq_mat, stringsAsFactors = FALSE)
+  result <- lapply(df, lfq_summary)
+  result <- as.data.frame(do.call(rbind, result))
+  return(result)
+}
