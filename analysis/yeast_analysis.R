@@ -15,6 +15,7 @@ source("R/util.R")
 source("R/assert_functions.R")
 source("R/DEP_plot_functions_freq.R")
 source("R/DEP_plot_functions_qc.R")
+source("R/plot_functions.R")
 
 #### Import data and reference tables ----
 # load proteinGroups.txt
@@ -79,9 +80,19 @@ plot_dendro(lfq_filt_norm) # EV_1 not clustering with other EV samples
 lfq2 <- lfq[, !colnames(lfq) %in% c("EV_1", "WCL_2")]
 
 # filter for proteins identified in at least 3/3 replicates of EV or WCL
-lfq2_filt <- na_filter2(lfq2, "or", pattern1 = "EV.*", value1 = 0, pattern2 = "W.*", value2 = 0)
+lfq2_filt_1 <- na_filter2(lfq2, "or",
+                           pattern1 = "EV.*", value1 = 0,
+                           pattern2 = "W.*", value2 = 0) # 859
 
-plot_frequency2(lfq2_filt) # mmost proteins identified in 3/6 or 6/6 samples
+# filter for proteins identified in exactly 2/3 replicates of EV and WCL
+lfq2_filt_2 <- na_filter3(lfq2, "and",
+                           pattern1 = "EV.*", value1 = 1,
+                           pattern2 = "W.*", value2 = 1) # 10
+
+# stick matrices together
+lfq2_filt <- rbind(lfq2_filt_1, lfq2_filt_2)
+
+plot_frequency2(lfq2_filt) # most proteins identified in 3/6 or 6/6 samples
 
 plot_numbers2(lfq2_filt, expd) # similar intragroup protein numbers
 
@@ -97,6 +108,52 @@ plotMDS(lfq2_filt_norm) # looks ok
 plot_dendro(lfq2_filt_norm) # looks ok
 
 #### Imputation ----
+# explore percentage of missing values in each sample
+lfq_summarise(lfq2_filt_norm) # 17.1-36.2 percent
 
+# should not impute with so many missing values
+# remove proteins exclusive to EV or WCL first
+lfq2_excl <- na_filter3(lfq2_filt_norm, "or", "EV.*", 3, "W.*", 3)
+lfq2_both <- na_filter2(lfq2_filt_norm, "and", "EV.*", 2, "W.*", 2)
 
+# explore percentage of missing values in lfq_both
+lfq_summarise(lfq2_both) # 2.9-14.7 percent
 
+# explore pattern of missing values in data.
+plot_missval2(lfq2_both) # no particular pattern
+
+# plot intensity distribution for proteins with and without missing values
+plot_detect2(lfq2_both) # protein with missing values tend to have lower intensity
+
+# therefore proteins are MNAR, close to detection limit
+# use left censored imputation method
+lfq2_imp <- QRILC_impute(lfq2_both)
+
+# observe effect of imputation on sample intensity distribution
+plot_imputation2(expd, lfq2_both, lfq2_imp)
+
+#### Differential expression analysis with limma ----
+# stick imputed proteins and exclusive proteins back together
+Reduce(intersect, list(rownames(lfq2_imp), rownames(lfq2_excl))) # No duplicated rows
+lfq2_de <- rbind(lfq2_excl, lfq2_both)
+
+# see limma user guide section 9.2 for more info
+# create design matrix
+samples <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+design <- model.matrix( ~ 0 + T, data = samples)
+colnames(design) <- c("EV", "WCL")
+
+# make all pair-wise comparisons between EV and WCL
+cm <- makeContrasts(EV - WCL, levels = design)
+fit_ev <- lmFit(lfq2_de, design = design)
+fit_ev_cm <- contrasts.fit(fit_ev, cm)
+efit_ev <- eBayes(fit_ev_cm)
+
+# extract DE results
+result <- topTable(efit_ev, genelist = rownames(lfq2_de), number = Inf)
+
+result <- result %>%
+  mutate(sig = ifelse(adj.P.Val < 0.01 & (logFC > 1.5 | logFC < -1.5), TRUE, FALSE))
+
+#### Explore results ----
+plot_dendro(lfq2_de)

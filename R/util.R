@@ -34,6 +34,16 @@ na_filter2 <- function(df, logic, pattern1, value1, pattern2, value2) {
   }
 }
 
+na_filter3 <- function(df, logic, pattern1, value1, pattern2, value2) {
+  if(logic == "and") {
+    df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) == value1 &
+         apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) == value2, ]
+  } else if(logic == "or") {
+    df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) == value1 |
+         apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) == value2, ]
+  }
+}
+
 add_newcol <- function(value_col, lookup_col, match_col) {
   value_col[match(match_col, lookup_col)]
 }
@@ -89,4 +99,9 @@ lfq_summarise <- function(lfq_mat) {
   result <- lapply(df, lfq_summary)
   result <- as.data.frame(do.call(rbind, result))
   return(result)
+}
+
+QRILC_impute <- function(lfq_mat) {
+  imp <- imputeLCMD::impute.QRILC(lfq_mat)
+  imp <- imp[[1]]
 }
