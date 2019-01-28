@@ -92,37 +92,31 @@ meanSdPlot <- function(x,
 #' # Plot normalization
 #' plot_normalization(se, filt, norm)
 #' @export
-plot_normalization <- function(se, ...) {
+plot_normalization2 <- function(exd, lfq_mat, ...) {
   # Get arguments from call
   call <- match.call()
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
   arglist <- lapply(arglist, eval.parent, n = 2)
   names(arglist) <- var.names
+  arglist <- arglist[-1]
 
   # Show error if inputs are not the required classes
+  assertthat::assert_that(is.data.frame(exd),
+                          assert_exd(exd))
   lapply(arglist, function(x) {
-    assertthat::assert_that(inherits(x,
-                                     "SummarizedExperiment"),
-                            msg = "input objects need to be of class 'SummarizedExperiment'")
-    if (any(!c("label", "ID", "condition", "replicate") %in% colnames(colData(x)))) {
-      stop("'label', 'ID', 'condition' and/or 'replicate' ",
-           "columns are not present in (one of) the input object(s)",
-           "\nRun make_se() or make_se_parse() to obtain the required columns",
-           call. = FALSE)
-    }
+    assertthat::assert_that(is.matrix(x))
   })
 
   # Function to get a long data.frame of the assay data
   # annotated with sample info
-  gather_join <- function(se) {
-    assay(se) %>%
-      data.frame() %>%
+  gather_join <- function(lfq_mat) {
+      data.frame(lfq_mat) %>%
       gather(ID, val) %>%
-      left_join(., data.frame(colData(se)), by = "ID")
+      left_join(., data.frame(exd), by = "ID")
   }
 
-  df <- map_df(arglist, gather_join, .id = "var") %>%
+  df <- purrr::map_df(arglist, gather_join, .id = "var") %>%
     mutate(var = factor(var, levels = names(arglist)))
 
   # Boxplots for conditions with facet_wrap
@@ -132,7 +126,7 @@ plot_normalization <- function(se, ...) {
     coord_flip() +
     facet_wrap(~var, ncol = 1) +
     labs(x = "", y = expression(log[2]~"Intensity")) +
-    theme_DEP1()
+    theme_bw()
 }
 
 #' Visualize imputation

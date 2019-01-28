@@ -14,8 +14,14 @@ val_filter2 <- function(df, pattern1, value1, pattern2, value2) {
        apply(df[, c(grep(pattern2, colnames(df)))] > 1, 1, sum) >= value2, ]
 }
 
-na_filter <- function(df, pattern, value) {
+na_filter <- function(df, logic, pattern, value) {
+  if(logic == "<=") {
   df[apply(is.na(df[, c(grep(pattern, colnames(df)))]), 1, sum) <= value, ]
+  } else if(logic == "=") {
+    df[apply(is.na(df[, c(grep(pattern, colnames(df)))]), 1, sum) == value, ]
+  } else if(logic == ">=") {
+    df[apply(is.na(df[, c(grep(pattern, colnames(df)))]), 1, sum) >= value, ]
+  }
 }
 
 na_filter2 <- function(df, logic, pattern1, value1, pattern2, value2) {
@@ -72,8 +78,8 @@ lfq_summary <- function(lfq_mat) {
               Min = min(lfq_mat, na.rm = TRUE),
               Max = max(lfq_mat, na.rm = TRUE),
               Range = max(lfq_mat, na.rm = TRUE) - min(lfq_mat, na.rm = TRUE),
-              Valid.vals = length(na.omit(lfq_mat)),
-              Num.na = sum(is.na(lfq_mat)),
+              N.valid.val = length(na.omit(lfq_mat)),
+              N.na.val = sum(is.na(lfq_mat)),
               Prcnt.na = sum(is.na(lfq_mat))/length(lfq_mat)*100
               )
 }
