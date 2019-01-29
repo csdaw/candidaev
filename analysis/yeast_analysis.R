@@ -6,6 +6,8 @@
 # resulting proteinGroups.txt file used for this analysis, rows = protein groups
 
 #### Load required packages and scripts ----
+library(cluster)
+library(ComplexHeatmap)
 library(dplyr)
 library(ggplot2)
 library(limma)
@@ -135,7 +137,7 @@ plot_imputation2(expd, lfq2_both, lfq2_imp)
 #### Differential expression analysis with limma ----
 # stick imputed proteins and exclusive proteins back together
 Reduce(intersect, list(rownames(lfq2_imp), rownames(lfq2_excl))) # No duplicated rows
-lfq2_de <- rbind(lfq2_excl, lfq2_both)
+lfq2_de <- rbind(lfq2_excl, lfq2_imp)
 
 # see limma user guide section 9.2 for more info
 # create design matrix
@@ -150,10 +152,11 @@ fit_ev_cm <- contrasts.fit(fit_ev, cm)
 efit_ev <- eBayes(fit_ev_cm)
 
 # extract DE results
-result <- topTable(efit_ev, genelist = rownames(lfq2_de), number = Inf)
-
-result <- result %>%
-  mutate(sig = ifelse(adj.P.Val < 0.01 & (logFC > 1.5 | logFC < -1.5), TRUE, FALSE))
+tt <- topTable(efit_ev, sort.by = "none", number = Inf) %>%
+  as.matrix()
 
 #### Explore results ----
+result <- combine_result(lfq_de = lfq2_de, tt = tt)
+
 plot_dendro(lfq2_de)
+

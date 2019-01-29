@@ -105,3 +105,10 @@ QRILC_impute <- function(lfq_mat) {
   imp <- imputeLCMD::impute.QRILC(lfq_mat)
   imp <- imp[[1]]
 }
+
+combine_result <- function(lfq_de, tt) {
+  result <- cbind(lfq_de,
+                  tt[match(rownames(lfq_de), rownames(tt)), ],
+                  significant = tt[, "adj.P.Val"] < 0.01)
+  return(result)
+}
