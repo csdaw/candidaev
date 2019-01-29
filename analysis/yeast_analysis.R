@@ -160,3 +160,6 @@ result <- combine_result(lfq_de = lfq2_de, tt = tt)
 
 plot_dendro(lfq2_de)
 
+plot_heatmap2(result, expd, type = "centered", kmeans = TRUE, k = 6, clustering_distance = "euclidean", indicate = c("condition", "replicate"))
+
+

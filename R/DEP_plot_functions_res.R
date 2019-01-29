@@ -188,20 +188,22 @@ plot_single <- function(dep, proteins, type = c("contrast", "centered"), plot = 
 }
 
 # Internal function to get ComplexHeatmap::HeatmapAnnotation object
-get_annotation <- function(dep, indicate) {
+get_annotation2 <- function(result_mat, exd, indicate) {
   assertthat::assert_that(
-    inherits(dep, "SummarizedExperiment"),
+    is.matrix(result_mat),
+    is.data.frame(exd),
+    assert_exd(exd),
     is.character(indicate))
 
   # Check indicate columns
-  col_data <- colData(dep) %>%
-    as.data.frame()
+  col_data <- exd %>%
+    filter(ID %in% colnames(result_mat))
   columns <- colnames(col_data)
   if(all(!indicate %in% columns)) {
     stop("'",
          paste0(indicate, collapse = "' and/or '"),
          "' column(s) is/are not present in ",
-         deparse(substitute(dep)),
+         deparse(substitute(exd)),
          ".\nValid columns are: '",
          paste(columns, collapse = "', '"),
          "'.",
@@ -303,7 +305,7 @@ get_annotation <- function(dep, indicate) {
 #' plot_heatmap(dep, 'centered', kmeans = TRUE, k = 6, row_font_size = 3)
 #' plot_heatmap(dep, 'contrast', col_limit = 10, row_font_size = 3)
 #' @export
-plot_heatmap <- function(dep, type = c("contrast", "centered"),
+plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
                          kmeans = FALSE, k = 6,
                          col_limit = 6, indicate = NULL,
                          clustering_distance = c("euclidean", "maximum", "manhattan", "canberra",
@@ -315,7 +317,9 @@ plot_heatmap <- function(dep, type = c("contrast", "centered"),
   if(is.integer(col_limit)) col_limit <- as.numeric(col_limit)
   if(is.integer(row_font_size)) row_font_size <- as.numeric(row_font_size)
   if(is.integer(col_font_size)) col_font_size <- as.numeric(col_font_size)
-  assertthat::assert_that(inherits(dep, "SummarizedExperiment"),
+  assertthat::assert_that(is.matrix(result_mat),
+                          is.data.frame(exd),
+                          assert_exd(exd),
                           is.character(type),
                           is.logical(kmeans),
                           is.numeric(k),
@@ -334,25 +338,24 @@ plot_heatmap <- function(dep, type = c("contrast", "centered"),
   clustering_distance <- match.arg(clustering_distance)
 
   # Extract row and col data
-  row_data <- rowData(dep, use.names = FALSE)
-  col_data <- colData(dep) %>%
-    as.data.frame()
+  row_data <- result_mat
+  col_data <- exd
 
   # Show error if inputs do not contain required columns
   if(any(!c("label", "condition", "replicate") %in% colnames(col_data))) {
     stop(paste0("'label', 'condition' and/or 'replicate' columns are not present in '",
-                deparse(substitute(dep)), "'"),
+                deparse(substitute(exd)), "'"),
          call. = FALSE)
   }
-  if(length(grep("_diff", colnames(row_data))) < 1) {
-    stop(paste0("'[contrast]_diff' columns are not present in '",
-                deparse(substitute(dep)),
+  if(length(grep("logFC", colnames(row_data))) < 1) {
+    stop(paste0("'logFC' columns are not present in '",
+                deparse(substitute(result_mat)),
                 "'.\nRun test_diff() to obtain the required columns."),
          call. = FALSE)
   }
   if(!"significant" %in% colnames(row_data)) {
     stop(paste0("'significant' column is not present in '",
-                deparse(substitute(dep)),
+                deparse(substitute(result_mat)),
                 "'.\nRun add_rejections() to obtain the required column."),
          call. = FALSE)
   }
@@ -363,17 +366,22 @@ plot_heatmap <- function(dep, type = c("contrast", "centered"),
             call. = FALSE)
   }
   if(!is.null(indicate) & type == "centered") {
-    ha1 <- get_annotation(dep, indicate)
+    ha1 <- get_annotation2(result_mat, exd, indicate)
   } else {
     ha1 <- NULL
   }
 
   # Filter for significant proteins only
-  filtered <- dep[row_data$significant, ]
+  filtered <- result_mat %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "ID") %>%
+    filter(significant == 1) %>%
+    select(ID, matches("EV.*"), matches("W.*")) %>%
+    column_to_rownames(var = "ID")
 
   # Check for missing values
-  if(any(is.na(assay(filtered)))) {
-    warning("Missing values in '", deparse(substitute(dep)), "'. ",
+  if(any(is.na(filtered))) {
+    warning("Missing values in '", deparse(substitute(result_mat)), "'. ",
             "Using clustering_distance = 'gower'",
             call. = FALSE)
     clustering_distance <- "gower"
@@ -384,18 +392,16 @@ plot_heatmap <- function(dep, type = c("contrast", "centered"),
 
   # Get centered intensity values ('centered')
   if(type == "centered") {
-    rowData(filtered)$mean <- rowMeans(assay(filtered), na.rm = TRUE)
-    df <- assay(filtered) - rowData(filtered, use.names = FALSE)$mean
+    mn <- filtered
+    mn$mean <- rowMeans(mn, na.rm = TRUE)
+    df <- filtered - mn$mean
   }
   # Get contrast fold changes ('contrast')
   if(type == "contrast") {
-    df <- rowData(filtered, use.names = FALSE) %>%
-      data.frame() %>%
-      column_to_rownames(var = "name") %>%
-      select(ends_with("_diff"))
-    colnames(df) <-
-      gsub("_diff", "", colnames(df)) %>%
-      gsub("_vs_", " vs ", .)
+    df <- result_mat
+      as.data.frame() %>%
+      filter(significant == 1) %>%
+      select(logFC)
   }
 
   # Facultative kmeans clustering
