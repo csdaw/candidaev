@@ -10,6 +10,9 @@
 #'
 #' @examples
 clean_cgd <- function(file) {
+  if(!exists("fill blank", mode = "function")) {
+    source("R/util.R")
+  }
 
   # read input .tab file
   cgd_table <- read.delim(file,
@@ -147,28 +150,36 @@ clean_unip <- function(file) {
   # if orf column is blank, insert identifier from ol column
   unip_table <- fill_blank(unip_table, "Gene_name_orf", "Gene_name_ol")
 
-  # create a new CGDID column using info from cgd-table.txt
+  # create a new CGDID column using info from cgd-table.txt and Gene_name_ol
   cgd_table <- read.table(file = "data/clean/cgd-table.txt",
                           header = TRUE,
                           sep = "\t",
                           stringsAsFactors = FALSE)
   unip_table$CGDID2 <- as.character(cgd_table$CGDID[match(unip_table$Gene_name_ol,
-                                                          cgd_table$Feature_name)])
+                                                          cgd_table$Systematic_name)])
+
+  unip_table$CGDID3 <- as.character(cgd_table$CGDID[match(unip_table$Gene_name_orf,
+                                                          cgd_table$Systematic_name)])
 
   # fill in blanks in unip_table CGDID column
   unip_table <- fill_blank(unip_table, "CGDID", "CGDID2")
+
+  unip_table$CGDID <- as.character(unip_table$CGDID)
+
+  unip_table <- fill_na(unip_table, "CGDID", "CGDID3")
 
   # remove semicolons in CGDID column
   unip_table$CGDID <- gsub(";C", "; C", unip_table$CGDID)
 
   unip_table$CGDID <- gsub(";", "", unip_table$CGDID)
 
-  # add CGD gene name column (using CGDID for crossreference)
-  unip_table$CGD_gene_name <- as.character(cgd_table$Gene_name[match(unip_table$CGDID,
+  # add CGD gene name column (using first UniProt CGDID for crossreference)
+  unip_table$CGD_gene_name <- as.character(cgd_table$Gene_name[match(stringr::str_extract(unip_table$CGDID,
+                                                                                          "[^ ]*"),
                                                                      cgd_table$CGDID)])
 
-  # remove CGDID2, ol, orf column
-  unip_table <- within(unip_table, rm(CGDID2, Gene_name_ol, Gene_name_orf))
+  # remove CGDID2, CGDID3 ol, orf column
+  unip_table <- within(unip_table, rm(CGDID2, CGDID3, Gene_name_ol, Gene_name_orf))
 
   # rearrange columns
   unip_table <- unip_table %>%

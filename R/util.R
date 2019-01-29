@@ -5,6 +5,14 @@ fill_blank <- function(df, blank_col, fill_col) {
   return(df)
 }
 
+fill_na <- function(df, na_col, fill_col) {
+  df[[na_col]][is.na(df[[na_col]])] <- ""
+  df[[na_col]] <- factor(ifelse(df[[na_col]] == "",
+                                df[[fill_col]],
+                                df[[na_col]]))
+  return(df)
+}
+
 val_filter <- function(df, pattern, value) {
   df[apply(df[, c(grep(pattern, colnames(df)))], 1, sum) >= value, ]
 }
