@@ -120,3 +120,11 @@ combine_result <- function(lfq_de, tt) {
                   significant = tt[, "adj.P.Val"] < 0.01)
   return(result)
 }
+
+match_uniprot <- function(up_col, reftable, fill_col, match_col) {
+  stringr::str_extract_all(up_col, "[^;]+") %>%
+    lapply(., function(x) match(x, reftable[[match_col]])) %>%
+    Map("[", list(as.character(reftable[[fill_col]])), .) %>%
+    lapply(., function(x) paste(x, collapse = ";")) %>%
+    unlist()
+}

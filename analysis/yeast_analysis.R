@@ -11,6 +11,7 @@ library(ComplexHeatmap)
 library(dplyr)
 library(ggplot2)
 library(limma)
+library(stringr)
 library(tibble)
 library(tidyr)
 source("R/util.R")
@@ -158,8 +159,22 @@ tt <- topTable(efit_ev, sort.by = "none", number = Inf) %>%
 #### Explore results ----
 result <- combine_result(lfq_de = lfq2_de, tt = tt)
 
+sig <- result %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "UP_accession") %>%
+  mutate(name = match_uniprot(.[["UP_accession"]], unip_table, "CGD_gene_name", "UP_accession")) %>%
+  filter(significant == 1)
+
 plot_dendro(lfq2_de)
 
 plot_heatmap2(result, expd, type = "centered", kmeans = TRUE, k = 6, clustering_distance = "euclidean", indicate = c("condition", "replicate"))
 
+accession_interest <- result %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "accession") %>%
+  filter(AveExpr > 30) %>%
+  pull(accession)
 
+prot_interest <- match_uniprot(accession_interest, unip_table, "CGD_gene_name", "UP_accession")
+
+plot_volcano2(result, expd, unip_table, lab = prot_interest)

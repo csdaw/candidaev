@@ -547,13 +547,14 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
 #' plot_volcano(dep, 'Ubi6_vs_Ctrl', add_names = FALSE)
 #' plot_volcano(dep, 'Ubi4_vs_Ctrl', label_size = 5, add_names = TRUE)
 #' @export
-plot_volcano <- function(dep, contrast, label_size = 3,
-                         add_names = TRUE, adjusted = FALSE, plot = TRUE) {
+plot_volcano2 <- function(result_mat, exd, unip, label_size = 3,
+                         add_names = TRUE, lab = NULL, adjusted = FALSE, plot = TRUE) {
   # Show error if inputs are not the required classes
   if(is.integer(label_size)) label_size <- as.numeric(label_size)
-  assertthat::assert_that(inherits(dep, "SummarizedExperiment"),
-                          is.character(contrast),
-                          length(contrast) == 1,
+  assertthat::assert_that(is.matrix(result_mat),
+                          is.data.frame(exd),
+                          assert_exd(exd),
+                          is.data.frame(unip),
                           is.numeric(label_size),
                           length(label_size) == 1,
                           is.logical(add_names),
@@ -563,65 +564,38 @@ plot_volcano <- function(dep, contrast, label_size = 3,
                           is.logical(plot),
                           length(plot) == 1)
 
-  row_data <- rowData(dep, use.names = FALSE)
-
   # Show error if inputs do not contain required columns
-  if(any(!c("name", "ID") %in% colnames(row_data))) {
-    stop(paste0("'name' and/or 'ID' columns are not present in '",
-                deparse(substitute(dep)),
-                "'.\nRun make_unique() to obtain required columns."),
-         call. = FALSE)
-  }
-  if(length(grep("_p.adj|_diff", colnames(row_data))) < 1) {
-    stop(paste0("'[contrast]_diff' and '[contrast]_p.adj' columns are not present in '",
-                deparse(substitute(dep)),
-                "'.\nRun test_diff() to obtain the required columns."),
-         call. = FALSE)
-  }
-  if(length(grep("_significant", colnames(row_data))) < 1) {
-    stop(paste0("'[contrast]_significant' columns are not present in '",
-                deparse(substitute(dep)),
-                "'.\nRun add_rejections() to obtain the required columns."),
+  if(any(!c("logFC", "AveExpr", "t", "P.Value", "adj.P.Val", "B", "significant") %in% colnames(result_mat))) {
+    stop(paste0("'logFC', 'AveExpr', 't', 'P.Value', 'adj.P.Val', 'B', and/or 'significant'
+                columns are not present in '",
+                deparse(substitute(result_mat)),
+                "'.\nRun combine_result() to obtain required columns."),
          call. = FALSE)
   }
 
-  # Show error if an unvalid contrast is given
-  if (length(grep(paste(contrast, "_diff", sep = ""),
-                  colnames(row_data))) == 0) {
-    valid_cntrsts <- row_data %>%
-      data.frame() %>%
-      select(ends_with("_diff")) %>%
-      colnames(.) %>%
-      gsub("_diff", "", .)
-    valid_cntrsts_msg <- paste0("Valid contrasts are: '",
-                                paste0(valid_cntrsts, collapse = "', '"),
-                                "'")
-    stop("Not a valid contrast, please run `plot_volcano()` with a valid contrast as argument\n",
-         valid_cntrsts_msg,
-         call. = FALSE)
-  }
+  # Convert result_mat into correct format with gene names
+  row_data <- result_mat %>%
+    as.data.frame()
+  row_data$significant <- row_data$significant == 1
+  row_data$name <- match_uniprot(row.names(row_data), unip, "CGD_gene_name", "UP_accession")
 
   # Generate a data.frame containing all info for the volcano plot
-  diff <- grep(paste(contrast, "_diff", sep = ""),
-               colnames(row_data))
+  lfc <- grep("logFC", colnames(row_data))
   if(adjusted) {
-    p_values <- grep(paste(contrast, "_p.adj", sep = ""),
-                     colnames(row_data))
+    p_values <- grep("adj.P.Val", colnames(row_data))
   } else {
-    p_values <- grep(paste(contrast, "_p.val", sep = ""),
-                     colnames(row_data))
+    p_values <- grep("P.Value", colnames(row_data))
   }
-  signif <- grep(paste(contrast, "_significant", sep = ""),
-                 colnames(row_data))
-  df <- data.frame(x = row_data[, diff],
+  signif <- grep("significant", colnames(row_data))
+  df <- data.frame(x = row_data[, lfc],
                    y = -log10(row_data[, p_values]),
                    significant = row_data[, signif],
                    name = row_data$name) %>%
     filter(!is.na(significant)) %>%
     arrange(significant)
 
-  name1 <- gsub("_vs_.*", "", contrast)
-  name2 <- gsub(".*_vs_", "", contrast)
+  name1 <- unique(exd[["condition"]])[1]
+  name2 <- unique(exd[["condition"]])[2]
 
   # Plot volcano with or without labels
   p <- ggplot(df, aes(x, y)) +
@@ -634,13 +608,20 @@ plot_volcano <- function(dep, contrast, label_size = 3,
                                        label = c(name1, name2),
                                        size = 5,
                                        fontface = "bold")) +
-    labs(title = contrast,
+    labs(title = paste0(name1, " vs ", name2),
          x = expression(log[2]~"Fold change")) +
-    theme_DEP1() +
+    theme_bw() +
     theme(legend.position = "none") +
     scale_color_manual(values = c("TRUE" = "black", "FALSE" = "grey"))
-  if (add_names) {
-    p <- p + ggrepel::geom_text_repel(data = filter(df, significant),
+  if(add_names & length(lab) > 0) {
+    p <- p + ggrepel::geom_text_repel(data = filter(df, name %in% lab),
+                                      aes(label = name),
+                                      size = label_size,
+                                      box.padding = unit(0.1, 'lines'),
+                                      point.padding = unit(0.1, 'lines'),
+                                      segment.size = 0.5)
+  } else if(add_names & length(lab) > 0) {
+    p <- p + ggrepel::geom_text_repel(data = filter(df, significant == TRUE),
                                       aes(label = name),
                                       size = label_size,
                                       box.padding = unit(0.1, 'lines'),
