@@ -3,25 +3,39 @@ title: "Analysis"
 author: "Charlotte Dawson"
 date: "2018-01-20"
 output:
-  html_notebook: default
-  html_document:
+  html_notebook: 
     toc: true
     toc_float: true
     number_sections: true
     df_print: kable
-    code_folding: hide
   bookdown::html_document2:
     toc: true
     toc_float: true
     keep_md: true
+    df_print: kable
+# number_sections: true
+# code_folding: hide
   md_document:
     variant: markdown_github
     toc: true
     toc_float: true
 ---
 
-# This is a first level heading
+# Introduction and data description
 
+# EV characterisation
+
+# Yeast DAY286 
+
+# Biofilm DAY286
+
+# Yeast ATCC90028
+
+# Yeast ATCC10231
+
+# Comparison to previous data
+
+# EV marker protein selection
 
 
 
