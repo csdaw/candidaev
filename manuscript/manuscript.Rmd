@@ -17,6 +17,8 @@ output:
       keep_tex: no
 bibliography: references.bib
 csl: "templates/molecular-and-cellular-proteomics.csl"
+link-citations: yes
+linkcolor: blue
 fontsize: 12pt
 geometry: margin=1in
 classoption: letterpaper
@@ -71,7 +73,7 @@ The abstract goes here.
 
 # Introduction
 
-Here is a citation [@Marwick2017]
+Here is a citation [@marwick2017].
 
 # Background
 
