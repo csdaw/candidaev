@@ -137,7 +137,7 @@ b_sig <- b_result %>%
 
 plot_dendro(b_lfq_de)
 
-plot_heatmap2(b_result, b_expd, type = "centered", kmeans = TRUE, k = 6, clustering_distance = "gower", indicate = c("condition", "replicate"), na_col = "green")
+plot_heatmap2(b_result, b_expd, unip_table, kmeans = TRUE, k = 6, clustering_distance = "euclidean", indicate = c("condition", "replicate"), na_col = "green")
 
 b_accession_interest <- b_result %>%
   as.data.frame() %>%

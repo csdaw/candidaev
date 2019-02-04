@@ -187,61 +187,6 @@ plot_single <- function(dep, proteins, type = c("contrast", "centered"), plot = 
   }
 }
 
-# Internal function to get ComplexHeatmap::HeatmapAnnotation object
-get_annotation2 <- function(result_mat, exd, indicate) {
-  assertthat::assert_that(
-    is.matrix(result_mat),
-    is.data.frame(exd),
-    assert_exd(exd),
-    is.character(indicate))
-
-  # Check indicate columns
-  col_data <- exd %>%
-    filter(ID %in% colnames(result_mat))
-  columns <- colnames(col_data)
-  if(all(!indicate %in% columns)) {
-    stop("'",
-         paste0(indicate, collapse = "' and/or '"),
-         "' column(s) is/are not present in ",
-         deparse(substitute(exd)),
-         ".\nValid columns are: '",
-         paste(columns, collapse = "', '"),
-         "'.",
-         call. = FALSE)
-  }
-  if(any(!indicate %in% columns)) {
-    indicate <- indicate[indicate %in% columns]
-    warning("Only used the following indicate column(s): '",
-            paste0(indicate, collapse = "', '"),
-            "'")
-  }
-
-  # Get annotation
-  anno <- select(col_data, indicate)
-
-  # Annotation color
-  names <- colnames(anno)
-  anno_col <- vector(mode="list", length=length(names))
-  names(anno_col) <- names
-  for(i in names) {
-    var = anno[[i]] %>% unique() %>% sort()
-    if(length(var) == 1)
-      cols <- c("black")
-    if(length(var) == 2)
-      cols <- c("orangered", "cornflowerblue")
-    if(length(var) < 7 & length(var) > 2)
-      cols <- RColorBrewer::brewer.pal(length(var), "Pastel1")
-    if(length(var) > 7)
-      cols <- RColorBrewer::brewer.pal(length(var), "Set3")
-    names(cols) <- var
-    anno_col[[i]] <-  cols
-  }
-
-  # HeatmapAnnotation object
-  HeatmapAnnotation(df = anno,
-                    col = anno_col,
-                    show_annotation_name = TRUE)
-}
 
 #' Plot a heatmap
 #'
@@ -305,7 +250,7 @@ get_annotation2 <- function(result_mat, exd, indicate) {
 #' plot_heatmap(dep, 'centered', kmeans = TRUE, k = 6, row_font_size = 3)
 #' plot_heatmap(dep, 'contrast', col_limit = 10, row_font_size = 3)
 #' @export
-plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
+plot_heatmap2 <- function(result_mat, exd, unip,
                          kmeans = FALSE, k = 6,
                          col_limit = 6, indicate = NULL,
                          clustering_distance = c("euclidean", "maximum", "manhattan", "canberra",
@@ -320,7 +265,6 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
   assertthat::assert_that(is.matrix(result_mat),
                           is.data.frame(exd),
                           assert_exd(exd),
-                          is.character(type),
                           is.logical(kmeans),
                           is.numeric(k),
                           length(k) == 1,
@@ -334,8 +278,65 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
                           length(plot) == 1)
 
   # Show error if inputs do not contain required columns
-  type <- match.arg(type)
+  # Show error if unip does not contain required columns
+  #
   clustering_distance <- match.arg(clustering_distance)
+
+  # Internal function to get ComplexHeatmap::HeatmapAnnotation object
+  get_annotation2 <- function(result_mat, exd, indicate) {
+    assertthat::assert_that(
+      is.matrix(result_mat),
+      is.data.frame(exd),
+      assert_exd(exd),
+      is.character(indicate))
+
+    # Check indicate columns
+    col_data <- exd %>%
+      filter(ID %in% colnames(result_mat))
+    columns <- colnames(col_data)
+    if(all(!indicate %in% columns)) {
+      stop("'",
+           paste0(indicate, collapse = "' and/or '"),
+           "' column(s) is/are not present in ",
+           deparse(substitute(exd)),
+           ".\nValid columns are: '",
+           paste(columns, collapse = "', '"),
+           "'.",
+           call. = FALSE)
+    }
+    if(any(!indicate %in% columns)) {
+      indicate <- indicate[indicate %in% columns]
+      warning("Only used the following indicate column(s): '",
+              paste0(indicate, collapse = "', '"),
+              "'")
+    }
+
+    # Get annotation
+    anno <- select(col_data, indicate)
+
+    # Annotation color
+    names <- colnames(anno)
+    anno_col <- vector(mode="list", length=length(names))
+    names(anno_col) <- names
+    for(i in names) {
+      var = anno[[i]] %>% unique() %>% sort()
+      if(length(var) == 1)
+        cols <- c("black")
+      if(length(var) == 2)
+        cols <- c("orangered", "cornflowerblue")
+      if(length(var) < 7 & length(var) > 2)
+        cols <- RColorBrewer::brewer.pal(length(var), "Pastel1")
+      if(length(var) > 7)
+        cols <- RColorBrewer::brewer.pal(length(var), "Set3")
+      names(cols) <- var
+      anno_col[[i]] <-  cols
+    }
+
+    # HeatmapAnnotation object
+    HeatmapAnnotation(df = anno,
+                      col = anno_col,
+                      show_annotation_name = TRUE)
+  }
 
   # Extract row and col data
   row_data <- result_mat
@@ -361,11 +362,7 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
   }
 
   # Heatmap annotation
-  if(!is.null(indicate) & type == "contrast") {
-    warning("Heatmap annotation only applicable for type = 'centered'",
-            call. = FALSE)
-  }
-  if(!is.null(indicate) & type == "centered") {
+  if(!is.null(indicate)) {
     ha1 <- get_annotation2(result_mat, exd, indicate)
   } else {
     ha1 <- NULL
@@ -374,10 +371,12 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
   # Filter for significant proteins only
   filtered <- result_mat %>%
     as.data.frame() %>%
-    rownames_to_column(var = "ID") %>%
+    rownames_to_column(var = "UP_accession") %>%
+    mutate(gn = match_uniprot(.[["UP_accession"]], unip, "CGD_gene_name", "UP_accession")) %>%
+    drop_na() %>%
     filter(significant == 1) %>%
-    select(ID, matches("EV.*"), matches("W.*")) %>%
-    column_to_rownames(var = "ID")
+    select(gn, matches("EV.*"), matches("W.*")) %>%
+    column_to_rownames(var = "gn")
 
   # Check for missing values
   if(any(is.na(filtered))) {
@@ -391,18 +390,9 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
   }
 
   # Get centered intensity values ('centered')
-  if(type == "centered") {
     mn <- filtered
     mn$mean <- rowMeans(mn, na.rm = TRUE)
     df <- filtered - mn$mean
-  }
-  # Get contrast fold changes ('contrast')
-  if(type == "contrast") {
-    df <- result_mat
-      as.data.frame() %>%
-      filter(significant == 1) %>%
-      select(logFC)
-  }
 
   # Facultative kmeans clustering
   if(kmeans & obs_NA) {
@@ -413,7 +403,6 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
   if(kmeans & !obs_NA) {
     set.seed(1)
     df_kmeans <- kmeans(df, k)
-    if(type == "centered") {
       # Order the k-means clusters according to the maximum fold change
       # in all samples averaged over the proteins in the cluster
       order <- data.frame(df) %>%
@@ -425,18 +414,6 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
         pull(cluster) %>%
         match(seq_len(k), .)
       df_kmeans$cluster <- order[df_kmeans$cluster]
-    }
-    if(type == "contrast") {
-      # Order the k-means clusters according to their average fold change
-      order <- cbind(df, cluster = df_kmeans$cluster) %>%
-        gather(condition, diff, -cluster) %>%
-        group_by(cluster) %>%
-        summarize(row = mean(diff)) %>%
-        arrange(desc(row)) %>%
-        pull(cluster) %>%
-        match(seq_len(k), .)
-      df_kmeans$cluster <- order[df_kmeans$cluster]
-    }
   }
 
   if(ncol(df) == 1) {
@@ -458,9 +435,7 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
   }
 
   # Legend info
-  legend <- ifelse(type == "contrast",
-                   "log2 Fold change",
-                   "log2 Centered intensity")
+  legend <- "log2 Fold change"
 
   # Heatmap
   ht1 = Heatmap(df,
@@ -494,7 +469,7 @@ plot_heatmap2 <- function(result_mat, exd, type = c("contrast", "centered"),
       df <- cbind(df, k = df_kmeans$cluster)
     }
     df[unlist(row_order(ht1)),] %>%
-      rownames_to_column(var = "protein") %>%
+      rownames_to_column(var = "gene_name") %>%
       as.data.frame() %>%
       mutate(order = row_number())
   }
