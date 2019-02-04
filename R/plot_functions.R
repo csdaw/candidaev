@@ -4,12 +4,15 @@ plot_dendro <- function(lfq_mat) {
   plot(hc)
 }
 
-plot_venn <- function(mats, plot = TRUE, file = NULL, output = c("tiff", "png"), ...) {
-  # Supress futile logger message from VennDiagram package
+plot_venn <- function(mats, unip, plot = TRUE, file = NULL, output = c("tiff", "png"), ...) {
+  # supress futile logger message from VennDiagram package
   futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger")
 
-  # use matrix rownames for comparison
+  # extract matrix rownames (UniProt accessions) for comparison
   comparison <- mapply(rownames, mats)
+
+  # convert Uniprot accessions to gene names
+  comparison <- lapply(comparison, function(x) match_uniprot(x, unip, "CGD_gene_name", "UP_accession"))
 
   # plot venn or get venn partition lists
   if(plot == FALSE) {
@@ -22,7 +25,9 @@ plot_venn <- function(mats, plot = TRUE, file = NULL, output = c("tiff", "png"),
                               width = 800,
                               resolution = 300,
                               lty = "solid",
-                              lwd = 2)
+                              lwd = 2,
+                              ...)
+    grid.newpage()
     grid.draw(venn_plot)
   } else if(plot == TRUE & is.null(file) == FALSE) {
     venn_plot <- venn.diagram(x = comparison,
@@ -33,7 +38,8 @@ plot_venn <- function(mats, plot = TRUE, file = NULL, output = c("tiff", "png"),
                               width = 800,
                               resolution = 300,
                               lty = "solid",
-                              lwd = 2)
+                              lwd = 2,
+                              ...)
     if(output == "tiff") {
       tiff(filename = file,
            width = 800,

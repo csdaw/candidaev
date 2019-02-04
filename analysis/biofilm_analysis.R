@@ -14,6 +14,7 @@ library(limma)
 library(stringr)
 library(tibble)
 library(tidyr)
+library(VennDiagram)
 source("R/util.R")
 source("R/assert_functions.R")
 source("R/DEP_plot_functions_freq.R")
@@ -58,7 +59,7 @@ plot_numbers2(b_lfq, b_expd) # EV_5 has many more proteins than other EV samples
 
 lfq_summarise(b_lfq) # EV_1 to EV_4 have more `NA` values than valid values
 
-#### Initial filtering and normalisation ----
+#### Filtering and normalisation ----
 # filter for proteins identified in at least 4/5 replicates of EV or WCL
 b_lfq_filt <- na_filter2(b_lfq, logic = "or",
                          pattern1 = "EV.*", value1 = 1, pattern2 = "W.*", value2 = 1)
@@ -66,6 +67,11 @@ b_lfq_filt <- na_filter2(b_lfq, logic = "or",
 plot_frequency2(b_lfq_filt) # now most proteins identified in 10/10 samples
 
 plot_numbers2(b_lfq_filt, b_expd) # EV_5 now similar to other EV samples
+
+b_ev <- na_filter(b_lfq_filt, "<=", "E.*", 4)
+b_wcl <- na_filter(b_lfq_filt, "<=", "W.*", 4)
+
+plot_venn(list(ev = b_ev, w = b_wcl), unip_table, plot = TRUE, main = "Overlap of proteins in at least 1/5 reps of WCL or EV")
 
 lfq_summarise(b_lfq_filt) # Percent `NA` values reduced to ~30% for EVs and ~13% for WCL
 
@@ -85,8 +91,8 @@ plot_dendro(b_lfq_filt_norm) # Dendrogram looks good though
 lfq_summarise(b_lfq_filt_norm) # 11.3%-34.6% `NA`
 
 # should not impute with so many missing values
-# remove proteins exclusive to EV or WCL first
-b_lfq_excl <- na_filter4(b_lfq_filt_norm, "or", "EV.*", 4, "W.*", 4)
+# remove proteins with 4 or more missing values in EV or WCL
+b_lfq_noimp <- na_filter4(b_lfq_filt_norm, "or", "EV.*", 4, "W.*", 4)
 b_lfq_both <- na_filter2(b_lfq_filt_norm, "and", "EV.*", 3, "W.*", 3)
 
 # explore percentage of missing values in lfq_both
@@ -107,8 +113,8 @@ plot_imputation2(b_expd, b_lfq_both, b_lfq_imp)
 
 #### Differential expression analysis with limma ----
 # stick imputed proteins and exclusive proteins back together
-Reduce(intersect, list(rownames(b_lfq_imp), rownames(b_lfq_excl))) # No duplicated rows
-b_lfq_de <- rbind(b_lfq_excl, b_lfq_imp)
+Reduce(intersect, list(rownames(b_lfq_imp), rownames(b_lfq_noimp))) # No duplicated rows
+b_lfq_de <- rbind(b_lfq_noimp, b_lfq_imp)
 
 # see limma user guide section 9.2 for more info
 # create design matrix
@@ -145,12 +151,31 @@ b_accession_interest <- b_result %>%
   filter(AveExpr > 30) %>%
   pull(accession)
 
+
+
 b_prot_interest <- match_uniprot(b_accession_interest, unip_table, "CGD_gene_name", "UP_accession")
 
 plot_volcano2(b_result, b_expd, unip_table, lab = b_prot_interest)
 
 
+#### Output results table ----
 
+b_result_df <- b_result %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "UP_accession") %>%
+  mutate(group = case_when(significant == 0 ~ "not sig",
+                           significant == 1 & logFC > 0 ~ "ev up",
+                           significant == 1 & logFC < 0 ~ "wcl up",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(b_ev) ~ "ev ex",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(b_wcl) ~ "wcl ex"),
+         in_ev = ifelse(UP_accession %in% rownames(b_ev), TRUE, FALSE),
+         in_wcl = ifelse(UP_accession %in% rownames(b_wcl), TRUE, FALSE),
+         CGD_gene_name = match_uniprot(.[["UP_accession"]], unip_table, "CGD_gene_name", "UP_accession"),
+         Protein_name = match_uniprot(.[["UP_accession"]], unip_table, "Protein_name", "UP_accession")) %>%
+  select(UP_accession, CGD_gene_name, Protein_name, everything())
+
+table(b_result_df$group)
+table(b_result_df$in_ev)
 
 
 
