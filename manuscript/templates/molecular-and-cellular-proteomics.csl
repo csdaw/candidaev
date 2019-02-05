@@ -99,7 +99,7 @@
           <group prefix=" ">
             <group delimiter=" " suffix=", ">
               <text variable="container-title" form="short" font-style="italic" strip-periods="false"/>
-              <text variable="volume"/>
+              <text variable="volume" font-weight="bold"/>
             </group>
             <text variable="page"/>
           </group>

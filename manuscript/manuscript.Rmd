@@ -3,12 +3,12 @@ title: "**Defining protein biomarkers for *Candida albicans* extracellular vesic
 author: "*Charlotte Dawson^a^, Mark Bleackley^a^, Marilyn Anderson^a^*"
 date: "*^a^Department of Biochemistry and Genetics, La Trobe University, Victoria, Australia*"
 output: 
+    html_notebook: default
     bookdown::word_document2:
       pandoc_args:
         '--lua-filter=templates/pagebreak.lua'
       reference_docx: "templates/draft_template.docx"
       fig_caption: yes
-    html_notebook: default
     bookdown::pdf_document2:
       latex_engine: xelatex
       fig_caption: yes
@@ -67,7 +67,11 @@ EV - extracellular vesicle
 
 # Abstract
 
-The abstract goes here.
+The abstract goes here. Here is a citation [@liao2012].
+
+Here is another citation [@gil-bona2018].
+
+And another [@lin2014].
 
 \newpage
 
