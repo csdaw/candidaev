@@ -12,7 +12,7 @@ The compendium includes all the data, code, and text associated with the
 publication. It is structured as an R package to facilitate
 reproducilibity and distribution. The principles and motivations behind
 using research compendiums for academic research is detailed in [Marwick
-et al. (2017)](https://doi.org/10.1080/00031305.2017.1375986).
+et al. (2018)](https://doi.org/10.1080/00031305.2017.1375986).
 
 The R package [rrtools](https://github.com/benmarwick/rrtools) was used
 in the production of this compendium.
@@ -40,7 +40,7 @@ in the production of this compendium.
 Please cite this compendium as:
 
 > Authors, (2019). *Compendium of R code and data for ‘Title of paper’*.
-> Accessed 22 Jan 2019. Online at <https://doi.org/xxx/xxx>
+> Accessed 12 Feb 2019. Online at <https://doi.org/xxx/xxx>
 
 ### How to download or install
 

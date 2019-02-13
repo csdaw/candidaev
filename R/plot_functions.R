@@ -4,15 +4,18 @@ plot_dendro <- function(lfq_mat) {
   plot(hc)
 }
 
-plot_venn <- function(mats, unip, plot = TRUE, file = NULL, output = c("tiff", "png"), ...) {
+plot_venn <- function(vlist, use_rownames = c(TRUE, FALSE),
+                      unip = NULL, plot = TRUE, file = NULL, output = c("tiff", "png"), ...) {
   # supress futile logger message from VennDiagram package
   futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger")
 
-  # extract matrix rownames (UniProt accessions) for comparison
-  comparison <- mapply(rownames, mats)
-
-  # convert Uniprot accessions to gene names
-  comparison <- lapply(comparison, function(x) match_uniprot(x, unip, "CGD_gene_name", "UP_accession"))
+  if(use_rownames == TRUE & is.null(unip) == FALSE) {
+    # extract rownames (UniProt acessions) for comparison
+    comparison <- mapply(rownames, vlist)
+    # convert UniProt accessions to gene names
+    comparison <- lapply(comparison, function(x) match_uniprot(x, unip,
+                                                               "CGD_gene_name", "UP_accession"))
+  } else {comparison <- vlist}
 
   # plot venn or get venn partition lists
   if(plot == FALSE) {
@@ -21,24 +24,12 @@ plot_venn <- function(mats, unip, plot = TRUE, file = NULL, output = c("tiff", "
   } else if(plot == TRUE & is.null(file) == TRUE) {
     venn_plot <- venn.diagram(x = comparison,
                               filename = NULL,
-                              height = 800,
-                              width = 800,
-                              resolution = 300,
-                              lty = "solid",
-                              lwd = 2,
                               ...)
     grid.newpage()
     grid.draw(venn_plot)
   } else if(plot == TRUE & is.null(file) == FALSE) {
     venn_plot <- venn.diagram(x = comparison,
                               filename = NULL,
-                              imagetype = "tiff",
-                              compression = "lzw",
-                              height = 800,
-                              width = 800,
-                              resolution = 300,
-                              lty = "solid",
-                              lwd = 2,
                               ...)
     if(output == "tiff") {
       tiff(filename = file,

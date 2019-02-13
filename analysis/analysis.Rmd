@@ -21,6 +21,19 @@ output:
     toc_float: true
 ---
 
+```{r, setup, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  echo = FALSE,
+  comment = "#>",
+  fig.path = "../figures/"
+)
+
+library(candidaev)
+```
+
 # Introduction and data description
 
 # EV characterisation

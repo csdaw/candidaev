@@ -42,7 +42,7 @@ clean_cgd <- function(file) {
                            "Scerevisiae_orthologs")
 
   # extract orf identifiers (Feature_name) from aliases column
-  cgd_table$Feature_name <- stringr::str_extract(cgd_table$Aliases, "orf19.[0-9]+")
+  cgd_table$Feature_name <- stringr::str_extract(cgd_table$Aliases, "(orf19.[0-9.]+)|(CaalfMp[0-9]{2})")
 
   # replace blank gene names with orf identifiers
   cgd_table <- fill_blank(cgd_table, "Gene_name", "Feature_name")
@@ -154,7 +154,8 @@ clean_unip <- function(file) {
   cgd_table <- read.table(file = "data/clean/cgd-table.txt",
                           header = TRUE,
                           sep = "\t",
-                          stringsAsFactors = FALSE)
+                          stringsAsFactors = FALSE,
+                          check.names = FALSE)
   unip_table$CGDID2 <- as.character(cgd_table$CGDID[match(unip_table$Gene_name_ol,
                                                           cgd_table$Systematic_name)])
 
@@ -168,22 +169,22 @@ clean_unip <- function(file) {
 
   unip_table <- fill_na(unip_table, "CGDID", "CGDID3")
 
-  # remove semicolons in CGDID column
-  unip_table$CGDID <- gsub(";C", "; C", unip_table$CGDID)
+  # remove semicolons if there is only one CGDID in CGDID column
+  unip_table$CGDID <- gsub(";$", "", unip_table$CGDID)
 
-  unip_table$CGDID <- gsub(";", "", unip_table$CGDID)
-
-  # add CGD gene name column (using first UniProt CGDID for crossreference)
-  unip_table$CGD_gene_name <- as.character(cgd_table$Gene_name[match(stringr::str_extract(unip_table$CGDID,
-                                                                                          "[^ ]*"),
-                                                                     cgd_table$CGDID)])
+  # add some CGD columns (using UniProt CGDIDs for crossreference)
+  unip_table$CGD_gene_name <- match_uniprot(unip_table$CGDID, cgd_table, "Gene_name", "CGDID")
+  unip_table$CGD_feature_name <- match_uniprot(unip_table$CGDID, cgd_table, "Feature_name", "CGDID")
+  unip_table$CGD_systematic_name <- match_uniprot(unip_table$CGDID, cgd_table, "Systematic_name", "CGDID")
+  unip_table$CGD_description <- match_uniprot(unip_table$CGDID, cgd_table, "Description", "CGDID")
 
   # remove CGDID2, CGDID3 ol, orf column
   unip_table <- within(unip_table, rm(CGDID2, CGDID3, Gene_name_ol, Gene_name_orf))
 
   # rearrange columns
   unip_table <- unip_table %>%
-    select(UP_accession, CGDID, UP_gene_name, CGD_gene_name, everything())
+    select(UP_accession, CGDID, UP_gene_name, CGD_gene_name, CGD_feature_name,
+           CGD_systematic_name, Protein_name, CGD_description, everything())
 
   # write output .txt file
   write.table(unip_table,

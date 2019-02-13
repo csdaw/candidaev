@@ -49,7 +49,7 @@ pg <- pg_orig %>%
 pg <- pg %>%
   filter(Unique.peptides >= 2)
 
-#### Prepare LFQ data frame for initial analysis ----
+#### Prepare LFQ matrix for initial analysis ----
 lfq <- convert_lfq(pg, expd)
 
 plot_frequency2(lfq) # most proteins identified in only 1 sample
@@ -66,6 +66,7 @@ lfq_filt <- na_filter2(lfq, logic = "or",
 plot_frequency2(lfq_filt) # now most proteins identified in 8/8 samples
 
 plot_numbers2(lfq_filt, expd) # WCL_2 still has far fewer proteins than other WCL samples
+
 
 plotMDS(lfq_filt) # MDS plot shows WCL_2, WCL_3, EV_1 not clustering with other samples
 
@@ -98,6 +99,11 @@ lfq2_filt <- rbind(lfq2_filt_1, lfq2_filt_2)
 plot_frequency2(lfq2_filt) # most proteins identified in 3/6 or 6/6 samples
 
 plot_numbers2(lfq2_filt, expd) # similar intragroup protein numbers
+
+y_ev <- na_filter(lfq2_filt, "<=", "E.*", 2)
+y_wcl <- na_filter(lfq2_filt, "<=", "W.*", 2)
+
+plot_venn(list(ev = y_ev, w = y_wcl), unip_table, use_rownames = TRUE, plot = TRUE, main = "Overlap of proteins in at least 1/3 reps of WCL or EV")
 
 plotMDS(lfq2_filt) # WCL_3 outlier, try normalisation
 
@@ -147,14 +153,16 @@ design <- model.matrix( ~ 0 + T, data = samples)
 colnames(design) <- c("EV", "WCL")
 
 # make all pair-wise comparisons between EV and WCL
-cm <- makeContrasts(EV - WCL, levels = design)
+cm <- makeContrasts(ev.vs.wcl = EV - WCL, levels = design)
 fit_ev <- lmFit(lfq2_de, design = design)
 fit_ev_cm <- contrasts.fit(fit_ev, cm)
 efit_ev <- eBayes(fit_ev_cm)
 
 # extract DE results
-tt <- topTable(efit_ev, sort.by = "none", number = Inf) %>%
+tt <- topTable(efit_ev, coef = "ev.vs.wcl", sort.by = "none", number = Inf) %>%
   as.matrix()
+
+test <- topTable(efit_ev, coef = "ev.vs.wcl", sort.by = "none", number = Inf)
 
 #### Explore results ----
 result <- combine_result(lfq_de = lfq2_de, tt = tt)
@@ -167,7 +175,8 @@ sig <- result %>%
 
 plot_dendro(lfq2_de)
 
-plot_heatmap2(result, expd, type = "centered", kmeans = TRUE, k = 6, clustering_distance = "euclidean", indicate = c("condition", "replicate"))
+plot_heatmap2(result, expd, unip_table, kmeans = TRUE, k = 6, clustering_distance = "euclidean", indicate = c("condition", "replicate"),
+              na_col = "green", show_row_names = FALSE)
 
 accession_interest <- result %>%
   as.data.frame() %>%
@@ -178,3 +187,18 @@ accession_interest <- result %>%
 prot_interest <- match_uniprot(accession_interest, unip_table, "CGD_gene_name", "UP_accession")
 
 plot_volcano2(result, expd, unip_table, lab = prot_interest)
+
+#### Output results table ----
+result_df <- result %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "UP_accession") %>%
+  mutate(group = case_when(significant == 0 ~ "not sig",
+                           significant == 1 & logFC > 0 ~ "ev up",
+                           significant == 1 & logFC < 0 ~ "wcl up",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(y_ev) ~ "ev ex",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(y_wcl) ~ "wcl ex"),
+         in_ev = ifelse(UP_accession %in% rownames(y_ev), TRUE, FALSE),
+         in_wcl = ifelse(UP_accession %in% rownames(y_wcl), TRUE, FALSE),
+         CGD_gene_name = match_uniprot(.[["UP_accession"]], unip_table, "CGD_gene_name", "UP_accession"),
+         Protein_name = match_uniprot(.[["UP_accession"]], unip_table, "Protein_name", "UP_accession")) %>%
+  select(UP_accession, CGD_gene_name, Protein_name, everything())
