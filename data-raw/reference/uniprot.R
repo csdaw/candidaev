@@ -64,7 +64,7 @@ uniprot <- uniprot %>%
          CGD_description = match_id(CGDID, cgd, "CGDID", "Description")) %>%
   select(UP_accession, CGDID, UP_gene_name, CGD_gene_name, CGD_feature_name,
          CGD_systematic_name, Protein_name, CGD_description, everything(),
-         -CGDID2, CGDID3, Gene_name_ol, Gene_name_orf)
+         -CGDID2, -CGDID3, -Gene_name_ol, -Gene_name_orf)
 
 # write output .rda file
 usethis::use_data(uniprot)
