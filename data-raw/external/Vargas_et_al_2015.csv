@@ -1,0 +1,148 @@
+﻿Group_number,Protein_number,Fasta_header,Combined_peptides,Combined_spectra,XCorr_sum,S11_peptides,S11_spectra,ATCC_peptides,ATCC_spectra
+1,1,sp|P30575|ENO1_CANAL Enolase 1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ENO1 PE=1 SV=1,14,45,49.197,13,37,5,8
+1,2,tr|C4YDI1|C4YDI1_CANAW Enolase OS=Candida albicans (strain WO-1) GN=CAWG_00576 PE=3 SV=1,14,45,49.197,13,37,5,8
+2,1,sp|Q92211|G3P_CANAW Glyceraldehyde-3-phosphate dehydrogenase OS=Candida albicans (strain WO-1) GN=TDH1 PE=1 SV=2,8,35,30.986,8,23,6,12
+2,2,tr|Q5ADM7|Q5ADM7_CANAL Glyceraldehyde-3-phosphate dehydrogenase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TDH3 PE=3 SV=1,8,35,30.986,8,23,6,12
+3,1,tr|Q59XS9|Q59XS9_CANAL Potential glycosyl hydrolase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=MP65 PE=3 SV=1,8,205,38.042,7,148,6,57
+3,2,tr|C4YKR7|C4YKR7_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_06074 PE=3 SV=1,4,61,15.885,3,42,3,19
+3,3,tr|Q9HEP1|Q9HEP1_CANAX Mannoprotein MP65 OS=Candida albicans GN=mp65 PE=2 SV=1,5,124,22.634,4,84,4,40
+4,1,tr|C4YFT3|C4YFT3_CANAW Protein UTH1 OS=Candida albicans (strain WO-1) GN=CAWG_00059 PE=4 SV=1,8,69,30.336,8,44,5,25
+4,2,tr|Q5AKU5|Q5AKU5_CANAL Putative uncharacterized protein UTH1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SIM1 PE=4 SV=1,8,69,30.336,8,44,5,25
+5,1,tr|C4YGJ3|C4YGJ3_CANAW Pyruvate decarboxylase OS=Candida albicans (strain WO-1) GN=CAWG_03171 PE=3 SV=1,10,22,36.081,9,18,3,4
+5,2,sp|P83779|PDC1_CANAL Pyruvate decarboxylase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PDC11 PE=1 SV=2,10,22,36.081,9,18,3,4
+6,1,tr|Q5AKC7|Q5AKC7_CANAL Potential cell wall glucanase (Fragment) OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SCW11 PE=4 SV=1,6,19,24.371,5,7,5,12
+6,2,tr|C4YRS7|C4YRS7_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04784 PE=4 SV=1,6,19,24.371,5,7,5,12
+7,1,tr|Q5AJN2|Q5AJN2_CANAL Putative uncharacterized protein TOS1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TOS1 PE=4 SV=1,6,29,24.144,5,14,3,15
+7,2,tr|Q5AJA4|Q5AJA4_CANAL Putative uncharacterized protein TOS1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TOS1 PE=4 SV=1,6,29,24.144,5,14,3,15
+7,3,tr|C4YPT5|C4YPT5_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_02487 PE=4 SV=1,6,29,24.144,5,14,3,15
+8,1,tr|Q5AMT2|Q5AMT2_CANAL Potential glycosyl hydrolase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=BGL2 PE=3 SV=1,5,28,20.683,5,23,2,5
+8,2,tr|C4YHM1|C4YHM1_CANAW Glucan 1_3-beta-glucosidase OS=Candida albicans (strain WO-1) GN=CAWG_03569 PE=3 SV=1,5,28,20.683,5,23,2,5
+8,3,sp|P43070|BGL2_CANAX Glucan 1_3-beta-glucosidase OS=Candida albicans GN=BGL2 PE=1 SV=1,5,28,20.683,5,23,2,5
+9,1,tr|C4YJD6|C4YJD6_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_03949 PE=4 SV=1,4,44,19.988,4,42,2,2
+9,2,tr|Q5ALT5|Q5ALT5_CANAL Potential cell surface flocculin OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=MSB2 PE=4 SV=1,4,44,19.988,4,42,2,2
+10,1,tr|Q5ALY4|Q5ALY4_CANAL Phospholipase B3 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PLB4.5 PE=4 SV=1,3,7,8.958,3,5,0,0
+10,2,tr|Q5AMD3|Q5AMD3_CANAL Phospholipase B3 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PLB3 PE=4 SV=1,3,7,8.958,3,5,0,0
+10,3,tr|Q5ALY3|Q5ALY3_CANAL Phospholipase B3 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PLB4 PE=4 SV=1,2,3,6.192,2,3,0,0
+10,4,tr|C4YJ98|C4YJ98_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_03911 PE=4 SV=1,5,10,15.15,5,8,0,0
+11,1,tr|C4YHS0|C4YHS0_CANAW Fructose-bisphosphate aldolase OS=Candida albicans (strain WO-1) GN=CAWG_03619 PE=4 SV=1,5,13,20.017,5,13,0,0
+11,2,sp|Q9URB4|ALF_CANAL Fructose-bisphosphate aldolase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=FBA1 PE=1 SV=2,5,13,20.017,5,13,0,0
+12,1,tr|Q59NP5|Q59NP5_CANAL SUN family beta-glucosidase-like protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SUN41 PE=4 SV=1,5,16,14.701,5,15,0,0
+13,1,tr|C4YRS9|C4YRS9_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04786 PE=4 SV=1,3,16,13.186,3,6,2,10
+13,2,sp|P40953|CHI2_CANAL Chitinase 2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CHT2 PE=3 SV=1,3,16,13.186,3,6,2,10
+13,3,tr|Q6SYY8|Q6SYY8_CANAX Chitinase OS=Candida albicans GN=cht2 PE=4 SV=1,3,16,13.186,3,6,2,10
+13,4,tr|Q5AKT9|Q5AKT9_CANAL Chitinase Cht2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CHT2 PE=4 SV=1,3,16,13.186,3,6,2,10
+14,1,tr|C4YN32|C4YN32_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_02272 PE=4 SV=1,3,23,13.734,3,17,2,6
+14,2,sp|P40954|CHI3_CANAL Chitinase 3 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CHT3 PE=3 SV=2,3,23,13.734,3,17,2,6
+15,1,sp|O13318|PHR2_CANAL pH-responsive protein 2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PHR2 PE=2 SV=2,3,10,9.236,3,6,1,4
+15,2,tr|C4YFM5|C4YFM5_CANAW Protein EPD1 OS=Candida albicans (strain WO-1) GN=CAWG_01343 PE=4 SV=1,3,10,9.236,3,6,1,4
+16,1,tr|Q5AF30|Q5AF30_CANAL Putative uncharacterized protein (Fragment) OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CaO19.10293 PE=4 SV=1,4,6,16.49,0,0,4,6
+17,1,sp|P82612|PMGY_CANAL Phosphoglycerate mutase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=GPM1 PE=1 SV=3,2,20,9.79,2,8,2,12
+17,2,tr|C4YJS4|C4YJS4_CANAW Phosphoglycerate mutase OS=Candida albicans (strain WO-1) GN=CAWG_04094 PE=3 SV=1,2,20,9.79,2,8,2,12
+18,1,sp|P46273|PGK_CANAL Phosphoglycerate kinase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PGK1 PE=1 SV=1,4,5,10.672,4,5,0,0
+19,1,tr|C4YPV1|C4YPV1_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_02505 PE=4 SV=1,3,7,9.478,2,2,2,5
+19,2,tr|Q5AJC0|Q5AJC0_CANAL Putative uncharacterized protein UTR2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=UTR2 PE=4 SV=1,3,7,9.478,2,2,2,5
+20,1,tr|C4YFZ1|C4YFZ1_CANAW Heat shock protein SSA4 OS=Candida albicans (strain WO-1) GN=CAWG_00103 PE=3 SV=1,4,6,10.766,4,6,0,0
+20,2,sp|P41797|HSP71_CANAL Heat shock protein SSA1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SSA1 PE=1 SV=2,4,6,10.766,4,6,0,0
+20,3,sp|P46587|HSP72_CANAL Heat shock protein SSA2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SSA2 PE=1 SV=3,3,5,8.201,3,5,0,0
+20,4,tr|C4YEK6|C4YEK6_CANAW Heat shock protein SSA2 OS=Candida albicans (strain WO-1) GN=CAWG_00963 PE=3 SV=1,3,5,8.201,3,5,0,0
+21,1,sp|P87020|PRA1_CANAL pH-regulated antigen PRA1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PRA1 PE=2 SV=2,2,4,6.939,2,4,0,0
+21,2,tr|C4YGF4|C4YGF4_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_03130 PE=4 SV=1,4,7,13.172,4,7,0,0
+22,1,tr|Q5A017|Q5A017_CANAL Transaldolase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TAL1 PE=3 SV=1,3,5,10.085,3,5,0,0
+22,2,tr|C4YLJ0|C4YLJ0_CANAW Transaldolase OS=Candida albicans (strain WO-1) GN=CAWG_01708 PE=3 SV=1,3,5,10.085,3,5,0,0
+23,1,tr|Q5AF44|Q5AF44_CANAL Potential alkyl hydroperoxide reductase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=AHP1 PE=4 SV=1,3,10,12.491,3,10,0,0
+23,2,tr|C4YHK7|C4YHK7_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_03554 PE=4 SV=1,3,10,12.491,3,10,0,0
+24,1,sp|P83775|GRP2_CANAL Putative NADPH-dependent methylglyoxal reductase GRP2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=GRP2 PE=1 SV=2,2,3,7.15,2,2,1,1
+24,2,tr|C4YRG9|C4YRG9_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04668 PE=4 SV=1,2,3,7.15,2,2,1,1
+25,1,sp|Q9P940|TPIS_CANAL Triosephosphate isomerase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TPI1 PE=1 SV=3,3,6,10.614,3,6,0,0
+25,2,tr|C4YPA3|C4YPA3_CANAW Triosephosphate isomerase OS=Candida albicans (strain WO-1) GN=CAWG_03053 PE=3 SV=1,2,4,7.629,2,4,0,0
+26,1,sp|C4YMJ3|CARP2_CANAW Candidapepsin-2 OS=Candida albicans (strain WO-1) GN=SAP2 PE=1 SV=1,2,5,7.986,2,5,0,0
+27,1,sp|O94039|TKT1_CANAX Transketolase 1 OS=Candida albicans GN=TKT1 PE=3 SV=1,2,3,7.612,2,3,0,0
+27,2,tr|C4YDJ8|C4YDJ8_CANAW Transketolase OS=Candida albicans (strain WO-1) GN=CAWG_00593 PE=4 SV=1,2,3,7.612,2,3,0,0
+27,3,tr|Q5A750|Q5A750_CANAL Putative uncharacterized protein TKT1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TKL1 PE=4 SV=1,1,1,3.291,1,1,0,0
+28,1,tr|C4YEN4|C4YEN4_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_00991 PE=4 SV=1,2,4,5.152,2,4,0,0
+28,2,tr|Q59QH2|Q59QH2_CANAL Putative uncharacterized protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CSH1 PE=4 SV=1,2,4,5.152,2,4,0,0
+29,1,tr|Q59XY6|Q59XY6_CANAL Potential alpha-1_6-mannanase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CaO19.1765 PE=4 SV=1,2,7,8.615,0,0,2,7
+29,2,tr|Q59XU0|Q59XU0_CANAL Potential alpha-1_6-mannanase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CaO19.9334 PE=4 SV=1,2,7,8.615,0,0,2,7
+29,3,tr|C4YKS9|C4YKS9_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_06087 PE=4 SV=1,2,7,8.615,0,0,2,7
+30,1,tr|C4YR94|C4YR94_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04593 PE=4 SV=1,2,2,5.536,2,2,0,0
+30,2,tr|C4YR96|C4YR96_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04595 PE=4 SV=1,2,2,5.536,2,2,0,0
+30,3,tr|Q5AGU9|Q5AGU9_CANAL Putative uncharacterized protein HSP12 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=HSP12 PE=4 SV=1,2,2,5.536,2,2,0,0
+30,4,tr|Q59YM0|Q59YM0_CANAL Putative uncharacterized protein HSP12 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=HSP12 PE=4 SV=1,2,2,5.536,2,2,0,0
+31,1,tr|Q5ANB7|Q5ANB7_CANAL Likely thiamine biosynthesis enzyme OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=THI4 PE=4 SV=1,2,6,9.404,2,6,0,0
+31,2,tr|C4YNP4|C4YNP4_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_02825 PE=4 SV=1,2,6,9.404,2,6,0,0
+31,3,tr|Q8TG41|Q8TG41_CANAX THI4 enzyme OS=Candida albicans PE=4 SV=2,2,6,9.404,2,6,0,0
+32,1,sp|C4YJQ8|EF2_CANAW Elongation factor 2 OS=Candida albicans (strain WO-1) GN=EFT2 PE=3 SV=1,2,3,5.896,2,3,0,0
+32,2,sp|Q5A0M4|EF2_CANAL Elongation factor 2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=EFT2 PE=1 SV=2,2,3,5.896,2,3,0,0
+33,1,sp|Q9Y7F0|TSA1_CANAL Peroxiredoxin TSA1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TSA1 PE=2 SV=1,2,5,7.686,2,5,0,0
+33,2,tr|C4YNZ5|C4YNZ5_CANAW Peroxiredoxin TSA1 OS=Candida albicans (strain WO-1) GN=CAWG_02929 PE=4 SV=1,2,5,7.686,2,5,0,0
+34,1,tr|C4YQ30|C4YQ30_CANAW Protein SNO4 OS=Candida albicans (strain WO-1) GN=CAWG_02584 PE=4 SV=1,2,3,6.836,2,3,0,0
+34,2,tr|Q6YK78|Q6YK78_CANAX 29 kDa IgE-binging protein OS=Candida albicans PE=2 SV=1,2,3,6.836,2,3,0,0
+34,3,tr|Q5AEL7|Q5AEL7_CANAL Putative uncharacterized protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CaO19.251 PE=4 SV=1,2,3,6.836,2,3,0,0
+34,4,tr|Q5AF03|Q5AF03_CANAL Putative uncharacterized protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CaO19.7882 PE=4 SV=1,2,3,6.836,2,3,0,0
+35,1,tr|Q59SU1|Q59SU1_CANAL Secretory aspartyl proteinase SAP9p OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SAP9 PE=3 SV=1,2,2,4.198,2,2,0,0
+35,2,sp|O42779|CARP9_CANAX Candidapepsin-9 OS=Candida albicans GN=SAP9 PE=3 SV=1,2,2,4.198,2,2,0,0
+35,3,tr|C4YQE7|C4YQE7_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_02704 PE=3 SV=1,2,2,4.198,2,2,0,0
+36,1,sp|P0CY28|CARP3_CANAX Candidapepsin-3 OS=Candida albicans GN=SAP3 PE=1 SV=1,1,1,3.345,1,1,0,0
+36,2,sp|P0CY29|CARP3_CANAL Candidapepsin-3 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SAP3 PE=1 SV=1,1,1,3.345,1,1,0,0
+36,3,sp|P0DJ06|CARP2_CANAL Candidapepsin-2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SAP2 PE=1 SV=1,1,1,3.345,1,1,0,0
+36,4,tr|B8YPH9|B8YPH9_CANAX Secreted aspartyl protease (Fragment) OS=Candida albicans GN=SAP2 PE=3 SV=1,1,3,4.928,1,3,0,0
+36,5,sp|C4YNQ5|CARP3_CANAW Candidapepsin-3 OS=Candida albicans (strain WO-1) GN=SAP3 PE=1 SV=1,1,1,3.345,1,1,0,0
+36,6,sp|Q8NKF1|CARP2_CANAX Candidapepsin-2 OS=Candida albicans GN=SAP2 PE=1 SV=2,2,4,8.273,2,4,0,0
+37,1,sp|O94038|ADH2_CANAL Alcohol dehydrogenase 2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ADH2 PE=1 SV=1,1,4,5.1,1,4,0,0
+37,2,tr|C4YS13|C4YS13_CANAW Alcohol dehydrogenase I OS=Candida albicans (strain WO-1) GN=CAWG_04871 PE=3 SV=1,2,6,8.689,2,6,0,0
+37,3,tr|Q5AKI5|Q5AKI5_CANAL Putative uncharacterized protein ADH1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ADH1 PE=3 SV=1,2,6,8.689,2,6,0,0
+37,4,tr|C4YDJ7|C4YDJ7_CANAW Alcohol dehydrogenase II OS=Candida albicans (strain WO-1) GN=CAWG_00592 PE=3 SV=1,1,4,5.1,1,4,0,0
+37,5,tr|Q5AK23|Q5AK23_CANAL Putative uncharacterized protein ADH1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ADH1 PE=3 SV=1,2,6,8.689,2,6,0,0
+37,6,sp|P43067|ADH1_CANAX Alcohol dehydrogenase 1 OS=Candida albicans GN=ADH1 PE=1 SV=1,2,6,8.689,2,6,0,0
+38,1,tr|Q59XX2|Q59XX2_CANAL Potential glycosyl hydrolase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=MP65 PE=3 SV=1,2,5,5.559,0,0,2,5
+39,1,tr|C4YKB0|C4YKB0_CANAW Protein YOP1 OS=Candida albicans (strain WO-1) GN=CAWG_05907 PE=4 SV=1,2,2,6.06,2,2,0,0
+40,1,tr|C4YEJ7|C4YEJ7_CANAW Aminopeptidase 2 OS=Candida albicans (strain WO-1) GN=CAWG_00954 PE=4 SV=1,2,2,6.153,0,0,2,2
+40,2,sp|Q59KZ1|APE2_CANAL Aminopeptidase 2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=APE2 PE=1 SV=2,2,2,6.153,0,0,2,2
+41,1,tr|C4YEV7|C4YEV7_CANAW Putative uncharacterized protein (Fragment) OS=Candida albicans (strain WO-1) GN=CAWG_01065 PE=4 SV=1,2,13,8.876,0,0,2,13
+42,1,gi|10963 tr|Q9URP8|Q9URP8_CANAX Agglutinin-like protein (Fragment) OS=Candida albicans GN=ALS4 PE=4 SV=1,1,2,3.217,0,0,1,2
+42,2,gi|46 sp|O74660|ALS4_CANAX Agglutinin-like protein 4 (Fragment) OS=Candida albicans GN=ALS4 PE=4 SV=1,1,2,3.217,0,0,1,2
+42,3,gi|9070 tr|C4YSA4|C4YSA4_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04966 PE=4 SV=1,1,2,3.217,0,0,1,2
+42,4,gi|7504 tr|Q59L09|Q59L09_CANAL Agglutinin-like ALS4 protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ALS4 PE=4 SV=1,1,2,3.217,0,0,1,2
+42,5,gi|15352 tr|Q9HFX4|Q9HFX4_CANAX Agglutinin-like protein (Fragment) OS=Candida albicans PE=2 SV=1,1,2,3.217,0,0,1,2
+43,1,sp|C4YSF6|CARP1_CANAW Candidapepsin-1 OS=Candida albicans (strain WO-1) GN=SAP1 PE=1 SV=1,1,5,4.139,1,5,0,0
+43,2,sp|P0CY26|CARP1_CANAX Candidapepsin-1 OS=Candida albicans GN=SAP1 PE=1 SV=1,1,5,4.139,1,5,0,0
+43,3,sp|P0CY27|CARP1_CANAL Candidapepsin-1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SAP1 PE=1 SV=1,1,5,4.139,1,5,0,0
+44,1,sp|Q59XU5|RAS1_CANAL Ras-like protein 1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=RAS1 PE=3 SV=1,1,1,3.868,1,1,0,0
+44,2,sp|C4YKT4|RAS1_CANAW Ras-like protein 1 OS=Candida albicans (strain WO-1) GN=RAS1 PE=3 SV=1,1,1,3.868,1,1,0,0
+44,3,sp|P0CY32|RAS1_CANAX Ras-like protein 1 OS=Candida albicans GN=RAS1 PE=3 SV=1,1,1,3.868,1,1,0,0
+45,1,sp|P87222|HSP75_CANAW Heat shock protein SSB1 OS=Candida albicans (strain WO-1) GN=SSB1 PE=1 SV=2,1,1,3.145,1,1,0,0
+45,2,tr|Q5A397|Q5A397_CANAL Putative uncharacterized protein SSB1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=SSB1 PE=3 SV=1,1,1,3.145,1,1,0,0
+45,3,tr|D2J4C7|D2J4C7_CANAX Heat shock protein 70 (Fragment) OS=Candida albicans PE=2 SV=1,1,1,3.145,1,1,0,0
+46,1,tr|C4YDW6|C4YDW6_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_00714 PE=4 SV=1,1,1,3.231,1,1,0,0
+46,2,tr|Q9HFZ2|Q9HFZ2_CANAX Repressed by TUP1 protein 4 OS=Candida albicans GN=RBT4 PE=4 SV=1,1,1,3.231,1,1,0,0
+47,1,sp|O74660|ALS4_CANAX Agglutinin-like protein 4 (Fragment) OS=Candida albicans GN=ALS4 PE=4 SV=1,1,7,4.529,1,5,0,0
+47,2,tr|Q9HFX4|Q9HFX4_CANAX Agglutinin-like protein (Fragment) OS=Candida albicans PE=2 SV=1,1,7,4.529,1,5,0,0
+47,3,tr|C4YSA4|C4YSA4_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04966 PE=4 SV=1,1,7,4.529,1,5,0,0
+47,4,tr|Q9URP8|Q9URP8_CANAX Agglutinin-like protein (Fragment) OS=Candida albicans GN=ALS4 PE=4 SV=1,1,7,4.529,1,5,0,0
+47,5,tr|Q59L09|Q59L09_CANAL Agglutinin-like ALS4 protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ALS4 PE=4 SV=1,1,7,4.529,1,5,0,0
+48,1,tr|Q5AGZ7|Q5AGZ7_CANAL Likely cytosolic ribosomal protein L5 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=RPL5 PE=3 SV=1,1,1,3.179,1,1,0,0
+48,2,tr|C4YTN5|C4YTN5_CANAW 60S ribosomal protein L5 OS=Candida albicans (strain WO-1) GN=CAWG_05530 PE=3 SV=1,1,1,3.179,1,1,0,0
+48,3,tr|G1UAA6|G1UAA6_CANAX Putative uncharacterized protein CaJ7.0206 OS=Candida albicans GN=RPL5 PE=3 SV=1,1,1,3.179,1,1,0,0
+49,1,tr|Q5A9W8|Q5A9W8_CANAL Potential protein disulfide isomerase (Fragment) OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CaO19.10052 PE=4 SV=1,1,2,3.463,1,2,0,0
+49,2,tr|C4YPP7|C4YPP7_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_02448 PE=4 SV=1,1,2,3.463,1,2,0,0
+50,1,sp|Q5ACR4|OS9_CANAL Protein OS-9 homolog OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=YOS9 PE=3 SV=1,1,2,3.281,1,2,0,0
+50,2,tr|C4YN26|C4YN26_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_02266 PE=4 SV=1,1,2,3.281,1,2,0,0
+51,1,tr|Q59K68|Q59K68_CANAL Elongation factor 1-alpha OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TEF1 PE=3 SV=1,1,1,3.593,1,1,0,0
+51,2,sp|P0CY35|EF1A1_CANAL Elongation factor 1-alpha 1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TEF1 PE=3 SV=1,1,1,3.593,1,1,0,0
+51,3,tr|Q0ZID4|Q0ZID4_CANAX GTPase cytoplasmic elongation factor 1 alpha (Fragment) OS=Candida albicans GN=tef1 PE=4 SV=1,1,1,3.593,1,1,0,0
+51,4,sp|Q59QD6|EF1A2_CANAL Elongation factor 1-alpha 2 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TEF2 PE=3 SV=1,1,1,3.593,1,1,0,0
+51,5,tr|C4YDJ3|C4YDJ3_CANAW Elongation factor 1-alpha OS=Candida albicans (strain WO-1) GN=CAWG_00588 PE=3 SV=1,1,1,3.593,1,1,0,0
+52,1,tr|Q59Q33|Q59Q33_CANAL Potential cell wall protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=CIS302 PE=4 SV=1,1,2,3.312,0,0,1,2
+52,2,tr|C4YIW5|C4YIW5_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_04394 PE=4 SV=1,1,2,3.312,0,0,1,2
+53,1,sp|Q5A860|TCTP_CANAL Translationally-controlled tumor protein homolog OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=TMA19 PE=3 SV=1,1,2,3.013,1,2,0,0
+53,2,tr|C4YNI2|C4YNI2_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_01444 PE=4 SV=1,1,2,3.013,1,2,0,0
+54,1,tr|Q5AG68|Q5AG68_CANAL Nucleoside diphosphate kinase OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=YNK1 PE=3 SV=1,1,2,3.165,1,2,0,0
+54,2,tr|C4YRH0|C4YRH0_CANAW Nucleoside diphosphate kinase OS=Candida albicans (strain WO-1) GN=CAWG_04670 PE=3 SV=1,1,2,3.165,1,2,0,0
+55,1,tr|Q5AA33|Q5AA33_CANAL Putative uncharacterized protein OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=PGA45 PE=4 SV=1,1,2,4.078,1,2,0,0
+56,1,gi|11962 tr|Q5AHY6|Q5AHY6_CANAL Putative uncharacterized protein ENG1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ENG1 PE=4 SV=1,1,2,3.001,1,2,0,0
+56,2,gi|8667 tr|C4YER4|C4YER4_CANAW Putative uncharacterized protein OS=Candida albicans (strain WO-1) GN=CAWG_01022 PE=4 SV=1,1,2,3.001,1,2,0,0
+56,3,gi|8351 tr|Q5AIR7|Q5AIR7_CANAL Putative uncharacterized protein ENG1 OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=ENG1 PE=4 SV=1,1,2,3.001,1,2,0,0
+56,4,gi|1874 tr|Q9UR03|Q9UR03_CANAX Endo-1_3-beta-glucanase OS=Candida albicans GN=eng1 PE=4 SV=1,1,2,3.001,1,2,0,0
+57,1,sp|O13287|6PGD_CANAX 6-phosphogluconate dehydrogenase_ decarboxylating OS=Candida albicans GN=DOR14 PE=3 SV=1,1,2,3.348,1,2,0,0
+57,2,tr|C4YFU0|C4YFU0_CANAW 6-phosphogluconate dehydrogenase_ decarboxylating OS=Candida albicans (strain WO-1) GN=CAWG_00066 PE=3 SV=1,1,2,3.348,1,2,0,0
+57,3,tr|Q5AKV3|Q5AKV3_CANAL 6-phosphogluconate dehydrogenase_ decarboxylating OS=Candida albicans (strain SC5314 / ATCC MYA-2876) GN=GND1 PE=3 SV=1,1,2,3.348,1,2,0,0

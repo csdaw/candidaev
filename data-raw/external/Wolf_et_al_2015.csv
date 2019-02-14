@@ -1,0 +1,373 @@
+﻿Protein_name,Gene_name,WT_pep,cho1d_pep,cho1d_CHO1_pep,psd1d_psd2d_pep,psd1d_pep,psd1d_psd2d_PSD2_pep
+Acetyl-CoA hydrolase,ACH1,11,13,14,14,6,14
+Aconitase; induced in high iron,ACO1,10,14,7,14,,8
+Acetyl-CoA synthetase,ACS2,,,9,4,,
+Actin,ACT1,10,10,11,11,8,8
+Adenylosuccinate synthetase,ADE12,4,,2,6,,
+"5-Aminoimidazole-4-carboxamide ribotide transformylase, enzyme of adenine biosynthesis",ADE17,,10,9,5,,8
+Phosphoribosylaminoimadazole carboxylase,ADE2,,,,,4,
+5-Phosphoribosylformyl glycinamidine synthetase,ADE6,,6,6,,,
+Alcohol dehydrogenase,ADH1,18,14,15,19,14,17
+Alcohol dehydrogenase,ADH2,15,10,10,13,11,12
+Putative alcohol dehydrogenase,ADH5,5,6,,6,6,4
+Phosphoacetylglucosamine mutase (N-acetylglucosamine-phosphate mutase),AGM1,,3,,,,
+Alkyl hydroperoxide reductase,AHP1,4,6,2,3,4,4
+Alanyl-tRNA synthetase,ALA1,,,4,,,
+"aldehyde dehydrogenase, mitochondrial precursor, putative",ALD5,14,17,5,16,13,6
+Putative alanine transaminase,ALT1,,1,,,,
+Putative alpha-mannosidase,AMS1,,,,34,16,
+"Neutral arginine, alanine, leucine specific metallo-aminopeptidase",APE2,,8,,,,
+D-Arabinose dehydrogenase,ARA1,,,,5,,5
+Putative G4 nucleic acid binding protein,ARC1,,2,,,,
+"D-arabitol dehydrogenase, NAD-dependent (ArDH)",ARD,,,1,,,1
+ADP-ribosylation factor,ARF1,,,,,,1
+Putative ADP-ribosylation factor,ARF2,,4,2,2,2,
+Argininosuccinate synthase,ARG1,,,,,,4
+Aromatic decarboxylase,ARO10,,,,,,3
+3-deoxy-D-arabinoheptulosonate-7-phosphate synthase,ARO3,,5,3,3,,4
+3-deoxy-D-arabinoheptulosonate-7-phosphate synthase,ARO4,,3,,,,3
+Aromatic transaminase of the Ehrlich fusel oil pathway of aromatic alcohol biosynthesis,ARO8,,,6,,2,
+40S ribosomal subunit similar to G-beta subunits,ASC1,4,6,6,6,3,5
+Putative asparagine synthetase,ASN1,,,7,10,,
+"ATP alpha synthase chain, mitochondrial precursor, putative",ATP1,18,,16,16,17,
+F1 beta subunit of F1F0 ATPase complex,ATP2,16,20,16,17,12,17
+F1-ATP synthase complex subunit,ATP3,1,,,,,
+Putative F0-ATP synthase subunit 4,ATP4,4,,5,,2,
+" ATP synthase chain D, mitochondrial, putative [Candida dubliniensis]",ATP7,3,,,,4,
+"Cell wall 1,3-beta-glucosyltransferase",BGL2,,5,,3,,5
+Sole 14-3-3 protein in C. albicans,BMH1,6,6,4,3,2,6
+Putative dihydroxyacetone kinase,DAK2,,4,9,10,4,7
+Putative translation elongation factor eEF1 gamma,CAM1,7,11,,11,,
+Ornithine aminotransferase,CAR2,11,5,6,4,5,8
+Catalase,CAT1,,3,,,,5
+Major carnitine acetyl transferase,CAT2,,,,5,6,
+"Cytochrome c peroxidase, mitochondrial",CCP1,10,6,6,5,4,5
+Putative cytosolic chaperonin Cct ring complex subunit,CCT6,,,2,,,
+Cytosolic chaperonin Cct ring complex,CCT7,,,,3,,
+Pyruvate kinase,CDC19,15,16,19,16,22,16
+Putative microsomal ATPase,CDC48,12,,,7,13,7
+Multidrug transporter of ABC superfamily,CDR1,,,8,18,,
+Putative transporter of PDR subfamily of ABC family,CDR11,,,,6,,
+drug resistance protein 2,CDR2,4,,,,,
+Elongation factor 3,CEF3,9,14,19,21,13,10
+Clathrin heavy chain,CHC1,10,5,,,10,
+Citrate synthase,CIT1,7,14,5,8,15,6
+Putative cofilin,COF1,,6,,,,
+"Subunit II of cytochrome c oxidase, which is the terminal member of the mitochondrial inner membrane electron transport chain",COX2,2,3,,1,2,
+Putative cytochrome c oxidase subunit IV,COX4,,,,,4,
+Cytochrome oxidase subunit V,COX5,3,3,,2,7,
+"cytochrome c oxidase polypeptide VI, mitochondrial precursor,",COX6,4,,,1,5,
+Putative peptidyl-prolyl cis-trans isomerase,CPR6,,,2,,,
+Mitochondrial carnitine carrier protein,CRC1,,,,,3,
+exportin-1 ,CRM1,3,,6,4,,3
+Aldo-keto reductase,CSH1,,2,,,,5
+Hyphal cell wall protein,CSP37,5,6,,,,
+Peptidyl-prolyl cis-trans isomerase,CYP1,4,3,,2,,3
+"cytochrome c1, mitochondrial precursor",CYT1,,,,,2,
+Putative dihydroxyacetone kinase,DAK2-a,,,,,,5
+Predicted ATP-dependent RNA helicase,DED1,,,,5,,
+Putative tRNA-Asn synthetase,DED81,,,3,5,,
+Putative tRNA-Asp synthetase,DPS1-1,,,9,8,,7
+NADPH oxidoreductase,EBP1,,4,,,,
+Cell surface GPI-anchored protein,ECM33,9,8,7,6,6,9
+GPI-anchored protein,ECM331,,,,2,,
+Cytoplasmic glutathione S-transferase,ECM4,,5,5,,,2
+Elongation factor 1-beta,EFB1,1,,1,5,,
+Elongation Factor 2 (eEF2),EFT2,15,19,15,11,9,10
+Nascent polypeptide associated complex protein alpha subunit,EGD2,,,,,3,
+Translation initiation factor eIF4E,EIF4E,,,2,,,
+enolase,ENO1,19,18,17,15,10,19
+"Putative translation release factor 1, which interacts with stop codons and promotes release of nascent peptides from ribosomes",ERF1,,3,4,,,
+Acetyl-CoA acetyltransferase,ERG10,1,9,,5,2,
+3-hydroxy-3-methylglutaryl coenzyme A synthase,ERG13,,,2,,,
+"Putative farnesyl pyrophosphate synthetase involved in isoprenoid and sterol biosynthesis, based on similarity to S. cerevisiae Erg20p; likely to be essential for growth, based on an insertional mutagenesis strategy",ERG20,2,2,4,1,,
+Endoplasmic reticulum vesicle protein 25,ERV25,,,1,,,
+Fatty acid synthase subunit beta,FAS1,52,15,53,51,63,66
+fatty acid synthase alpha subunit,FAS2,30,9,37,34,51,52
+Fructose-bisphosphate aldolase,FBA1,14,12,9,11,14,9
+"Fructose-1,6-bisphosphatase",FBP1,8,8,5,,6,8
+Formate dehydrogenase,FDH1,,,,,,3
+Glutathione-dependent formaldehyde dehydrogenase,FDH3,3,7,,7,,8
+Putative tRNA-Phe synthetase,FRS2,,3,8,,,5
+Putative fumarate hydratase,FUM12,,6,,,,
+Uracil phosphoribosyltransferase,FUR1,,,2,,,
+Putative glutamate decarboxylase,GAD1,13,9,9,13,16,
+Gamma subunit of translation initiation factor eIF2,GCD11,,,4,,,
+Glycine decarboxylase P subunit,GCV2,,,3,6,,
+Aldo/keto reductase,GCY1,,,4,,,
+Putative Rab GDP-dissociation inhibitor,GDI1,,,,3,3,
+"Putative 1,4-glucan branching enzyme",GLC3,,,,2,,
+Putative nuclear pore complex,GLE2,,2,,,,
+Putative self-glucosylating initiator of glycogen synthesis,GLG2,,,,3,,
+Putative glucokinase,GLK1,17,21,5,12,5,15
+Putative tRNA-Gln synthetase,GLN4,,,5,8,,
+Glutathione-independent glyoxalase,GLX3,10,5,,1,1,4
+6-phosphogluconate dehydrogenase,GND1,20,24,14,14,14,21
+"glycogen phosphorylase, putative",GPH1,6,24,12,13,,14
+Phosphoglycerate mutase,GPM1,8,11,,,,
+Putative D-xylose reductase,GRE3,,,,,,2
+Methylglyoxal reductase,GRP2,11,12,4,10,6,11
+Putative tRNA-Gly synthetase,GRS1,,,,11,,
+"beta-1,3-glucan synthase catalytic subunit",GSC1,9,,,,,
+Small RAN G-protein,GSP1,2,,5,3,,4
+Glutathione S-transferase,GST3,,3,,,,
+"Glutathione S-transferase, localized to ER",GTT11,,,,,1,
+Putative GMP synthase,GUA1,2,,4,,,
+Putative glutamine-tRNA ligase,GUS1,,,8,,,
+Coproporphyrinogen III oxidase,HEM13,5,5,5,5,6,4
+Putative sphingolipid transfer protein,HET1,4,6,4,5,3,4
+Putative high-affinity MFS glucose transporter,HGT6,7,,,9,7,8
+Putative MFS glucose transporter,HGT7,,2,4,,,
+High-affinity glucose transporter of the major facilitator superfamily,HGT8,,,,,3,
+Putative histone H4,HHF1,,3,,,,
+Putative imidazole glycerol phosphate synthase,HIS7,,,3,,,
+Protein with similarity to protein kinase C inhibitor-I,HNT1,,,2,,,
+Putative homoserine dehydrogenase,HOM6,,6,4,,,2
+Putative homoserine dehydrogenase,HOM6,,,,,,2
+ heat shock protein Hsp104,HSP104,7,14,,6,11,11
+Small heat shock protein 21,HSP21,3,2,5,3,7,6
+heat shock protein 60,HSP60,14,13,13,21,19,16
+Heat shock protein SSA1,HSP70,25,21,17,28,22,23
+heat shock protein 90,HSP90,25,19,19,24,31,24
+Putative tRNA-His synthetase,HTS1,,,3,4,,
+likely hexokinase II,HXK2,10,11,7,7,9,
+Isocitrate lyase,ICL1,3,4,9,8,3,9
+Putative mitochondrial NAD-isocitrate dehydrogenase subunit 1,IDH1,,,3,3,,2
+Putative mitochondrial NAD-isocitrate dehydrogenase subunit,IDH2,,,,,,5
+Isocitrate dehydrogenase,IDP2,10,13,19,18,,14
+Putative alcohol dehydrogenase,IFE2,,2,,,,3
+Zinc-binding dehydrogenase,IFR2,1,3,2,,,4
+probable Isoleucyl-tRNA synthetase,ILS1,7,6,17,,,
+likely mitochondrial ketol-acid reductoisomerase,ILV5,6,6,9,8,7,7
+Inosine monophosphate (IMP) dehydrogenase,IMH3,,,,,2,
+ potential inositol-1-phosphate synthase,INO1,10,6,,,7,1
+Putative inorganic pyrophosphatase,IPP1,4,6,2,6,5,8
+likely HSP70/BiP chaperone,KAR2,10,11,,8,10,12
+Subtilisin-like protease (proprotein convertase),KEX2,,2,,,,4
+Putative 2-oxoglutarate dehydrogenase,KGD1,,,7,10,,
+Putative dihydrolipoamide S-succinyltransferase,KGD2,,,5,4,2,
+YEF3-subfamily ABC family protein,KRE30,3,,7,6,,
+Putative tRNA-Lys synthetase,KRS1,,,,,,5
+Mannosyltransferase,KTR4,,6,,,,
+Putative aminopeptidase yscI precursor,LAP41,,,7,17,14,
+Putative dihydrolipoamide acetyltransferase component (E2) of pyruvate dehydrogenase complex,LAT1,3,,2,4,5,
+Isopropyl malate dehydrogenase,LEU2,,3,,,,
+Putative alpha-isopropylmalate synthase,LEU42,1,3,8,8,2,7
+Putative succinate-CoA ligase beta subunit,LSC2,,,,,2,
+Eisosome component with a predicted role in endocytosis,LSP1,6,6,9,9,8,8
+Homoisocitrate dehydrogenase,LYS12,,,3,,3,
+Homocitrate synthase,LYS21,,10,,6,,
+Homocitrate synthase,LYS21,,5,,,8,
+Putative homocitrate synthase,LYS22,,8,4,,,
+Saccharopine dehydrogenase,LYS9,4,,3,5,,5
+conserved hypothetical protein,MAM33,1,,,2,7,
+NADH-cytochrome-b5 reductase,MCR1,,,5,,,4
+Mitochondrial malate dehydrogenase,MDH1,6,5,,6,6,4
+Predicted malate dehydrogenase precursor,MDH1-1,5,6,7,4,9,8
+O-acetylhomoserine O-acetylserine sulphydrylase,MET15,9,7,6,6,4,8
+Essential 5-methyltetrahydropteroyltriglutamate-homocysteine methyltransferase (cobalamin-independent methionine synthase),MET6,,20,23,18,,23
+Putative mitochondrial matrix cochaperone,MGE1,,,,,2,
+Putative mitochondrial phosphate transporter,MIR1,3,,,2,,
+Predicted mitochondrial C1-tetrahydrofolate synthase precursor,MIS11,,,11,9,,9
+ malate synthase,MLS1,10,16,13,13,14,18
+putative mannosyl transferase,MNT1,4,3,3,,,4
+Cell surface mannoprotein,MP65,,3,,2,,5
+Putative mitochondrial respiratory protein,MRF1,,4,,4,,
+Mucin family adhesin-like protein,MSB2,,,3,1,1,
+Essential HSP70 family protein,MSI3,6,6,6,7,8,
+Sphingolipid C9-methyltransferase,MTS1,,,4,3,4,
+Eukaryotic translation initiation factor 3 subunit C,NIP1,,,10,12,,
+Ortholog of S. cerevisiae Nop58,NOP5,,,5,7,,
+Putative nuclear envelope protein,NTF2,,,,,,3
+Putative flavoprotein subunit of fumarate reductase,OSM1,7,7,,7,5,9
+Putative mitochondrial fumarate reductase,OSM2,,,,,2,
+NAD(P)H oxidoreductase family protein,OYE32,,,4,,,
+Phosphoenolpyruvate carboxykinase,PCK1,10,6,,8,,9
+Putative pyruvate dehydrogenase,PDB1,3,4,6,7,6,6
+Pyruvate decarboxylase,PDC11,17,17,13,18,13,14
+Putative protein disulfide-isomerase,PDI1,,,,1,,5
+potential mitochondrial inner membrane ATP/ADP translocator,PET9,10,12,8,6,4,4
+Phosphofructokinase alpha subinit,PFK1,7,3,12,8,7,21
+ATP-dependent 6-phosphofructokinase subunit beta,PFK2,5,,12,9,,5
+Profilin,PFY1,2,,,2,,
+GPI-anchored cell surface protein,PGA4,,,,4,4,6
+GPI-anchored protein 52,PGA52,3,3,3,4,2,4
+Glucose-6-phosphate isomerase,PGI1,,12,6,,,10
+phosphoglycerate kinase,PGK1,21,20,11,15,19,17
+Ortholog of S. cerevisiae Pgm2; induced in planktonic culture,PGM2,8,9,,4,6,10
+Prohibitin 2,PHB2,,,,,3,
+Putative 4a-hydroxytetrahydrobiopterin dehydratase,PHHB,1,,,2,1,2
+Cell surface glycosidase,PHR1,5,6,,4,,8
+pH-responsive protein 2,PHR2,5,5,7,4,3,7
+possible sphingolipid long chain base sensory protein,PIL1,4,4,7,3,4,7
+GPI-anchored cell surface phospholipase B,PLB3,5,,,3,1,5
+Phospholipase B,PLB4.5,,4,,,,
+Putative glycogen synthesis initiator,PMA1,11,16,12,19,11,16
+Phosphomannose isomerase,PMI1,,2,,,,
+Phosphomannomutase,PMM1,,6,,,,
+Putative peptide:N-glycanase,PNG2,5,,5,9,,
+Similar to proliferating cell nuclear antigen (PCNA),POL30,,,,2,,
+Mitochondrial outer membrane porin,POR1,9,9,12,6,9,11
+Predicted acyl-CoA oxidase,POX1-3,,17,10,21,10,4
+"Protein with similarity to proteasomal 26S regulatory subunit of S. cerevisiae, H. sapiens, Methanobacterium thermoautotrophicum (Archaebacterium)",PR26,,,,5,4,
+Putative proteinase,PRD1,,,,8,,
+Alpha7 (C8) subunit of the 20S proteasome,PRE10,,,,4,,
+Putative proteasome beta-5 subunit,PRE2,,,,3,,
+Putative beta-1 proteasome subunit,PRE3,,,,3,,
+Alpha6 subunit of the 20S proteasome,PRE5,,,,8,5,
+Putative alpha-4 subunit of the proteasome,PRE6,2,4,3,6,7,
+Putative alpha-2_sc subunit of proteasome,PRE8,,,,8,,
+Alpha3 (C9) subunit of the 20S proteasome,PRE9,,,,7,,
+Putative translation initiation factor eIF3,PRT1,,,9,,,
+Thioredoxin peroxidase,PRX1,,3,,2,,
+Mannose-1-phosphate guanyltransferase,PSA2,5,7,4,5,5,8
+Putative flavodoxin,PST3,3,5,,3,5,2
+Alpha5 subunit of the 20S proteasome,PUP2,,,,7,3,
+Putative beta 3 subunit of the 20S proteasome,PUP3,,4,3,8,,
+Putative delta-1-pyrroline-5-carboxylate dehydrogenase,PUT2,,,,4,,
+Putative pyruvate carboxylase,PYC2,,7,7,,,5
+"Cytochrome b-c1 complex subunit 2, mitochondrial",QCR2,5,,,3,6,
+"Putative ubiquinol-cytochrome-c reductase, subunit 7",QCR7,5,,,,2,
+RAS signal transduction GTPase,RAS1,,,1,2,,
+Fluconazole-induced protein,RCT1,3,3,2,4,3,2
+Putative rho GDP dissociation inhibitor,RDI1,,3,,,,
+Putative DNA replication factor A,RFA1,,2,,3,,
+GTP-binding protein RHO1,RHO1,2,,,,,4
+"3,4-Dihydroxy-2-butanone 4-phosphate synthase",RIB3,,,,,,3
+Putative riboflavin synthase,RIB5,2,6,2,4,4,4
+Member of RNase L inhibitor (RLI) subfamily of ABC family,RLI1,,,3,7,,
+Ribonucleoside-diphosphate reductase,RNR21,4,3,,,2,6
+Putative ribonucleoside diphosphate reductase,RNR22,,4,,4,,
+Putative translation initiation factor,RPG1A,,,5,12,,
+Ribosomal protein L10,RPL10,,2,6,2,,4
+40S ribosomal subunit similar to G-beta subunits,RPL10A,,4,8,8,4,6
+Ribosomal protein,RPL11,1,,5,5,2,
+likely cytosolic ribosomal protein L12,RPL12,5,,4,4,3,5
+Ribosomal protein L14,RPL14,,2,5,1,,2
+Putative ribosomal protein,RPL15A,2,5,7,7,,6
+Ribosomal protein,RPL16A,,,,3,,2
+Ribosomal protein L17,RPL17B,5,,,3,,1
+Predicted ribosomal protein,RPL18,,,,3,,
+Ribosomal protein L19,RPL19A,2,1,5,4,1,5
+Putative 60S ribosomal protein L2,RPL2,,,2,2,,
+Ribosomal protein L20,RPL20B,,4,3,4,,3
+Ribosomal protein,RPL23A,,,,,1,
+Putative rRNA-binding ribosomal protein component of the 60S ribosomal subunit,RPL25,,,3,,,
+Putative ribosomal protein,RPL28,2,,4,4,,4
+likely cytosolic ribosomal protein L3,RPL3,4,7,11,7,1,6
+Component of the large (60S) ribosomal subunit,RPL32,,,3,,,
+Ribosomal protein,RPL35,,3,4,4,4,3
+"Putative ribosomal protein, large subunit",RPL43A,,,1,,,
+likely cytosolic ribosomal protein L4,RPL4B,6,8,7,8,6,7
+Ribosomal protein,RPL5,4,2,5,4,4,3
+"Ortholog of S. cerevisiae ribosomal subunit, Rpl6B",RPL6,4,5,1,,,
+Predicted ribosomal protein,RPL82,3,8,5,6,2,2
+Ribosomal protein L9,RPL9B,,,4,5,,7
+Putative COP9 signalosome component,RPN5,,,5,,,
+Putative ribosomal protein,RPP0,5,4,3,8,6,6
+Conserved acidic ribosomal protein,RPP1A,,,,,,1
+"Conserved acidic ribosomal protein, likely involved in regulation of translation elongation",RPP1B,,,,2,,
+Acidic ribosomal protein,RPP2A,1,1,,2,,
+40S ribosomal protein S1,RPS1,5,4,6,11,4,6
+Ribosomal protein S10,RPS10,,,,2,,
+Acidic ribosomal protein S12,RPS12,1,3,,,,
+Putative ribosomal protein of the small subunit,RPS13,,,6,6,,4
+Putative ribosomal protein of the small subunit,RPS13,,4,,,,
+Putative ribosomal protein,RPS14B,,,1,3,,
+Putative ribosomal protein,RPS15,,,,,2,
+Putative 40S ribosomal subunit,RPS16A,3,5,4,5,,7
+Predicted ribosomal protein,RPS18,3,,4,5,2,
+Putative ribosomal protein S19,RPS19A,,,1,,2,6
+Protein component of the small (40S) subunit,RPS21,3,7,4,8,1,
+Putative ribosomal protein,RPS23A,,2,,,,
+Predicted ribosomal protein,RPS24,4,5,7,4,6,6
+Ribosomal protein,RPS25B,,1,,,,
+Ribosomal protein,RPS26A,,,1,,,2
+Ribosomal protein S3,RPS3,8,10,13,9,,6
+ likely cytosolic ribosomal protein S5,RPS5,5,5,5,3,3,4
+Ribosomal protein 6A,RPS6A,,,,4,,
+Ribosomal protein S7,RPS7A,,3,6,7,3,5
+likely cytosolic ribosomal protein S8,RPS8A,2,3,4,5,,3
+Predicted ribosomal protein,RPS9B,3,,8,5,1,6
+26S proteasome regulatory subunit,RPT4,,,4,5,,5
+Putative ATPase of the 19S regulatory particle of the 26S proteasome,RPT6,,,4,,,
+Putative trancription modulator,RVB2,,,4,7,,
+Protein required for endocytosis,RVS161,4,,,5,4,
+SH3-domain- and BAR domain-containing protein involved in endocytosis,RVS167,,,,3,4,
+Fimbrin,SAC6,6,4,5,9,8,5
+S-adenosyl-L-homocysteine hydrolase,SAH1,,9,6,,2,10
+S-adenosylmethionine synthetase,SAM2,2,5,12,6,,
+Candidapepsin-9,SAP9,5,5,6,3,5,7
+Similar to RNA binding proteins,SBP1,,,3,,2,
+Proteasome subunit YC7alpha,SCL1,,,,9,,
+Putative copper transporter,SCO1,,,,,6,
+Succinate dehydrogenase,SDH12,,,3,4,6,
+Essential protein,SEC14,,6,,,,
+"Functional homolog of S. cerevisiae Sec18p, which acts in protein transport; conserved ATP binding site",SEC18,,,5,3,,
+Small GTPase of Rab family,SEC4,,4,,3,,
+Predicted enzyme of amino acid biosynthesis,SER33,,6,2,,,
+potential serine tRNA synthetase,SES1,,12,20,14,,7
+Cytoplasmic serine hydroxymethyltransferase,SHM2,,4,12,5,4,7
+Putative U3 snoRNP protein,SIK1,,5,,5,4,
+Adhesin-like protein,SIM1,1,,2,1,,
+Stationary phase protein,SNZ1,5,9,6,8,3,8
+Enzyme involved in utilization of L-sorbose,SOU1,2,3,,1,,
+Essential GDP-mannose pyrophosphorylase,SRB1,,4,7,7,1,4
+HSP70 family chaperone,SSA2,21,17,12,24,15,
+Heat shock protein SSB1,SSB1,12,11,5,12,6,15
+Heat shock protein SSC1,SSC1,10,11,11,13,19,16
+Plasma membrane t-SNARE,SSO2,,,,2,,
+ATP-dependent RNA helicase SUB2,SUB2,4,4,,,,
+Putative spermidine synthase,SUI2,,,3,,,
+Putative translation initiation factor,SUI3,,,1,,,
+Translation factor eRF3,SUP35,,,5,,,
+Putative ribosomal protein 10 of the 40S subunit,SUR7,3,,3,3,,2
+Transaldolase,TAL1,14,14,12,11,12,20
+NAD-linked glyceraldehyde-3-phosphate dehydrogenase,TDH3,17,14,17,17,14,20
+probable translation elongation factor EF-1 alpha,TEF2,13,12,14,10,9,13
+Subunit of vacuolar H+-ATPase,TFP1,4,7,,5,6,2
+Putative carboxypeptidase y inhibitor,TFS1,3,,,,,
+Putative threonyl-tRNA synthetase,THS1,,,6,7,,
+ translation initiation factor,TIF,11,11,11,1,,12
+Putative translation initiation factor,TIF5,,,4,,,
+Putative transketolase,TKL1,,17,,4,8,
+"Cell wall protein, ortholog of S. cerevisiae Tma19p",TMA19,,3,3,2,,4
+Putative mitochondrial primary import receptor,TOM20,,3,,2,,
+Putative mitochondrial import receptor subunit,TOM22,,,,1,,
+"Ortholog(s) have mitochondrion targeting sequence binding, protein channel activity and role in protein import into mitochondrial inner membrane, protein import into mitochondrial matrix",TOM70,,3,,3,2,
+Triose-phosphate isomerase,TPI1,5,5,6,5,8,8
+Predicted tryptophan synthase,TRP5,,,5,,,
+Thioredoxin,TRX1,4,5,,4,1,6
+TSA/alkyl hydroperoxide peroxidase C (AhPC) family protein,TSA1,8,8,6,8,5,7
+Tubulin alpha chain,TUB1,3,3,4,7,4,5
+Tubulin beta chain,TUB2,6,9,7,8,5,8
+Translation elongation factor TU,TUF1,,3,,6,4,4
+Transcriptional corepressor,TUP1,,4,,,,
+Putative integral membrane protein,TVP18,2,,,,,
+Putative tRNA-Tyr synthetase,TYS1,,,,8,,
+Ubiquitin-activating enzyme,UBA1,,,6,,,
+Fusion of ubiquitin with the S34 protein of the small ribosomal subunit,UBI3,3,2,3,4,,
+Upregulated by cAMP in filamentous growth,UCF1,2,2,,,,3
+Putative GABA transaminase,UGA1,,5,8,6,,
+UTP-glucose-1-phosphaturidyl transferase,UGP1,5,9,8,13,3,5
+Putative bifunctional carbamoylphosphate synthetase-aspartate transcarbamylase,URA2,,,18,,,
+Putative orotate phosphoribosyltransferase,URA5,,3,,,,5
+CTP synthase 1,URA7,,,,7,,
+Extracellular glycosidase UTR2,UTR2,3,,,,,8
+Putative GPI anchored cell wall glycosidase,UTR2,,,4,3,,5
+Putative tRNA-Val synthetase,VAS1,,,12,,,
+Predicted proton-transporting ATPase,VMA13,,,,,,2
+Vacuolar H(+)-ATPase,VMA2,5,,9,9,5,4
+H+ transporting ATPase E chain,VMA4,,3,,3,3,
+Dynamin-family GTPase-related protein,VPS1,,,,,5,
+D-xylulose reductase,XYL2,9,9,4,5,3,7
+P-loop ATPase with similarity to human OLA1 and bacterial YchF,YBN5,2,4,8,6,,3
+Putative flavodoxin,YCP4,,,,3,,
+Putative type I HSP40 co-chaperone,YDJ1,,,,4,2,
+Nitric oxide dioxygenase,YHB1,,4,4,,,9
+Putative protein of the vacuolar SNARE complex,YKT6,,6,,2,,
+Nucleoside diphosphate kinase (NDP kinase),YNK1,,,4,,,4
+"Functional homolog of S. cerevisiae Ypt1p, which is an essential small Ras-type GTPase involved in protein secretion at ER-to-Golgi",YPT1,,,,4,,
+Ribosome-associated protein,YST1,,,2,,,4
+Secreted yeast wall protein,YWP1,,,1,3,,
+Glucose-6-phosphate dehydrogenase,ZWF1,,6,,,,5
