@@ -1,0 +1,28 @@
+#' Plot dendrogram
+#'
+#' Plot a dendrogram based on heirarchical clustering using "Gower's distance"
+#' which allows for the presence of \code{NA} in the data set.
+#'
+#' Uses the \code{\link{daisy}} function from the \link{cluster} package.
+#'
+#' According to the \code{\link{daisy}} documentation, "missing values in a row of x
+#' are not included in the dissimilarities involving that row."
+#'
+#' @param mat numeric matrix or data frame: \code{NA} are allowed
+#'
+#' @return A dendrogram plot
+#'
+#' @examples
+#' # make a numeric matrix
+#' mat1 <- matrix(c(1,12,4, 2,13,3), nrow = 2, ncol = 3, byrow = TRUE,
+#' dimnames = list(c("row1", "row2"), c("C.1", "C.2", "C.3")))
+#'
+#' # plot a dendrogram
+#' plot_dendro(mat1)
+#'
+#' @export
+plot_dendro <- function(mat) {
+  dis <- cluster::daisy(t(mat), metric = "gower")
+  hc <- hclust(dis)
+  plot(hc)
+}

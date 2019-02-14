@@ -1,56 +1,84 @@
-plot_dendro <- function(lfq_mat) {
-  dis <- cluster::daisy(t(lfq_mat), metric = "gower")
-  hc <- hclust(dis)
-  plot(hc)
-}
-
-plot_venn <- function(vlist, use_rownames = c(TRUE, FALSE),
-                      unip = NULL, plot = TRUE, file = NULL, output = c("tiff", "png"), ...) {
+#' Title
+#'
+#' @param vlist
+#' @param use_uniprot
+#' @param plot
+#' @param file
+#' @param output
+#' @param ...
+#'
+#' @return
+#'
+#' @examples
+#' # make two data frames
+#' v1 <- data.frame(colour = c("green", "red", "blue"), level = c(60, 50, 45))
+#'
+#' v2 <- data.frame(colour = c("purple", "green", "pink"), level = c(10, 13, 22))
+#'
+#' # make list of vectors to compare
+#' comp <- list(c1 = v1$colour, c2 = v2$colour)
+#'
+#'
+#' # plot venn diagram
+#' plot_venn(vlist = comp)
+#'
+#' # plot venn diagram and save as png
+#' plot_venn(vlist = comp, file = "my_venn.png", output = "png")
+#'
+#' # don't plot venn but get venn partitions
+#' part <- plot_venn(vlist = comp, plot = FALSE)
+#'
+#' @export
+plot_venn <- function(vlist, use_uniprot = FALSE, plot = TRUE,
+                      file = NULL, output = c("tiff", "png"), output_dim = c(1000, 1000),
+                      output_res = 300, output_units = "px",
+                      output_pts = 14, ...) {
   # supress futile logger message from VennDiagram package
   futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger")
 
-  if(use_rownames == TRUE & is.null(unip) == FALSE) {
+  if(use_uniprot == TRUE) {
     # extract rownames (UniProt acessions) for comparison
     comparison <- mapply(rownames, vlist)
     # convert UniProt accessions to gene names
-    comparison <- lapply(comparison, function(x) match_uniprot(x, unip,
-                                                               "CGD_gene_name", "UP_accession"))
+    comparison <- lapply(comparison, function(x) match_id(x, uniprot,
+                                                          "UP_accession", "CGD_gene_name"))
   } else {comparison <- vlist}
 
-  # plot venn or get venn partition lists
-  if(plot == FALSE) {
-    venn <- get.venn.partitions(comparison)
-    return(venn)
-  } else if(plot == TRUE & is.null(file) == TRUE) {
-    venn_plot <- venn.diagram(x = comparison,
-                              filename = NULL,
-                              ...)
-    grid.newpage()
-    grid.draw(venn_plot)
-  } else if(plot == TRUE & is.null(file) == FALSE) {
-    venn_plot <- venn.diagram(x = comparison,
-                              filename = NULL,
-                              ...)
+  # plot venn in R, plot venn and save file, or get venn partition lists
+  if(plot == TRUE & is.null(file) == FALSE) {
+    venn_plot <- VennDiagram::venn.diagram(x = comparison,
+                                           filename = NULL, ...)
     if(output == "tiff") {
       tiff(filename = file,
-           width = 800,
-           height = 800,
-           res = 300,
-           units = "px",
-           pointsize = 12,
+           width = output_dim[1],
+           height = output_dim[2],
+           res = output_res,
+           units = output_units,
+           pointsize = output_pts,
+           family = "sans",
            type = "cairo",
            compression = "lzw")
-      grid.draw(venn_plot)
+      grid::grid.draw(venn_plot)
       dev.off()
     } else if (output == "png") {
       png(filename = file,
-          width = 800,
-          height = 800,
-          res = 300,
-          units = "px",
+          width = output_dim[1],
+          height = output_dim[2],
+          res = output_res,
+          units = output_units,
+          pointsize = output_pts,
+          family = "sans",
           type = "cairo")
-      grid.draw(venn_plot)
+      grid::grid.draw(venn_plot)
       dev.off()
     }
+  } else if(plot == TRUE & is.null(file) == TRUE) {
+    venn_plot <- VennDiagram::venn.diagram(x = comparison,
+                                           filename = NULL, ...)
+    grid::grid.newpage()
+    grid::grid.draw(venn_plot)
+  } else if(plot == FALSE) {
+    venn <- VennDiagram::get.venn.partitions(comparison)
+    return(venn)
   }
 }
