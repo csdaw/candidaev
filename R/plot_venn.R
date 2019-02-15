@@ -1,13 +1,27 @@
 #' Title
 #'
-#' @param vlist
-#' @param use_uniprot
-#' @param plot
-#' @param file
-#' @param output
-#' @param ...
 #'
-#' @return
+#' @param vlist Description
+#'
+#' @param use_uniprot Description
+#'
+#' @param plot Description
+#'
+#' @param file Description
+#'
+#' @param output Description
+#'
+#' @param output_dim Description
+#'
+#' @param output_res Description
+#'
+#' @param output_units Description
+#'
+#' @param output_pts Description
+#'
+#' @param ... Description
+#'
+#' @return Description
 #'
 #' @examples
 #' # make two data frames
@@ -28,6 +42,7 @@
 #' # don't plot venn but get venn partitions
 #' part <- plot_venn(vlist = comp, plot = FALSE)
 #'
+#' @importFrom grDevices dev.off png tiff
 #' @export
 plot_venn <- function(vlist, use_uniprot = FALSE, plot = TRUE,
                       file = NULL, output = c("tiff", "png"), output_dim = c(1000, 1000),
@@ -40,7 +55,7 @@ plot_venn <- function(vlist, use_uniprot = FALSE, plot = TRUE,
     # extract rownames (UniProt acessions) for comparison
     comparison <- mapply(rownames, vlist)
     # convert UniProt accessions to gene names
-    comparison <- lapply(comparison, function(x) match_id(x, uniprot,
+    comparison <- lapply(comparison, function(x) match_id(x, candidaev::uniprot,
                                                           "UP_accession", "CGD_gene_name"))
   } else {comparison <- vlist}
 

@@ -5,11 +5,11 @@
 #' the same data frame.
 #'
 #' Essentially \code{fill_na} converts all \code{NA} in a character column to ""
-#' then uses \code{\link{fill_blank()}} to fill in with values from
+#' then uses \code{\link{fill_blank}} to fill in with values from
 #' another character column in the same data frame.
 #'
 #' @param df Data frame
-#' @param blank_col Data frame character column containing \code{NA}
+#' @param na_col Data frame character column containing \code{NA}
 #' @param fill_col Data frame column containing strings to replace \code{NA}
 #'
 #' @return \code{df} with \code{NA} in a specific character column filled

@@ -1,6 +1,11 @@
+^data-raw$
+^vignettes/README\.Rmd$
+^vignettes/README\.md$
+^R/README\.md$
+^R/README\.Rmd$
 ^LICENSE\.md$
 ^candidaev\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^README-.*\.png$
-data-raw/
+

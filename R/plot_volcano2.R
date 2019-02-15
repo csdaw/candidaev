@@ -2,15 +2,18 @@
 #'
 #' \code{plot_volcano} generates a volcano plot for a specified contrast.
 #'
-#' @param dep SummarizedExperiment,
+#' @param mat SummarizedExperiment,
 #' Data object for which differentially enriched proteins are annotated
-#' (output from \code{\link{test_diff}()} and \code{\link{add_rejections}()}).
-#' @param contrast Character(1),
+#' (output from \code{test_diff()} and \code{add_rejections()}).
+#' @param exd Character(1),
 #' Specifies the contrast to plot.
+#' @param unip Description.
 #' @param label_size Integer(1),
 #' Sets the size of name labels.
 #' @param add_names Logical(1),
 #' Whether or not to plot names.
+#' @param lab Description
+#' Description
 #' @param adjusted Logical(1),
 #' Whether or not to use adjusted p values.
 #' @param plot Logical(1),
@@ -45,11 +48,11 @@
 #' plot_volcano(dep, 'Ubi6_vs_Ctrl', add_names = FALSE)
 #' plot_volcano(dep, 'Ubi4_vs_Ctrl', label_size = 5, add_names = TRUE)
 #' @export
-plot_volcano2 <- function(result_mat, exd, unip, label_size = 3,
+plot_volcano2 <- function(mat, exd, unip, label_size = 3,
                           add_names = TRUE, lab = NULL, adjusted = FALSE, plot = TRUE) {
   # Show error if inputs are not the required classes
   if(is.integer(label_size)) label_size <- as.numeric(label_size)
-  assertthat::assert_that(is.matrix(result_mat),
+  assertthat::assert_that(is.matrix(mat),
                           is.data.frame(exd),
                           assert_exd(exd),
                           is.data.frame(unip),
@@ -63,19 +66,19 @@ plot_volcano2 <- function(result_mat, exd, unip, label_size = 3,
                           length(plot) == 1)
 
   # Show error if inputs do not contain required columns
-  if(any(!c("logFC", "AveExpr", "t", "P.Value", "adj.P.Val", "B", "significant") %in% colnames(result_mat))) {
+  if(any(!c("logFC", "AveExpr", "t", "P.Value", "adj.P.Val", "B", "significant") %in% colnames(mat))) {
     stop(paste0("'logFC', 'AveExpr', 't', 'P.Value', 'adj.P.Val', 'B', and/or 'significant'
                 columns are not present in '",
-                deparse(substitute(result_mat)),
+                deparse(substitute(mat)),
                 "'.\nRun combine_result() to obtain required columns."),
          call. = FALSE)
   }
 
-  # Convert result_mat into correct format with gene names
-  row_data <- result_mat %>%
+  # Convert mat into correct format with gene names
+  row_data <- mat %>%
     as.data.frame()
   row_data$significant <- row_data$significant == 1
-  row_data$name <- match_uniprot(row.names(row_data), unip, "CGD_gene_name", "UP_accession")
+  row_data$name <- match_id(row.names(row_data), unip, "UP_accession", "CGD_gene_name")
 
   # Generate a data.frame containing all info for the volcano plot
   lfc <- grep("logFC", colnames(row_data))
@@ -89,14 +92,14 @@ plot_volcano2 <- function(result_mat, exd, unip, label_size = 3,
                    y = -log10(row_data[, p_values]),
                    significant = row_data[, signif],
                    name = row_data$name) %>%
-    filter(!is.na(significant)) %>%
-    arrange(significant)
+    dplyr::filter(!is.na(significant)) %>%
+    dplyr::arrange(significant)
 
   name1 <- unique(exd[["condition"]])[1]
   name2 <- unique(exd[["condition"]])[2]
 
   # Plot volcano with or without labels
-  p <- ggplot(df, aes(x, y)) +
+  p <- ggplot2::ggplot(df, aes(x, y)) +
     geom_vline(xintercept = 0) +
     geom_point(aes(col = significant)) +
     geom_text(data = data.frame(), aes(x = c(Inf, -Inf),
@@ -112,18 +115,18 @@ plot_volcano2 <- function(result_mat, exd, unip, label_size = 3,
     theme(legend.position = "none") +
     scale_color_manual(values = c("TRUE" = "black", "FALSE" = "grey"))
   if(add_names & length(lab) > 0) {
-    p <- p + ggrepel::geom_text_repel(data = filter(df, name %in% lab),
+    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(df, name %in% lab),
                                       aes(label = name),
                                       size = label_size,
-                                      box.padding = unit(0.1, 'lines'),
-                                      point.padding = unit(0.1, 'lines'),
+                                      box.padding = grid::unit(0.1, 'lines'),
+                                      point.padding = grid::unit(0.1, 'lines'),
                                       segment.size = 0.5)
   } else if(add_names & length(lab) > 0) {
-    p <- p + ggrepel::geom_text_repel(data = filter(df, significant == TRUE),
+    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(df, significant == TRUE),
                                       aes(label = name),
                                       size = label_size,
-                                      box.padding = unit(0.1, 'lines'),
-                                      point.padding = unit(0.1, 'lines'),
+                                      box.padding = grid::unit(0.1, 'lines'),
+                                      point.padding = grid::unit(0.1, 'lines'),
                                       segment.size = 0.5)
   }
   if(adjusted) {
@@ -135,8 +138,8 @@ plot_volcano2 <- function(result_mat, exd, unip, label_size = 3,
     return(p)
   } else {
     df <- df %>%
-      select(name, x, y, significant) %>%
-      arrange(desc(x))
+      dplyr::select(name, x, y, significant) %>%
+      dplyr::arrange(dplyr::desc(x))
     colnames(df)[c(1,2,3)] <- c("protein", "log2_fold_change", "p_value_-log10")
     if(adjusted) {
       colnames(df)[3] <- "adjusted_p_value_-log10"

@@ -1,14 +1,20 @@
 #' Title
 #'
-#' @param data
-#' @param op
-#' @param pat
-#' @param val
+#' @param data Description
 #'
-#' @return
+#' @param op Description
+#'
+#' @param pat Description
+#'
+#' @param val Description
+#'
+#' @return Returns x
+#'
 #' @export
 #'
 #' @examples
+#' # example
+#'
 filter_val <- function(data, op = c("==", "<=", ">="), pat, val) {
   # refer to operator by name
   op <- as.name(op)

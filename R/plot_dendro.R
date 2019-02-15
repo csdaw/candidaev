@@ -20,9 +20,10 @@
 #' # plot a dendrogram
 #' plot_dendro(mat1)
 #'
+#' @importFrom graphics plot
 #' @export
 plot_dendro <- function(mat) {
   dis <- cluster::daisy(t(mat), metric = "gower")
-  hc <- hclust(dis)
+  hc <- stats::hclust(dis)
   plot(hc)
 }

@@ -2,13 +2,14 @@
 #'
 #' \code{plot_heatmap} generates a heatmap of all significant proteins.
 #'
-#' @param dep SummarizedExperiment,
+#' @param mat SummarizedExperiment,
 #' Data object for which differentially enriched proteins are annotated
-#' (output from \code{\link{test_diff}()} and \code{\link{add_rejections}()}).
-#' @param type 'contrast' or 'centered',
+#' (output from \code{test_diff()} and \code{add_rejections()}).
+#' @param exd 'contrast' or 'centered',
 #' The type of data scaling used for plotting.
 #' Either the fold change ('contrast') or
 #' the centered log2-intensity ('centered').
+#' @param unip Description.
 #' @param kmeans Logical(1),
 #' Whether or not to perform k-means clustering.
 #' @param k Integer(1),
@@ -60,7 +61,7 @@
 #' plot_heatmap(dep, 'centered', kmeans = TRUE, k = 6, row_font_size = 3)
 #' plot_heatmap(dep, 'contrast', col_limit = 10, row_font_size = 3)
 #' @export
-plot_heatmap2 <- function(result_mat, exd, unip,
+plot_heatmap2 <- function(mat, exd, unip,
                           kmeans = FALSE, k = 6,
                           col_limit = 6, indicate = NULL,
                           clustering_distance = c("euclidean", "maximum", "manhattan", "canberra",
@@ -72,7 +73,7 @@ plot_heatmap2 <- function(result_mat, exd, unip,
   if(is.integer(col_limit)) col_limit <- as.numeric(col_limit)
   if(is.integer(row_font_size)) row_font_size <- as.numeric(row_font_size)
   if(is.integer(col_font_size)) col_font_size <- as.numeric(col_font_size)
-  assertthat::assert_that(is.matrix(result_mat),
+  assertthat::assert_that(is.matrix(mat),
                           is.data.frame(exd),
                           assert_exd(exd),
                           is.logical(kmeans),
@@ -93,16 +94,16 @@ plot_heatmap2 <- function(result_mat, exd, unip,
   clustering_distance <- match.arg(clustering_distance)
 
   # Internal function to get ComplexHeatmap::HeatmapAnnotation object
-  get_annotation2 <- function(result_mat, exd, indicate) {
+  get_annotation2 <- function(mat, exd, indicate) {
     assertthat::assert_that(
-      is.matrix(result_mat),
+      is.matrix(mat),
       is.data.frame(exd),
       assert_exd(exd),
       is.character(indicate))
 
     # Check indicate columns
     col_data <- exd %>%
-      filter(ID %in% colnames(result_mat))
+      dplyr::filter(ID %in% colnames(mat))
     columns <- colnames(col_data)
     if(all(!indicate %in% columns)) {
       stop("'",
@@ -122,7 +123,7 @@ plot_heatmap2 <- function(result_mat, exd, unip,
     }
 
     # Get annotation
-    anno <- select(col_data, indicate)
+    anno <- dplyr::select(col_data, indicate)
 
     # Annotation color
     names <- colnames(anno)
@@ -143,13 +144,13 @@ plot_heatmap2 <- function(result_mat, exd, unip,
     }
 
     # HeatmapAnnotation object
-    HeatmapAnnotation(df = anno,
-                      col = anno_col,
-                      show_annotation_name = TRUE)
+    ComplexHeatmap::HeatmapAnnotation(df = anno,
+                                      col = anno_col,
+                                      show_annotation_name = TRUE)
   }
 
   # Extract row and col data
-  row_data <- result_mat
+  row_data <- mat
   col_data <- exd
 
   # Show error if inputs do not contain required columns
@@ -160,37 +161,37 @@ plot_heatmap2 <- function(result_mat, exd, unip,
   }
   if(length(grep("logFC", colnames(row_data))) < 1) {
     stop(paste0("'logFC' columns are not present in '",
-                deparse(substitute(result_mat)),
+                deparse(substitute(mat)),
                 "'.\nRun test_diff() to obtain the required columns."),
          call. = FALSE)
   }
   if(!"significant" %in% colnames(row_data)) {
     stop(paste0("'significant' column is not present in '",
-                deparse(substitute(result_mat)),
+                deparse(substitute(mat)),
                 "'.\nRun add_rejections() to obtain the required column."),
          call. = FALSE)
   }
 
   # Heatmap annotation
   if(!is.null(indicate)) {
-    ha1 <- get_annotation2(result_mat, exd, indicate)
+    ha1 <- get_annotation2(mat, exd, indicate)
   } else {
     ha1 <- NULL
   }
 
   # Filter for significant proteins only
-  filtered <- result_mat %>%
+  filtered <- mat %>%
     as.data.frame() %>%
-    rownames_to_column(var = "UP_accession") %>%
-    mutate(gn = match_uniprot(.[["UP_accession"]], unip, "CGD_gene_name", "UP_accession")) %>%
-    drop_na() %>%
-    filter(significant == 1) %>%
-    select(gn, matches("EV.*"), matches("W.*")) %>%
-    column_to_rownames(var = "gn")
+    tibble::rownames_to_column(var = "UP_accession") %>%
+    dplyr::mutate(gn = match_id(.[["UP_accession"]], unip, "UP_accession", "CGD_gene_name")) %>%
+    tidyr::drop_na() %>%
+    dplyr::filter(significant == 1) %>%
+    dplyr::select(gn, dplyr::matches("EV.*"), dplyr::matches("W.*")) %>%
+    tibble::column_to_rownames(var = "gn")
 
   # Check for missing values
   if(any(is.na(filtered))) {
-    warning("Missing values in '", deparse(substitute(result_mat)), "'. ",
+    warning("Missing values in '", deparse(substitute(mat)), "'. ",
             "Using clustering_distance = 'gower'",
             call. = FALSE)
     clustering_distance <- "gower"
@@ -217,11 +218,11 @@ plot_heatmap2 <- function(result_mat, exd, unip,
     # in all samples averaged over the proteins in the cluster
     order <- data.frame(df) %>%
       cbind(., cluster = df_kmeans$cluster) %>%
-      mutate(row = apply(.[, seq_len(ncol(.) - 1)], 1, function(x) max(x))) %>%
-      group_by(cluster) %>%
-      summarize(index = sum(row)/n()) %>%
-      arrange(desc(index)) %>%
-      pull(cluster) %>%
+      dplyr::mutate(row = apply(.[, seq_len(ncol(.) - 1)], 1, function(x) max(x))) %>%
+      dplyr::group_by(cluster) %>%
+      dplyr::summarise(index = sum(row)/dplyr::n()) %>%
+      dplyr::arrange(dplyr::desc(index)) %>%
+      dplyr::pull(cluster) %>%
       match(seq_len(k), .)
     df_kmeans$cluster <- order[df_kmeans$cluster]
   }
@@ -248,39 +249,39 @@ plot_heatmap2 <- function(result_mat, exd, unip,
   legend <- "log2 Fold change"
 
   # Heatmap
-  ht1 = Heatmap(df,
-                col = circlize::colorRamp2(
-                  seq(-col_limit, col_limit, (col_limit/5)),
-                  rev(RColorBrewer::brewer.pal(11, "RdBu"))),
-                split = if(kmeans) {df_kmeans$cluster} else {NULL},
-                cluster_rows = col_clust,
-                cluster_columns = row_clust,
-                row_names_side = "left",
-                column_names_side = "top",
-                clustering_distance_rows = clustering_distance,
-                clustering_distance_columns = clustering_distance,
-                heatmap_legend_param = list(color_bar = "continuous",
-                                            legend_direction = "horizontal",
-                                            legend_width = unit(5, "cm"),
-                                            title_position = "lefttop"),
-                name = legend,
-                row_names_gp = gpar(fontsize = row_font_size),
-                column_names_gp = gpar(fontsize = col_font_size),
-                top_annotation = ha1,
+  ht1 = ComplexHeatmap::Heatmap(df,
+                                col = circlize::colorRamp2(
+                                  seq(-col_limit, col_limit, (col_limit/5)),
+                                  rev(RColorBrewer::brewer.pal(11, "RdBu"))),
+                                split = if(kmeans) {df_kmeans$cluster} else {NULL},
+                                cluster_rows = col_clust,
+                                cluster_columns = row_clust,
+                                row_names_side = "left",
+                                column_names_side = "top",
+                                clustering_distance_rows = clustering_distance,
+                                clustering_distance_columns = clustering_distance,
+                                heatmap_legend_param = list(color_bar = "continuous",
+                                                            legend_direction = "horizontal",
+                                                            legend_width = grid::unit(5, "cm"),
+                                                            title_position = "lefttop"),
+                                name = legend,
+                                row_names_gp = grid::gpar(fontsize = row_font_size),
+                                column_names_gp = grid::gpar(fontsize = col_font_size),
+                                top_annotation = ha1,
                 ...)
   if(plot) {
     # Plot
-    draw(ht1, heatmap_legend_side = "top")
+    ComplexHeatmap::draw(ht1, heatmap_legend_side = "top")
   } else {
     # Return data.frame
     colnames(df) <- gsub(" ", "_", colnames(df))
-    df <- df[, unlist(column_order(ht1))]
+    df <- df[, unlist(ComplexHeatmap::column_order(ht1))]
     if(kmeans) {
       df <- cbind(df, k = df_kmeans$cluster)
     }
-    df[unlist(row_order(ht1)),] %>%
-      rownames_to_column(var = "gene_name") %>%
+    df[unlist(ComplexHeatmap::row_order(ht1)),] %>%
+      tibble::rownames_to_column(var = "gene_name") %>%
       as.data.frame() %>%
-      mutate(order = row_number())
+      dplyr::mutate(order = dplyr::row_number())
   }
 }

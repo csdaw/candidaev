@@ -3,7 +3,7 @@
 #' \code{plot_coverage} generates a barplot
 #' of the protein coverage in all samples.
 #'
-#' @param se SummarizedExperiment,
+#' @param mat SummarizedExperiment,
 #' Data object for which to plot observation frequency.
 #' @param plot Logical(1),
 #' If \code{TRUE} (default) the barplot is produced.
@@ -26,27 +26,27 @@
 #' filt <- filter_missval(se, thr = 0)
 #' plot_coverage(filt)
 #' @export
-plot_coverage2 <- function(lfq_mat, plot = TRUE) {
+plot_coverage2 <- function(mat, plot = TRUE) {
   # Show error if input is not the required classes
-  assertthat::assert_that(is.matrix(lfq_mat),
+  assertthat::assert_that(is.matrix(mat),
                           is.logical(plot),
                           length(plot) == 1)
 
   # Make a binary long data.frame (1 = valid value, 0 = missing value)
-  df <- lfq_mat %>%
+  df <- mat %>%
     data.frame() %>%
-    rownames_to_column() %>%
-    gather(ID, bin, -rowname) %>%
-    mutate(bin = ifelse(is.na(bin), 0, 1))
+    tibble::rownames_to_column() %>%
+    tidyr::gather(ID, bin, -rowname) %>%
+    dplyr::mutate(bin = ifelse(is.na(bin), 0, 1))
   # Identify the number of experiments a protein was observed
   stat <- df %>%
-    group_by(rowname) %>%
-    summarize(sum = sum(bin))
+    dplyr::group_by(rowname) %>%
+    dplyr::summarise(sum = sum(bin))
   # Get the frequency of the number of experiments proteins were observerd
   # and plot the cumulative sum of these numbers
   table <- table(stat$sum) %>%
     data.frame()
-  p <- ggplot(table, aes(x = "all", y = Freq, fill = Var1)) +
+  p <- ggplot2::ggplot(table, aes(x = "all", y = Freq, fill = Var1)) +
     geom_col(col = "white") +
     scale_fill_grey(start = 0.8, end = 0.2) +
     labs(title = "Protein coverage",

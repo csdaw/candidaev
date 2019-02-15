@@ -20,6 +20,9 @@
 #' the value will be replaced with the string "NA"
 #'
 #' @examples
+#' # load dplyr
+#' library(dplyr)
+#'
 #' # make a reference table
 #' ref_df <- data.frame(id = c("a1", "a2", "a3"), last_name = c("Smith", "Brown", "Doe"))
 #'

@@ -1,17 +1,26 @@
 #' Title
 #'
-#' @param data
-#' @param logic
-#' @param op
-#' @param pat1
-#' @param val1
-#' @param pat2
-#' @param val2
+#' @param data Description
 #'
-#' @return
+#' @param logic Description
+#'
+#' @param op Description
+#'
+#' @param pat1 Description
+#'
+#' @param val1 Description
+#'
+#' @param pat2 Description
+#'
+#' @param val2 Description
+#'
+#' @return Returns x
+#'
 #' @export
 #'
 #' @examples
+#' # example
+#'
 filter_na2 <- function(data, logic = c("and", "or"), op = c("==", ">=", "<="),
                        pat1, val1, pat2, val2) {
   # refer to operator by name

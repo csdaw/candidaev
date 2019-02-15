@@ -2,18 +2,38 @@ Package: candidaev
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R:
-    person(given = "First",
-           family = "Last",
+    person(given = "Charlotte",
+           family = "Dawson",
            role = c("aut", "cre"),
            email = "first.last@example.com")
-Description: What the package does (one paragraph)
-License: MIT + file LICENSE
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE.md
 ByteCompile: true
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/csdaw/candidaev
 BugReports: https://github.com/csdaw/candidaev/issues
-Imports: bookdown
+Imports: 
+    bookdown,
+    assertthat,
+    circlize,
+    ComplexHeatmap,
+    cluster,
+    dplyr,
+    futile.logger,
+    ggplot2,
+    ggrepel,
+    gridExtra,
+    imputeLCMD,
+    purrr,
+    RColorBrewer,
+    stringr,
+    tibble,
+    tidyr,
+    VennDiagram,
+    stats,
+    magrittr
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
+RoxygenNote: 6.1.1

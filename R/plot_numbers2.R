@@ -3,9 +3,10 @@
 #' \code{plot_numbers} generates a barplot
 #' of the number of identified proteins per sample.
 #'
-#' @param se SummarizedExperiment,
+#' @param mat SummarizedExperiment,
 #' Data object for which to plot protein numbers
-#' (output from \code{\link{make_se}()} or \code{\link{make_se_parse}()}).
+#' (output from \code{make_se()} or \code{make_se_parse()}).
+#' @param exd Description.
 #' @param plot Logical(1),
 #' If \code{TRUE} (default) the barplot is produced.
 #' Otherwise (if \code{FALSE}), the data which the
@@ -27,27 +28,27 @@
 #' filt <- filter_missval(se, thr = 0)
 #' plot_numbers(filt)
 #' @export
-plot_numbers2 <- function(lfq_mat, exd, plot = TRUE) {
+plot_numbers2 <- function(mat, exd, plot = TRUE) {
   # Show error if input is not the required classes
-  assertthat::assert_that(is.matrix(lfq_mat),
+  assertthat::assert_that(is.matrix(mat),
                           is.data.frame(exd),
                           assert_exd(exd),
                           is.logical(plot),
                           length(plot) == 1)
 
   # Make a binary long data.frame (1 = valid value, 0 = missing value)
-  df <- lfq_mat %>%
+  df <- mat %>%
     data.frame() %>%
-    rownames_to_column() %>%
-    gather(ID, bin, -rowname) %>%
-    mutate(bin = ifelse(is.na(bin), 0, 1))
+    tibble::rownames_to_column() %>%
+    tidyr::gather(ID, bin, -rowname) %>%
+    dplyr::mutate(bin = ifelse(is.na(bin), 0, 1))
   # Summarize the number of proteins identified
   # per sample and generate a barplot
   stat <- df %>%
-    group_by(ID) %>%
-    summarize(n = n(), sum = sum(bin)) %>%
-    left_join(., exd, by = "ID")
-  p <- ggplot(stat, aes(x = ID, y = sum, fill = condition)) +
+    dplyr::group_by(ID) %>%
+    dplyr::summarise(n = dplyr::n(), sum = sum(bin)) %>%
+    dplyr::left_join(., exd, by = "ID")
+  p <- ggplot2::ggplot(stat, aes(x = ID, y = sum, fill = condition)) +
     geom_col() +
     geom_hline(yintercept = unique(stat$n)) +
     labs(title = "Proteins per sample", x = "",

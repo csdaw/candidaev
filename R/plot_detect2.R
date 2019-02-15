@@ -3,7 +3,7 @@
 #' \code{plot_detect} generates density and CumSum plots
 #' of protein intensities with and without missing values
 #'
-#' @param se SummarizedExperiment,
+#' @param mat SummarizedExperiment,
 #' Data object with missing values.
 #' @return Density and CumSum plots of intensities of
 #' proteins with and without missing values
@@ -25,42 +25,42 @@
 #' # Plot intensities of proteins with missing values
 #' plot_detect(filt)
 #' @export
-plot_detect2 <- function(lfq_mat) {
+plot_detect2 <- function(mat) {
   # Show error if inputs are not the required classes
-  assertthat::assert_that(is.matrix(lfq_mat))
+  assertthat::assert_that(is.matrix(mat))
 
   # Show error if there are no missing values
-  if(!any(is.na(lfq_mat))) {
-    stop("No missing values in '", deparse(substitute(lfq_mat)), "'",
+  if(!any(is.na(mat))) {
+    stop("No missing values in '", deparse(substitute(mat)), "'",
          call. = FALSE)
   }
 
   # Get a long data.frame of the assay data annotated with sample info
-  df <- lfq_mat %>%
+  df <- mat %>%
     data.frame() %>%
-    rownames_to_column() %>%
-    gather(ID, val, -rowname)
+    tibble::rownames_to_column() %>%
+    tidyr::gather(ID, val, -rowname)
 
   # Get a summarized table with mean protein intensities and
   # indication whether the protein has missing values
   stat <- df %>%
-    group_by(rowname) %>%
-    summarize(mean = mean(val, na.rm = TRUE), missval = any(is.na(val)))
+    dplyr::group_by(rowname) %>%
+    dplyr::summarise(mean = mean(val, na.rm = TRUE), missval = any(is.na(val)))
 
   # Calculate cumulative fraction
   cumsum <- stat %>%
-    group_by(missval) %>%
-    arrange(mean) %>%
-    mutate(num = 1, cs = cumsum(num), cs_frac = cs/n())
+    dplyr::group_by(missval) %>%
+    dplyr::arrange(mean) %>%
+    dplyr::mutate(num = 1, cs = cumsum(num), cs_frac = cs/dplyr::n())
 
   # Plot the densities and cumalitive fractions for
   # proteins with and without missing values
-  p1 <- ggplot(stat, aes(mean, col = missval)) +
+  p1 <- ggplot2::ggplot(stat, aes(mean, col = missval)) +
     geom_density(na.rm = TRUE) +
     labs(x = expression(log[2]~"Intensity"), y = "Density") +
     guides(col = guide_legend(title = "Missing values")) +
     theme_bw()
-  p2 <- ggplot(cumsum, aes(mean, cs_frac, col = missval)) +
+  p2 <- ggplot2::ggplot(cumsum, aes(mean, cs_frac, col = missval)) +
     geom_line() +
     labs(x = expression(log[2]~"Intensity"), y = "Cumulative fraction") +
     guides(col = guide_legend(title = "Missing values")) +

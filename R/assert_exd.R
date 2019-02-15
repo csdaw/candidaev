@@ -24,7 +24,7 @@
 #'          replicate = c(1, 2, 1))
 #'
 #' @seealso
-#' This function is used in \code{\link(plot_heatmap2)}, etc.
+#' This function is used in \code{\link{plot_heatmap2}}, etc.
 #'
 assert_exd <- function(df) {
   # assert that input is data frame
