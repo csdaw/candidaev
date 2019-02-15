@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-val_filter <- function(data, op = c("==", "<=", ">="), pat, val) {
+filter_val <- function(data, op = c("==", "<=", ">="), pat, val) {
   # refer to operator by name
   op <- as.name(op)
 

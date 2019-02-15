@@ -6,12 +6,12 @@
 #' @export
 #'
 #' @examples
-lfq_summarise <- function(data) {
+summarise_lfq <- function(data) {
   # convert data to data frame
   df <- as.data.frame(data, stringsAsFactors = FALSE)
 
   # apply internal lfq_summary function to each column
-  sum_list <- lapply(df, na_summarise)
+  sum_list <- lapply(df, summarise_na)
 
   # bind the lfq_summary for each column together
   result <- as.data.frame(do.call(rbind, sum_list))

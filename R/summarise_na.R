@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-na_summarise <- function(data) {
+summarise_na <- function(data) {
   result <- list(Mean = mean(data, na.rm = TRUE),
                  Median = median(data, na.rm = TRUE),
                  Std.dev = sd(data, na.rm = TRUE),
