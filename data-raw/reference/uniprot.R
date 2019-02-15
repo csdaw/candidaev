@@ -6,7 +6,7 @@ if(file.exists("data/cgd.rda") == FALSE) {
 # load packages
 library(dplyr)
 
-# source fill_blank and fill_na function
+# source package functions
 source("R/fill_blank.R")
 source("R/fill_na.R")
 source("R/match_id.R")
