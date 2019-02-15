@@ -7,14 +7,14 @@
 #'
 #' @examples
 summarise_na <- function(data) {
-  result <- list(Mean = mean(data, na.rm = TRUE),
-                 Median = median(data, na.rm = TRUE),
-                 Std.dev = sd(data, na.rm = TRUE),
-                 Coeff.var = sd(data, na.rm = TRUE)/mean(data, na.rm = TRUE)*100,
-                 Min = min(data, na.rm = TRUE),
-                 Max = max(data, na.rm = TRUE),
-                 Range = max(data, na.rm = TRUE) - min(data, na.rm = TRUE),
-                 N.valid.val = length(na.omit(data)),
-                 N.na.val = sum(is.na(data)),
-                 Prcnt.na = sum(is.na(data))/length(data)*100)
+  result <- list(mean = mean(data, na.rm = TRUE),
+                 median = median(data, na.rm = TRUE),
+                 std.dev = sd(data, na.rm = TRUE),
+                 coeff.var = sd(data, na.rm = TRUE)/mean(data, na.rm = TRUE)*100,
+                 min = min(data, na.rm = TRUE),
+                 max = max(data, na.rm = TRUE),
+                 range = max(data, na.rm = TRUE) - min(data, na.rm = TRUE),
+                 n.valid.val = length(na.omit(data)),
+                 n.na.val = sum(is.na(data)),
+                 prcnt.na = sum(is.na(data))/length(data)*100)
 }
