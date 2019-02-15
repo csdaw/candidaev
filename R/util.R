@@ -1,49 +1,60 @@
-val_filter <- function(df, pattern, value) {
-  df[apply(df[, c(grep(pattern, colnames(df)))], 1, sum) >= value, ]
+val_filter <- function(data, op = c("==", "<=", ">="), pat, val) {
+  # refer to operator by name
+  op <- as.name(op)
+
+  # get sum of values in column group
+  col_sum <- apply(data[, c(grep(pat, colnames(data)))], 1, sum)
+
+  # subset data based on sum of values in column group
+  subset(data, sapply(col_sum, op, val))
 }
 
-val_filter2 <- function(df, pattern1, value1, pattern2, value2) {
-  df[apply(df[, c(grep(pattern1, colnames(df)))] > 1, 1, sum) >= value1 |
-       apply(df[, c(grep(pattern2, colnames(df)))] > 1, 1, sum) >= value2, ]
-}
+val_filter2 <- function(data, logic = c("and", "or"), op = c("==", "<=", ">="),
+                        pat1, val1, pat2, val2) {
+  # refer to operator by name
+  op <- as.name(op)
 
-na_filter <- function(df, logic, pattern, value) {
-  if(logic == "<=") {
-  df[apply(is.na(df[, c(grep(pattern, colnames(df)))]), 1, sum) <= value, ]
-  } else if(logic == "=") {
-    df[apply(is.na(df[, c(grep(pattern, colnames(df)))]), 1, sum) == value, ]
-  } else if(logic == ">=") {
-    df[apply(is.na(df[, c(grep(pattern, colnames(df)))]), 1, sum) >= value, ]
+  # get sum of values in first group of columns
+  sum1 <- apply(data[, c(grep(pat1, colnames(data)))], 1, sum)
+
+  # get sum of values in second group of columns
+  sum2 <- apply(data[, c(grep(pat2, colnames(data)))], 1, sum)
+
+  # subset data based on sum of values in two column groups
+  if(logic == "and") {
+    subset(data, sapply(sum1, op, val1) & sapply(sum2, op, val2))
+  } else if (logic == "or") {
+    subset(data, sapply(sum1, op, val1) | sapply(sum2, op, val2))
   }
 }
 
-na_filter2 <- function(df, logic, pattern1, value1, pattern2, value2) {
-  if(logic == "and") {
-  df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) <= value1 &
-       apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) <= value2, ]
-  } else if(logic == "or") {
-    df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) <= value1 |
-         apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) <= value2, ]
-  }
+na_filter <- function(data, op = c("==", "<=", ">="), pat, val) {
+  # refer to operator by name
+  op <- as.name(op)
+
+  # get number of NA in column group
+  n_na <- apply(is.na(data[, c(grep(pat, colnames(data)))]), 1, sum)
+
+  # subset data based on number of NA in column group
+  subset(data, sapply(n_na, op, val))
 }
 
-na_filter3 <- function(df, logic, pattern1, value1, pattern2, value2) {
-  if(logic == "and") {
-    df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) == value1 &
-         apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) == value2, ]
-  } else if(logic == "or") {
-    df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) == value1 |
-         apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) == value2, ]
-  }
-}
+na_filter2 <- function(data, logic = c("and", "or"), op = c("==", ">=", "<="),
+                       pat1, val1, pat2, val2) {
+  # refer to operator by name
+  op <- as.name(op)
 
-na_filter4 <- function(df, logic, pattern1, value1, pattern2, value2) {
+  # get number of NA in first group of columns
+  n_na1 <- apply(is.na(data[, c(grep(pat1, colnames(data)))]), 1, sum)
+
+  # get number of NA in second group of columns
+  n_na2 <- apply(is.na(data[, c(grep(pat2, colnames(data)))]), 1, sum)
+
+  # subset data based on number of NA in two column groups
   if(logic == "and") {
-    df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) >= value1 &
-         apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) >= value2, ]
-  } else if(logic == "or") {
-    df[apply(is.na(df[, c(grep(pattern1, colnames(df)))]), 1, sum) >= value1 |
-         apply(is.na(df[, c(grep(pattern2, colnames(df)))]), 1, sum) >= value2, ]
+    subset(data, sapply(n_na1, op, val1) & sapply(n_na2, op, val2))
+  } else if (logic == "or") {
+    subset(data, sapply(n_na1, op, val1) | sapply(n_na2, op, val2))
   }
 }
 
@@ -105,12 +116,4 @@ combine_result <- function(lfq_de, tt) {
                   tt[match(rownames(lfq_de), rownames(tt)), ],
                   significant = tt[, "adj.P.Val"] < 0.01)
   return(result)
-}
-
-match_uniprot <- function(up_col, reftable, fill_col, match_col) {
-  stringr::str_extract_all(up_col, "[^;]+") %>%
-    lapply(., function(x) match(x, reftable[[match_col]])) %>%
-    Map("[", list(as.character(reftable[[fill_col]])), .) %>%
-    lapply(., function(x) paste(x, collapse = ";")) %>%
-    unlist()
 }
