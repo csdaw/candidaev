@@ -50,15 +50,9 @@ plot_imputation2 <- function(exd, mat, ...) {
     assertthat::assert_that(is.matrix(x))
   })
 
-  # Function to get a long data.frame of the assay data
-  # annotated with sample info
-  gather_join <- function(mat) {
-    data.frame(mat) %>%
-      tidyr::gather(ID, val) %>%
-      left_join(., data.frame(exd), by = "ID")
-  }
 
-  df <- purrr::map_df(arglist, gather_join, .id = "var") %>%
+
+  df <- purrr::map_df(arglist, candidaev::gather_join2, .id = "var") %>%
     mutate(var = factor(var, levels = names(arglist)))
 
   # Density plots for different conditions with facet_wrap
