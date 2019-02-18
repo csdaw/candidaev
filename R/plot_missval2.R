@@ -38,7 +38,7 @@ plot_missval2 <- function(mat) {
 
   # Make assay data binary (1 = valid value, 0 = missing value)
   df <- mat %>%
-    data.frame()
+    as.data.frame()
   missval <- df[apply(df, 1, function(x) any(is.na(x))), ]
   missval <- ifelse(is.na(missval), 0, 1)
   # Plot binary heatmap
