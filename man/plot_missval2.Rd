@@ -19,6 +19,7 @@ A heatmap indicating whether values are missing (0) or not (1)
 with missing values to discover whether values are missing by random or not.
 }
 \examples{
+\dontrun{
 # Load example
 data <- UbiLength
 data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
@@ -34,4 +35,5 @@ filt <- filter_missval(se, thr = 0)
 
 # Plot missing values heatmap
 plot_missval(filt)
+}
 }

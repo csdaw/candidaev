@@ -24,6 +24,7 @@ Barplot of protein coverage in samples
 of the protein coverage in all samples.
 }
 \examples{
+\dontrun{
 # Load example
 data <- UbiLength
 data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
@@ -37,4 +38,5 @@ se <- make_se(data_unique, columns, exp_design)
 # Filter and plot coverage
 filt <- filter_missval(se, thr = 0)
 plot_coverage(filt)
+}
 }

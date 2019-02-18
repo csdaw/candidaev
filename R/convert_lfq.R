@@ -6,10 +6,13 @@
 #'
 #' @return Returns x
 #'
-#' @export
 #'
 #' @examples
 #' # example
+#'
+#' @import dplyr
+#'
+#' @export
 #'
 convert_lfq <- function(df, exd) {
   # define vector of labels from experimental design
@@ -25,7 +28,7 @@ convert_lfq <- function(df, exd) {
 
   # select LFQ data and convert to matrix with UniProt accessions as rownames
   mat <- df %>%
-    dplyr::select(Majority.protein.IDs, dplyr::one_of(lfq_cols)) %>%
+    select(Majority.protein.IDs, dplyr::one_of(lfq_cols)) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames(var = "Majority.protein.IDs") %>%
     as.matrix()

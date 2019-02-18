@@ -11,7 +11,7 @@
   ...
 }}
 \source{
-\url{http://www.candidagenome.org/download/chromosomal_feature_files/C_albicans_SC5314/}{Downloaded date}
+\href{http://www.candidagenome.org/download/chromosomal_feature_files/C_albicans_SC5314/}{CGD}
 }
 \usage{
 cgd

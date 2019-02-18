@@ -20,6 +20,7 @@ proteins with and without missing values
 of protein intensities with and without missing values
 }
 \examples{
+\dontrun{
 # Load example
 data <- UbiLength
 data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
@@ -35,4 +36,5 @@ filt <- filter_missval(se, thr = 0)
 
 # Plot intensities of proteins with missing values
 plot_detect(filt)
+}
 }

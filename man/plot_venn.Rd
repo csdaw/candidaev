@@ -30,7 +30,7 @@ plot_venn(vlist, use_uniprot = FALSE, plot = TRUE, file = NULL,
 \item{...}{Description}
 }
 \value{
-
+Description
 }
 \description{
 Title

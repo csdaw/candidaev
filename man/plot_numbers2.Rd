@@ -27,6 +27,7 @@ Barplot of the number of identified proteins per sample
 of the number of identified proteins per sample.
 }
 \examples{
+\dontrun{
 # Load example
 data <- UbiLength
 data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
@@ -40,4 +41,5 @@ se <- make_se(data_unique, columns, exp_design)
 # Filter and plot numbers
 filt <- filter_missval(se, thr = 0)
 plot_numbers(filt)
+}
 }

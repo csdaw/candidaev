@@ -16,6 +16,7 @@
 #' Adding components and other plot adjustments can be easily done
 #' using the ggplot2 syntax (i.e. using '+')
 #' @examples
+#' \dontrun{
 #' # Load example
 #' data <- UbiLength
 #' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
@@ -32,6 +33,7 @@
 #'
 #' # Plot normalization
 #' plot_normalization(se, filt, norm)
+#' }
 #' @export
 plot_normalization2 <- function(exd, mat, ...) {
   # Get arguments from call
@@ -54,15 +56,15 @@ plot_normalization2 <- function(exd, mat, ...) {
   gather_join <- function(mat) {
     data.frame(mat) %>%
       tidyr::gather(ID, val) %>%
-      dplyr::left_join(., data.frame(exd), by = "ID")
+      left_join(., data.frame(exd), by = "ID")
   }
 
   df <- purrr::map_df(arglist, gather_join, .id = "var") %>%
-    dplyr::mutate(var = factor(var, levels = names(arglist)))
+    mutate(var = factor(var, levels = names(arglist)))
 
   # Boxplots for conditions with facet_wrap
   # for the original and normalized values
-  ggplot2::ggplot(df, aes(x = ID, y = val, fill = condition)) +
+  ggplot(df, aes(x = ID, y = val, fill = condition)) +
     geom_boxplot(notch = TRUE, na.rm = TRUE) +
     coord_flip() +
     facet_wrap(~var, ncol = 1) +

@@ -29,6 +29,7 @@ using the ggplot2 syntax (i.e. using '+')
 of all conditions for input objects, e.g. before and after normalization.
 }
 \examples{
+\dontrun{
 # Load example
 data <- UbiLength
 data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
@@ -45,4 +46,5 @@ norm <- normalize_vsn(filt)
 
 # Plot normalization
 plot_normalization(se, filt, norm)
+}
 }

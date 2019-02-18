@@ -4,19 +4,26 @@
 \name{biofilm}
 \alias{biofilm}
 \title{Biofilm LC-MS/MS data}
-\format{A data frame with x rows and y variables:
+\format{A data frame with x observations and y variables:
 \describe{
   \item{Majority.protein.IDs}{Description}
   \item{Unique.peptides}{Unique peptides}
   ...
 }}
 \source{
-Source goes here
+Source goes here.
 }
 \usage{
 biofilm
 }
+\value{
+Description
+}
 \description{
 A description.
+}
+\details{
+This dataset contains the proteinGroups output file from
+\href{}{MaxQuant} v1.6.0.16.
 }
 \keyword{datasets}
