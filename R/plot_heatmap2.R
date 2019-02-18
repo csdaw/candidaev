@@ -122,7 +122,7 @@ plot_heatmap2 <- function(mat, exd, unip,
 
   # Heatmap annotation
   if(!is.null(indicate)) {
-    ha1 <- candidaev::get_annotation2(mat, exd, indicate)
+    ha1 <- get_annotation2(mat, exd, indicate)
   } else {
     ha1 <- NULL
   }
