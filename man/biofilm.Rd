@@ -24,6 +24,6 @@ A description.
 }
 \details{
 This dataset contains the proteinGroups output file from
-\href{}{MaxQuant} v1.6.0.16.
+\href{https://maxquant.org/}{MaxQuant} v1.6.0.16.
 }
 \keyword{datasets}

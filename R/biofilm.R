@@ -3,7 +3,7 @@
 #' A description.
 #'
 #' This dataset contains the proteinGroups output file from
-#' \href{}{MaxQuant} v1.6.0.16.
+#' \href{https://maxquant.org/}{MaxQuant} v1.6.0.16.
 #'
 #' @format A data frame with x observations and y variables:
 #' \describe{

@@ -40,7 +40,7 @@ plot_numbers2 <- function(mat, exd, plot = TRUE) {
 
   # Make a binary long data.frame (1 = valid value, 0 = missing value)
   df <- mat %>%
-    data.frame() %>%
+    as.data.frame() %>%
     tibble::rownames_to_column() %>%
     tidyr::gather(ID, bin, -rowname) %>%
     mutate(bin = ifelse(is.na(bin), 0, 1))

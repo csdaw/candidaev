@@ -52,7 +52,7 @@ plot_imputation2 <- function(exd, mat, ...) {
 
 
 
-  df <- purrr::map_df(arglist, candidaev::gather_join2, .id = "var") %>%
+  df <- purrr::map_df(arglist, gather_join2, .id = "var") %>%
     mutate(var = factor(var, levels = names(arglist)))
 
   # Density plots for different conditions with facet_wrap
