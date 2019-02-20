@@ -107,12 +107,6 @@ plot_heatmap2 <- function(mat, exd, unip,
                 deparse(substitute(exd)), "'"),
          call. = FALSE)
   }
-  if(length(grep("logFC", colnames(row_data))) < 1) {
-    stop(paste0("'logFC' columns are not present in '",
-                deparse(substitute(mat)),
-                "'.\nRun test_diff() to obtain the required columns."),
-         call. = FALSE)
-  }
   if(!"significant" %in% colnames(row_data)) {
     stop(paste0("'significant' column is not present in '",
                 deparse(substitute(mat)),
@@ -194,7 +188,7 @@ plot_heatmap2 <- function(mat, exd, unip,
   }
 
   # Legend info
-  legend <- "log2 Fold change"
+  legend <- "centred log2 intensity"
 
   # Heatmap
   ht1 = ComplexHeatmap::Heatmap(df,

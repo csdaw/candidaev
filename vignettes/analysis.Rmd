@@ -3,35 +3,29 @@ title: "Analysis"
 author: "Charlotte Dawson"
 date: "2018-01-20"
 output:
-  html_notebook: 
-    toc: true
-    toc_float: true
-    number_sections: true
-    df_print: kable
   bookdown::html_document2:
     toc: true
     toc_float: true
-    keep_md: true
     df_print: kable
-# number_sections: true
-# code_folding: hide
-  md_document:
-    variant: markdown_github
-    toc: true
-    toc_float: true
+vignette: > 
+  %\VignetteIndexEntry{Vignette title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
-```{r, setup, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  warning = FALSE,
-  message = FALSE,
-  echo = FALSE,
-  comment = "#>",
-  fig.path = "../figures/"
-)
-
+```{r, setup, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(collapse = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      echo = FALSE,
+                      comment = "#>")
+# use fig.path="../vignettes/figures" to save generated figures
+library(limma)
+library(dplyr)
+library(ggplot2)
 library(candidaev)
+source("../R/filter_na4.R")
+source("../R/plot_venn.R")
 ```
 
 # Introduction and data description
@@ -42,13 +36,167 @@ library(candidaev)
 
 # Biofilm DAY286
 
-# Yeast ATCC90028
-
-# Yeast ATCC10231
-
 # Comparison to previous data
 
 # EV marker protein selection
+
+# Different strains test
+## Introduction
+
+Aim is to determine whether identified potential biomarkers work in other 
+*C. albicans* strains.
+
+## Experimental design info
+Strain used:
+
+<div id="left">
+- ATCC10231
+- zzzzzz
+</div>
+
+<div id="right">
+- ATCC90028
+- zzzzzzz
+</div>
+
+```{r, atcc_exp}
+atcc_exp <- atcc_exp
+
+```
+
+
+## Analysis
+    
+### Prepare data
+```{r, load_atcc}
+atcc_pg <- atcc
+
+```
+
+The untouched proteinGroups.txt file has `r nrow(atcc_pg)` rows and `r ncol(atcc_pg)`  columns.
+
+Each of the `r nrow(atcc_pg)` rows corresponds to a single protein group. 
+
+```{r, prep_atcc}
+atcc <- atcc_pg %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2)
+
+atcc <- convert_lfq(atcc, atcc_exp)
+
+```
+
+First, filter any reverse and contaminant proteins. 
+Then select only proteins identified by at least 2 unique peptides.
+
+Now the dataset contains `r nrow(atcc)` proteins across the 12 samples.
+
+```{r, fig.cap="This is a figure caption", dpi=300}
+f7a <- plot_frequency2(atcc)
+
+f7b <- plot_numbers2(atcc, atcc_exp)
+
+ggpubr::ggarrange(f7a, f7b,
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  font.label = list(size = 24, color = "black"))
+
+```
+
+
+Table goes here.
+
+More text goes here.
+
+```{r}
+
+knitr::kable(summarise_lfq(atcc), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+```
+
+### Filter data
+
+Filter for proteins identified in 2/3 reps of at least 1 condition.
+
+
+
+```{r}
+atcc_filt <- filter_na4(atcc, "or", "<=", 
+                        pat1 = "10231_EV", 1, 
+                        pat2 = "10231_W", 1, 
+                        pat3 = "90028_EV", 1, 
+                        pat4 = "90028_W", 1)
+
+```
+
+Reduces `r nrow(atcc)` proteins to `r nrow(atcc_filt)`.
+
+```{r, dpi=300, fig.show='hide'}
+f8a <- plot_frequency2(atcc_filt)
+
+f8b <- plot_numbers2(atcc_filt, atcc_exp)
+
+a1_ev <- filter_na(atcc_filt, "<=", "10231_EV", 2)
+a1_w <- filter_na(atcc_filt, "<=", "10231_W", 2)
+
+a9_ev <- filter_na(atcc_filt, "<=", "90028_EV", 2)
+a9_w <- filter_na(atcc_filt, "<=", "90028_W", 2)
+
+f8c <- plot_venn(list("10231 ev" = a1_ev, "10231 wcl" = a1_w, 
+                      "90028 ev" = a9_ev, "90028 wcl" = a9_w),
+                 use_uniprot = TRUE, type = "plot")
+f8c <- ggpubr::as_ggplot(f8c) + theme(plot.margin = unit(c(0,5,0,5), "lines"))
+
+```
+
+```{r, dpi=300, fig.height=7}
+ggpubr::ggarrange(ggpubr::ggarrange(f8a, f8b, ncol = 2, labels = c("A", "B")), 
+                  f8c, 
+                  nrow = 2, 
+                  labels = c("", "C"))
+```
+
+
+Some words.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

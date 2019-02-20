@@ -4,18 +4,17 @@
 \alias{plot_venn}
 \title{Title}
 \usage{
-plot_venn(vlist, use_uniprot = FALSE, plot = TRUE, file = NULL,
-  output = c("tiff", "png"), output_dim = c(1000, 1000),
-  output_res = 300, output_units = "px", output_pts = 14, ...)
+plot_venn(vlist, use_uniprot = FALSE, type = c("list", "plot",
+  "output"), output = c("tiff", "png"), output_file = NULL,
+  output_dim = c(1000, 1000), output_res = 300, output_units = "px",
+  output_pts = 14, ...)
 }
 \arguments{
 \item{vlist}{Description}
 
 \item{use_uniprot}{Description}
 
-\item{plot}{Description}
-
-\item{file}{Description}
+\item{type}{Description}
 
 \item{output}{Description}
 

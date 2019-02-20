@@ -5,9 +5,7 @@
 #'
 #' @param use_uniprot Description
 #'
-#' @param plot Description
-#'
-#' @param file Description
+#' @param type Description
 #'
 #' @param output Description
 #'
@@ -44,8 +42,8 @@
 #'
 #' @importFrom grDevices dev.off png tiff
 #' @export
-plot_venn <- function(vlist, use_uniprot = FALSE, plot = TRUE,
-                      file = NULL, output = c("tiff", "png"), output_dim = c(1000, 1000),
+plot_venn <- function(vlist, use_uniprot = FALSE, type = c("list", "plot", "output"),
+                      output = c("tiff", "png"), output_file = NULL, output_dim = c(1000, 1000),
                       output_res = 300, output_units = "px",
                       output_pts = 14, ...) {
   # supress futile logger message from VennDiagram package
@@ -60,7 +58,7 @@ plot_venn <- function(vlist, use_uniprot = FALSE, plot = TRUE,
   } else {comparison <- vlist}
 
   # plot venn in R, plot venn and save file, or get venn partition lists
-  if(plot == TRUE & is.null(file) == FALSE) {
+  if(type == "save") {
     venn_plot <- VennDiagram::venn.diagram(x = comparison,
                                            filename = NULL, ...)
     if(output == "tiff") {
@@ -87,12 +85,10 @@ plot_venn <- function(vlist, use_uniprot = FALSE, plot = TRUE,
       grid::grid.draw(venn_plot)
       dev.off()
     }
-  } else if(plot == TRUE & is.null(file) == TRUE) {
-    venn_plot <- VennDiagram::venn.diagram(x = comparison,
-                                           filename = NULL, ...)
-    grid::grid.newpage()
-    grid::grid.draw(venn_plot)
-  } else if(plot == FALSE) {
+  } else if(type == "plot") {
+    venn_plot <- VennDiagram::venn.diagram(x = comparison, filename = NULL, ...)
+    return(venn_plot)
+  } else if(type == "list") {
     venn <- VennDiagram::get.venn.partitions(comparison)
     return(venn)
   }
