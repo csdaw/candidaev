@@ -24,15 +24,159 @@ library(limma)
 library(dplyr)
 library(ggplot2)
 library(candidaev)
-source("../R/filter_na4.R")
-source("../R/plot_venn.R")
+library(tidyNano)
+library(ggpubr)
 ```
 
-# Introduction and data description
+# Introduction
 
 # EV characterisation
 
+
+
+```{r, nta_tech_avg}
+data(nta)
+
+df <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
+                        "Biofilm_1", "Biofilm_2", "Biofilm_3", "Biofilm_4", "Biofilm_5", 
+                        "DAY286_1", "DAY286_2", "DAY286_3"), 
+                 Protein_conc = c(0.192, 0.282, 0.287, 0.424, 0.716, 0.584, 0.204, 0.198, 0.297, 0.193, 0.416, 0.437, 0.360, 0.447), 
+                 Culture_vol = c(rep(150, 6), rep(1000, 5), rep(300, 3)), 
+                 OD600 = c(0.455*20, 0.557*20, 0.615*20, 0.310*50, 0.337*50, 0.297*50, rep(NA, 5), 36.2, 39.7, 34.0), 
+                 stringsAsFactors = FALSE)
+
+nta_techavg <- nta %>% 
+  nanolyze(particle_size, Strain, Bio_rep, Dilution, 
+           name = "Tech_rep", 
+           param_var = True_count)
+
+nta_techavg %>% 
+  ggplot(aes(x = particle_size, y = Tech_rep_mean, colour = Bio_rep)) + 
+  geom_line(size = 1) + 
+  facet_wrap(~ Strain, scales = "free") + 
+  theme_classic()
+
+```
+
+Text.
+
+```{r}
+nta_bioavg <- nta_techavg %>% 
+  nanolyze(particle_size, Strain,
+           name = "Bio_rep", 
+           param_var = Tech_rep_mean) %>% 
+  mutate(facet = case_when(Strain == "Biofilm" ~ "first", TRUE ~ "second"))
+
+nta_bioavg %>% 
+  ggplot(aes(x = particle_size, y = Bio_rep_mean, colour = Strain)) + 
+  geom_line(size = 1) + 
+  facet_wrap(~ facet, scales = "free") + 
+  theme_classic()
+  
+```
+
+Text
+
+```{r}
+nta_total <- nta_techavg %>% 
+  nanocount(Strain, Bio_rep, Dilution, 
+            param_var = Tech_rep_mean) %>% 
+  tidyr::unite("id", Strain, Bio_rep) %>% 
+  mutate(protein_conc = as.numeric(match_id(id, df, "id", "Protein_conc")), 
+         od = as.numeric(match_id(id, df, "id", "OD600")), 
+         part_per_prot = Particle_count / protein_conc / 1000) %>% 
+  tidyr::separate(col = id, into = c("Strain", "Bio_rep"), sep = "_", remove = TRUE)
+
+nanoShapiro(nta_total, Strain, value = part_per_prot)
+
+nanoShapiro(nta_total, Strain, value = Particle_count)
+
+```
+
+
+Text.
+
+```{r}
+tukey_hsd <- function(x, ...) {
+  res <- TukeyHSD(x, ...) %>%
+    broom::tidy() %>%
+    mutate(comparison2 = comparison) %>%
+    tidyr::separate(comparison2, into= c("group2", "group1"), sep = "-") %>%
+    rename(p.adj = adj.p.value) %>%
+    mutate(p.adj = signif(p.adj, 2)) %>%
+    select(term, group1, group2, everything(), -term)
+  res
+}
+
+dunns_test <- function(x, g, method, ...) {
+  # capture console output before it prints
+  dtres <- utils::capture.output(res <- dunn.test::dunn.test(x, g, method, ...))
+  
+  # convert returned list `res` to data.frame
+  res <- res %>% 
+    as.data.frame() %>% 
+    rename(p.adj = P.adjusted, p.val = P, comparison = comparisons) %>% 
+    tidyr::separate(comparison, into = c("group2", "group1"), sep = " - ", remove= FALSE) %>% 
+    mutate(p.adj = signif(p.adj, 2)) %>% 
+    select(group1, group2, comparison, everything())
+    res
+}
+```
+
+
+```{r}
+# total particle concentration not normally distributed for biofilm
+# use Kruskal Wallis then Dunn's test
+stat.test <- dunns_test(x = nta_total$Particle_count, 
+                        g = nta_total$Strain, method = "bh")
+
+# total particle number per ug protein all normally distributed
+# use ANOVA then Tukey's HSD
+stat.test2 <- aov(part_per_prot ~ Strain, data = nta_total) %>% 
+  tukey_hsd()
+
+# save total particle concentration plot
+total_pconc <- nta_total %>% 
+  ggboxplot(x = "Strain", y = "Particle_count", 
+            color = "Strain", palette = "jco", add = "jitter") 
+total_pconc <- ggpar(total_pconc, 
+                     yscale = "log10", 
+                     format.scale = TRUE, 
+                     ylim = c(1e11, 1e13)) + 
+  stat_pvalue_manual(stat.test[c(1,2), ], label = "p.adj", 
+                     y.position = c(12.4, 13), 
+                     tip.length = 4e-3)
+
+# save total particle number per ug protein plot
+total_pnum <- nta_total %>% 
+  ggboxplot(x = "Strain", y = "part_per_prot", 
+            color = "Strain", palette = "jco", add = "jitter")
+total_pnum <- ggpar(total_pnum, 
+                    yscale = "log10", 
+                    format.scale = TRUE, 
+                    ylim = c(8e8, 8e10)) + 
+  stat_pvalue_manual(stat.test2[c(2,4,6), ], label = "p.adj", 
+                     y.position = c(10.7, 10.5, 10.9), 
+                     tip.length = 1e-2)
+
+# plot both
+ggarrange(total_pconc, total_pnum, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+  
+```
+
 # Yeast DAY286 
+
+Text.
+
+```{r}
+
+```
+
+
 
 # Biofilm DAY286
 
@@ -93,7 +237,8 @@ Now the dataset contains `r nrow(atcc)` proteins across the 12 samples.
 ```{r, fig.cap="This is a figure caption", dpi=300}
 f7a <- plot_frequency2(atcc)
 
-f7b <- plot_numbers2(atcc, atcc_exp)
+f7b <- plot_numbers2(atcc, atcc_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
 ggpubr::ggarrange(f7a, f7b,
                   labels = c("A", "B"), 
@@ -138,7 +283,8 @@ Reduces `r nrow(atcc)` proteins to `r nrow(atcc_filt)`.
 ```{r, dpi=300, fig.show='hide'}
 f8a <- plot_frequency2(atcc_filt)
 
-f8b <- plot_numbers2(atcc_filt, atcc_exp)
+f8b <- plot_numbers2(atcc_filt, atcc_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
 a1_ev <- filter_na(atcc_filt, "<=", "10231_EV", 2)
 a1_w <- filter_na(atcc_filt, "<=", "10231_W", 2)
