@@ -24,5 +24,5 @@
 plot_dendro <- function(mat) {
   dis <- cluster::daisy(t(mat), metric = "gower")
   hc <- stats::hclust(dis)
-  graphics::plot(hc)
+  ggdendro::ggdendrogram(hc, rotate = FALSE, size = 5)
 }
