@@ -33,10 +33,17 @@
 #' my_names$last <- match_id(my_names$id, ref_df, "id", "last_name")
 #'
 #' @export
-match_id <- function(id, ref, match, new) {
-  stringr::str_extract_all(id, "[^;]+") %>%
-    lapply(., function(x) match(x, ref[[match]])) %>%
-    Map("[", list(as.character(ref[[new]])), .) %>%
-    lapply(., function(x) paste(x, collapse = ";")) %>%
-    unlist()
+match_id <- function(id, ref, match, new, concat = TRUE) {
+  if(concat == TRUE) {
+    stringr::str_extract_all(id, "[^;]+") %>%
+      lapply(., function(x) match(x, ref[[match]])) %>%
+      Map("[", list(as.character(ref[[new]])), .) %>%
+      lapply(., function(x) paste(x, collapse = ";")) %>%
+      unlist()
+  } else if(concat == FALSE) {
+    stringr::str_extract_all(id, "[^;]+") %>%
+      lapply(., function(x) match(x, ref[[match]])) %>%
+      Map("[", list(as.character(ref[[new]])), .) %>%
+      unlist()
+  }
 }
