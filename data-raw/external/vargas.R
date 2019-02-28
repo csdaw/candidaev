@@ -34,8 +34,8 @@ clean_vargas <- function(df, badid, goodid, unip) {
   # add uniprot accessions and assign 1 protein per protein group (preferably one from the CANAL proteome)
   result <- result %>%
     mutate(proteome = stringr::str_extract(Fasta_header, "CANA."),
-           UP_accession = match_id(var_gene_name, unip, "UP_accession", "UP_gene_name"),
-           UP_accession2 = match_id(var_gene_name, unip, "UP_accession", "CGD_gene_name"),
+           UP_accession = match_id(var_gene_name, unip, "UP_gene_name", "UP_accession"),
+           UP_accession2 = match_id(var_gene_name, unip, "CGD_gene_name", "UP_accession"),
            UP_accession = gsub("NA", "", UP_accession)) %>%
     filter(proteome != "CANAX",
            var_gene_name != "orf19.10293") %>%
@@ -56,14 +56,9 @@ clean_vargas <- function(df, badid, goodid, unip) {
 }
 
 vargas <- clean_vargas(df = vargas,
-                    goodid = c("orf19.2516", "orf19.31", "GLX3", "orf19.2168.3", "RBT4"),
-                    badid = c("orf19.10052", "CIS302", "^orf19.251$", "CAWG_05907", "CAWG_00714"),
-                    unip = uniprot)
-
-
-# filter for proteins found in Strain 11 Candida EVs with min 1 peptide
-vargas <- vargas %>%
-  filter(S11_peptides > 0)
+                       goodid = c("orf19.2516", "orf19.31", "GLX3", "orf19.2168.3", "RBT4"),
+                       badid = c("orf19.10052", "CIS302", "^orf19.251$", "CAWG_05907", "CAWG_00714"),
+                       unip = uniprot)
 
 # write output .rda file
-usethis::use_data(vargas)
+usethis::use_data(vargas, overwrite = TRUE)

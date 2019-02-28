@@ -16,14 +16,10 @@ data(uniprot)
 gilbona <- read.csv(file = "data-raw/external/Gil-Bona_et_al_2015.csv", header = TRUE,
                 fileEncoding = "UTF-8-BOM", stringsAsFactors = FALSE, strip.white = TRUE)
 
-# filter for proteins found in SC5314 Candida EVs with min 1 peptide
-gilbona <- gilbona %>%
-  filter(!is.na(EV1_peptides) | !is.na(EV2_peptides) | !is.na(EV3_peptides))
-
 # add uniprot accession column by matching Gene_name column in gilbona
 gilbona$UP_accession <- match_id(gilbona$Gene_name, uniprot, "CGD_gene_name", "UP_accession")
 
 # write output .rda file
-usethis::use_data(gilbona)
+usethis::use_data(gilbona, overwrite = TRUE)
 
 

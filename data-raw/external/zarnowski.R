@@ -16,9 +16,5 @@ data(uniprot)
 zarnowski <- read.csv(file = "data-raw/external/Zarnowski_et_al_2018.csv", header = TRUE,
                       fileEncoding = "UTF-8-BOM", stringsAsFactors = FALSE)
 
-# filter for proteins found in planktonic SN152 Candida EVs
-zarnowski <- zarnowski %>%
-  filter(Planktonic_NTS > 0)
-
 # write output .rda file
-usethis::use_data(zarnowski)
+usethis::use_data(zarnowski, overwrite = TRUE)

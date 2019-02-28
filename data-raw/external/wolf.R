@@ -16,12 +16,8 @@ data(uniprot)
 wolf <- read.csv(file = "data-raw/external/Wolf_et_al_2015.csv", header = TRUE,
                  fileEncoding = "UTF-8-BOM", stringsAsFactors = FALSE)
 
-# filter for proteins found in SC5314 Candida EVs with min 1 peptide
-wolf <- wolf %>%
-  filter(!is.na(WT_pep))
-
 # add uniprot accession column by matching Gene_name column in wolf
 wolf$UP_accession <- match_id(wolf$Gene_name, uniprot, "CGD_gene_name", "UP_accession")
 
 # write output .rda file
-usethis::use_data(wolf)
+usethis::use_data(wolf, overwrite = TRUE)
