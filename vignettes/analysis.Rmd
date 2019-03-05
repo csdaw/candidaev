@@ -13,7 +13,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r, setup, echo=FALSE, message=FALSE}
+```{r setup, echo=FALSE, message=FALSE}
 knitr::opts_chunk$set(collapse = TRUE,
                       warning = FALSE,
                       message = FALSE,
@@ -174,7 +174,7 @@ ggarrange(total_pconc, total_pnum,
 
 Text.
 
-```{r, yeastInit}
+```{r yeastInit}
 yeast <- yeast %>% 
   filter(Reverse != "+", Potential.contaminant != "+", 
          Only.identified.by.site != "+", Unique.peptides >= 2)
@@ -248,7 +248,7 @@ ggarrange(y3a,
 
 Text.
 
-```{r, yeastFilt2}
+```{r yeastFilt2}
 # drop EV_1 and WCL_2
 yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_2")]
 
@@ -488,7 +488,7 @@ DT::datatable(yeast_res_short,
 
 Text.
 
-```{r, biofilmInit}
+```{r biofilmInit}
 biofilm <- biofilm %>% 
   filter(Reverse != "+", Potential.contaminant != "+", 
          Only.identified.by.site != "+", Unique.peptides >= 2)
@@ -564,7 +564,7 @@ ggarrange(b3a,
 Text.
 
 
-```{r, biofilmVenn}
+```{r biofilmVenn}
 # filter for proteins identified in min 1/5 reps of EV
 b_ev <- filter_na(biofilm_norm, op = "<=", 
                   pat = "EV", val = 4)
@@ -585,7 +585,7 @@ plot(b4)
 
 Text
 
-```{r, biofilmTop10}
+```{r biofilmTop10}
 # get top 10 most abundant protein exclusive to biofilm EVs
 # in descending order of abundance
 biofilm_top10 <- b_ev %>% 
@@ -607,7 +607,7 @@ knitr::kable(biofilm_top10,
 
 Text.
 
-```{r, biofilmSum}
+```{r biofilmSum}
 # explore percentage missing values in each sample
 knitr::kable(summarise_lfq(biofilm_norm), 
              caption = "A table caption", 
@@ -622,7 +622,7 @@ TEXT.
 
 TEXT.
 
-```{r, biofilmSum2, cache=TRUE}
+```{r biofilmSum2, cache=TRUE}
 # should not impute with so many missing values
 # filter for proteins with 4-5 NA values in EV or WCL
 biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=", 
@@ -655,7 +655,7 @@ ggarrange(b5a, b5b,
 
 TEXT. 
 
-```{r, biofilmImpute}
+```{r biofilmImpute}
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 
@@ -668,7 +668,7 @@ plot_imputation2(biofilm_exp, biofilm_both, biofilm_imp)
 
 TEXT.
 
-```{r, biofilmDE}
+```{r biofilmDE}
 # recombine imputed proteins and non-imputed proteins in matrix
 biofilm_de <- rbind(biofilm_excl, biofilm_imp)
 
@@ -747,14 +747,16 @@ DT::datatable(biofilm_res_short,
 
 TEXT
 
-```{r, zarnComp}
-data("zarnowski")
+```{r, biofilmComp}
+z_list_b <- zarnowski %>% 
+  filter(Biofilm_NTS > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
 
-zarn_list <- zarnowski %>% 
-  tibble::column_to_rownames(var = "UP_accession")
+b_ev_list <- match_id(rownames(b_ev), uniprot, "UP_accession", "CGD_gene_name", concat = FALSE)
 
-c1 <- plot_venn(list("mylist" = b_ev, "Zarn" = zarn_list), 
-                 use_uniprot = TRUE, type = "plot")
+c1 <- plot_venn(list("mylist" = b_ev_list, "Zarn" = z_list_b), 
+                 use_uniprot = FALSE, type = "plot")
 
 c1 <- as_ggplot(c1) + 
   theme(plot.margin = unit(c(0,2,0,2), "lines"))
@@ -765,14 +767,55 @@ plot(c1)
 
 TEXT
 
-```{r, allComp}
+```{r, yeastComp}
+g_list <- gilbona %>% 
+  filter(EV1_peptides > 0 | EV2_peptides > 0 | EV3_peptides > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+v_list <- vargas %>% 
+  filter(S11_peptides > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+w_list <- wolf %>% 
+  filter(WT_pep > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+z_list_y <- zarnowski %>% 
+  filter(Planktonic_NTS > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+y_ev_list <- match_id(rownames(y_ev), uniprot, "UP_accession", "CGD_gene_name", concat = FALSE)
+
+yeast_comp <- list("This paper" = y_ev_list, "Gil-Bona" = g_list, "Vargas" = v_list, "Wolf" = w_list, "Zarnowski" = z_list_y)
+
+upset(fromList(yeast_comp), 
+      point.size = 4.5, 
+      line.size = 2, 
+      mainbar.y.label = "\n\nIntersection protein number", 
+      mainbar.y.max = 400, 
+      sets.x.label = "Total protein number", 
+      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
+      order.by = "degree", 
+      queries = list(list(query = intersects, 
+                          params = list(c("This paper", "Gil-Bona", "Vargas", "Wolf", "Zarnowski")), 
+                          color = "limegreen", 
+                          active = TRUE)))
+yeast_comp_tab <- plot_venn(vlist = yeast_comp, use_uniprot = FALSE, type = "list") %>% 
+  mutate(..values.. = lapply(..values.., function(x) paste(x, collapse = ", ")))
+
+knitr::kable(yeast_comp_tab[1,], 
+             caption = "A table caption")
 
 
 
 ```
 
-
 # EV marker protein selection
+
 
 # Different strains test
 ## Introduction
@@ -793,44 +836,33 @@ Strain used:
 - zzzzzzz
 </div>
 
-```{r, atcc_exp}
-atcc_exp <- atcc_exp
-
-```
-
-
 ## Analysis
     
 ### Prepare data
-```{r, load_atcc}
-atcc_pg <- atcc
 
-```
+The untouched proteinGroups.txt file has `r nrow(atcc)` rows and `r ncol(atcc)`  columns.
 
-The untouched proteinGroups.txt file has `r nrow(atcc_pg)` rows and `r ncol(atcc_pg)`  columns.
+Each of the `r nrow(atcc)` rows corresponds to a single protein group. 
 
-Each of the `r nrow(atcc_pg)` rows corresponds to a single protein group. 
-
-```{r, prep_atcc}
-atcc <- atcc_pg %>% 
-  filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2)
-
-atcc <- convert_lfq(atcc, atcc_exp)
+```{r atccInit}
+atcc_lfq <- atcc %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2) %>% 
+  convert_lfq(., atcc_exp)
 
 ```
 
 First, filter any reverse and contaminant proteins. 
 Then select only proteins identified by at least 2 unique peptides.
 
-Now the dataset contains `r nrow(atcc)` proteins across the 12 samples.
+Now the dataset contains `r nrow(atcc_lfq)` proteins across the 12 samples.
 
-```{r, fig.cap="This is a figure caption"}
-f7a <- plot_frequency2(atcc)
+```{r atccInit2, fig.cap="This is a figure caption"}
+a1a <- plot_frequency2(atcc_lfq)
 
-f7b <- plot_numbers2(atcc, atcc_exp) + 
+a1b <- plot_numbers2(atcc_lfq, atcc_exp) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
-ggpubr::ggarrange(f7a, f7b,
+ggpubr::ggarrange(a1a, a1b,
                   labels = c("A", "B"), 
                   ncol = 2, 
                   nrow = 1, 
@@ -843,9 +875,9 @@ Table goes here.
 
 More text goes here.
 
-```{r}
+```{r atccInit3}
 
-knitr::kable(summarise_lfq(atcc), 
+knitr::kable(summarise_lfq(atcc_lfq), 
              caption = "A table caption", 
              col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
                            "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
@@ -859,53 +891,220 @@ Filter for proteins identified in 2/3 reps of at least 1 condition.
 
 
 
-```{r}
-atcc_filt <- filter_na4(atcc, "or", "<=", 
-                        pat1 = "10231_EV", 1, 
-                        pat2 = "10231_W", 1, 
-                        pat3 = "90028_EV", 1, 
-                        pat4 = "90028_W", 1)
+```{r atccFilt}
+atcc_filt <- filter_na4(atcc_lfq, "or", "<=", 
+                        pat1 = "A10231_EV", 1, 
+                        pat2 = "A10231_W", 1, 
+                        pat3 = "A90028_EV", 1, 
+                        pat4 = "A90028_W", 1)
 
-```
+a2a <- plot_frequency2(atcc_filt)
 
-Reduces `r nrow(atcc)` proteins to `r nrow(atcc_filt)`.
-
-```{r, fig.show='hide'}
-f8a <- plot_frequency2(atcc_filt)
-
-f8b <- plot_numbers2(atcc_filt, atcc_exp) + 
+a2b <- plot_numbers2(atcc_filt, atcc_exp) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
-a1_ev <- filter_na(atcc_filt, "<=", "10231_EV", 2)
-a1_w <- filter_na(atcc_filt, "<=", "10231_W", 2)
+a2c <- plot_mds(atcc_filt)
 
-a9_ev <- filter_na(atcc_filt, "<=", "90028_EV", 2)
-a9_w <- filter_na(atcc_filt, "<=", "90028_W", 2)
-
-f8c <- plot_venn(list("10231 ev" = a1_ev, "10231 wcl" = a1_w, 
-                      "90028 ev" = a9_ev, "90028 wcl" = a9_w),
-                 use_uniprot = TRUE, type = "plot")
-f8c <- ggpubr::as_ggplot(f8c) + theme(plot.margin = unit(c(0,5,0,5), "lines"))
+ggarrange(ggarrange(a2a, a2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
+                    font.label = list(size = 24, color = "black")), 
+          a2c, 
+          labels = c("", "C"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
 
 ```
 
-```{r, fig.height=7}
-ggpubr::ggarrange(ggpubr::ggarrange(f8a, f8b, ncol = 2, labels = c("A", "B")), 
-                  f8c, 
-                  nrow = 2, 
-                  labels = c("", "C"))
+Reduces `r nrow(atcc_lfq)` proteins to `r nrow(atcc_filt)`.
+
+Text.
+
+```{r atccNorm}
+atcc_norm <- normalizeCyclicLoess(atcc_filt)
+
+a3a <- plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
+
+a3b <- plot_mds(atcc_norm)
+
+a3c <- plot_dendro(atcc_norm)
+
+ggarrange(a3a, 
+          ggarrange(a3b, a3c, labels = c("B", "C"), ncol = 1, nrow = 2, font.label = list(size = 24, color = "black")), 
+          labels = c("A", ""), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+```
+
+Text.
+
+```{r atccVenn}
+
+# filter for proteins identified in min 1/3 reps of 10231 EV
+atcc1_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A10231_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 10231 WCL
+atcc1_w <- filter_na(atcc_norm, op = "<=", 
+                     pat = "A10231_W", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 EV
+atcc9_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 WCL
+atcc9_w <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_W", val = 2)
+
+a4 <- plot_venn(list("ATCC10231 EV" = atcc1_ev, "ATCC10231 WCL" = atcc1_w, 
+                     "ATCC90028 EV" = atcc9_ev, "ATCC90028 WCL" = atcc9_w), 
+                use_uniprot = TRUE, type = "plot")
+
+a4 <- as_ggplot(a4) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+
+plot(a4)
+
+```
+
+Text. 
+
+```{r atcc1Top10}
+# get top 10 most abundant protein exclusive to 10231 EVs
+# in descending order of abundance
+atcc1_top10 <- atcc1_ev %>% 
+  tibble::as_tibble(rownames = "id") %>% 
+  filter_na(., op = "==", pat = "A10231_W", val = 3) %>% 
+  select(id, contains("A10231_EV")) %>% 
+  mutate(mean = rowMeans(select(., contains("A10231_EV")), na.rm = TRUE)) %>% 
+  top_n(n = 10, wt = mean) %>% 
+  arrange(desc(mean)) %>% 
+  mutate(protein_name = match_id(id = id, uniprot, "UP_accession", "CGD_gene_name"), 
+         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+
+knitr::kable(atcc1_top10, 
+             caption = "This is a table caption", 
+             digits = 1)
+  
+
+```
+
+TEXT.
+
+```{r atcc9Top10}
+atcc9_top10 <- atcc9_ev %>% 
+  tibble::as_tibble(rownames = "id") %>% 
+  filter_na(., op = "==", pat = "A90028_W", val = 3) %>% 
+  select(id, contains("A90028_EV")) %>% 
+  mutate(mean = rowMeans(select(., contains("A90028_EV")), na.rm = TRUE)) %>% 
+  top_n(n = 10, wt = mean) %>% 
+  arrange(desc(mean)) %>% 
+  mutate(protein_name = match_id(id = id, uniprot, "UP_accession", "CGD_gene_name"), 
+         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+
+knitr::kable(atcc9_top10, 
+             caption = "This is a table caption", 
+             digits = 1)
+  
+```
+
+TEXT. 
+
+```{r atccSum}
+# explore percentage missing values in each sample
+knitr::kable(summarise_lfq(atcc_norm), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+```
+
+TEXT
+
+```{r atccSum2}
+# should not impute with so many missing values
+# filter for exclusive to 10231 EV or WCL or 90028 EV or WCL
+atcc_excl <- filter_na4(atcc_norm, logic = "or", op = "==", 
+                        pat1 = "A10231_EV", val1 = 3, 
+                        pat2 = "A10231_W", val2 = 3, 
+                        pat3 = "A90028_EV", val3 = 3, 
+                        pat4 = "A90028_W", val4 = 3)
+
+# filter for proteins with min 1 valid value in all 4 sample types
+atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=", 
+                        pat1 = "A10231_EV", val1 = 2, 
+                        pat2 = "A10231_W", val2 = 2, 
+                        pat3 = "A90028_EV", val3 = 2, 
+                        pat4 = "A90028_W", val4 = 2)
+
+knitr::kable(summarise_lfq(atcc_both), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+a5a <- grid::grid.grabExpr(plot_missval2(atcc_both))
+
+a5b <- grid::grid.grabExpr(plot_detect2(atcc_both))
+
+ggarrange(a5a, a5b, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, colour = "black"))
+```
+
+TEXT.
+
+```{r atccImpute}
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+atcc_imp <- impute_QRILC(atcc_both)
+
+plot_imputation2(atcc_exp, atcc_both, atcc_imp)
+
+```
+
+TEXT.
+
+```{r atccDE, eval=FALSE}
+# recombine imputed proteins and non-imputed proteins in matrix
+atcc_de <- rbind(atcc_excl, atcc_imp)
+
+colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de), 
+                                                     c("A10231_", "A90028_"), 
+                                                     c("A1_", "A9_"), 
+                                                     vectorize_all = FALSE)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3)))
+
+atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
+colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+
+atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W")
+
+# make all pair-wise comparisons for specified contrasts
+# and perform limma::eBayes()
+atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
+
+# extract overall results
+atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, type = "overall")
+
+# extract results for individual comparisons defined in atcc_contrasts
+atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, type = "individual")
+
 ```
 
 
-Some words.
-
-
-
-
-
-
-
-
+TEXT.
 
 
 
