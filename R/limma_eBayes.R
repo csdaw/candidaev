@@ -1,3 +1,19 @@
+#' Title
+#'
+#' Description.
+#'
+#' @param mat Description.
+#'
+#' @param design Description.
+#'
+#' @param contrasts Description.
+#'
+#' @return Description.
+#'
+#' @examples
+#' #example
+#'
+#' @export
 limma_eBayes <- function(mat, design, contrasts) {
   cm <- limma::makeContrasts(contrasts = contrasts, levels = design)
   fit <- limma::lmFit(mat, design = design)

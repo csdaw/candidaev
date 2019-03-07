@@ -27,6 +27,8 @@ library(candidaev)
 library(tidyNano)
 library(ggpubr)
 library(UpSetR)
+
+set.seed(1)
 ```
 
 # Introduction
@@ -35,7 +37,7 @@ library(UpSetR)
 
 Text.
 
-```{r, nta_tech_avg}
+```{r nta_tech_avg}
 data(nta)
 
 df <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
@@ -203,7 +205,7 @@ knitr::kable(summarise_lfq(yeast_lfq),
 
 Text.
 
-```{r, yeastFilt}
+```{r yeastFilt}
 # filter for proteins identified in min 3/4 reps of EV or WCL
 yeast_filt <- filter_na2(yeast_lfq, logic = "or", 
                          op = "<=", 
@@ -228,7 +230,7 @@ ggarrange(ggarrange(y2a, y2b, labels = c("A", "B"), ncol = 1, nrow = 2,
 
 Text.
 
-```{r, yeastNorm}
+```{r yeastNorm}
 yeast_norm <- normalizeCyclicLoess(yeast_filt)
 
 y3a <- plot_normalization2(yeast_exp, yeast_filt, yeast_norm)
@@ -252,18 +254,10 @@ Text.
 # drop EV_1 and WCL_2
 yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_2")]
 
-# filter for proteins identified in min 3/3 reps of EV or WCL
-yeast_lfq2_1 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
-                           pat1 = "EV", val1 = 0, 
-                           pat2 = "W", val2 = 0)
-
-# filter for proteins identified in exactly 2/3 reps of EV and WCL
-yeast_lfq2_2 <- filter_na2(yeast_lfq2, logic = "and", op = "==", 
-                           pat1 = "EV", val1 = 1, 
-                           pat2 = "WCL", val2 = 1)
-
-# stick matrices together
-yeast_filt2 <- rbind(yeast_lfq2_1, yeast_lfq2_2)
+# filter for proteins identified in min 2/3 reps of EV or WCL
+yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
+                          pat1 = "EV", val1 = 1, 
+                          pat2 = "W", val2 = 1)
 
 # create plots
 y4a <- plot_frequency2(yeast_filt2)
@@ -287,7 +281,7 @@ ggarrange(ggarrange(y4a, y4b, labels = c("A", "B"), ncol = 1, nrow = 2,
 
 Text.
 
-```{r, yeastNorm2}
+```{r yeastNorm2}
 yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
 
 y5a <- plot_normalization2(yeast_exp, yeast_filt2, yeast_norm2)
@@ -306,7 +300,7 @@ ggarrange(y5a,
 
 ```
 
-```{r, yeastVenn}
+```{r yeastVenn}
 # filter for proteins identified in min 1/3 reps of EV
 y_ev <- filter_na(yeast_norm2, op = "<=", 
                   pat = "EV", val = 2)
@@ -327,7 +321,7 @@ plot(y6)
 
 Text
 
-```{r, yeastTop10}
+```{r yeastTop10}
 # get top 10 most abundant protein exclusive to yeast EVs
 # in descending order of abundance
 yeast_top10 <- y_ev %>% 
@@ -349,7 +343,7 @@ knitr::kable(yeast_top10,
 
 Text.
 
-```{r, yeastSum}
+```{r yeastSum}
 # explore percentage missing values in each sample
 knitr::kable(summarise_lfq(yeast_norm2), 
              caption = "A table caption", 
@@ -362,7 +356,7 @@ knitr::kable(summarise_lfq(yeast_norm2),
 
 TEXT.
 
-```{r, yeastSum2, cache=TRUE}
+```{r yeastSum2}
 
 # should not impute with so many missing values
 yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
@@ -394,7 +388,7 @@ ggarrange(y7a, y7b,
 
 TEXT. 
 
-```{r, yeastImpute}
+```{r yeastImpute}
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 
@@ -407,7 +401,7 @@ plot_imputation2(yeast_exp, yeast_both, yeast_imp)
 
 TEXT.
 
-```{r, yeastDE}
+```{r yeastDE}
 # recombine imputed proteins and non-imputed proteins in matrix
 yeast_de <- rbind(yeast_excl, yeast_imp)
 
@@ -747,7 +741,7 @@ DT::datatable(biofilm_res_short,
 
 TEXT
 
-```{r, biofilmComp}
+```{r biofilmComp}
 z_list_b <- zarnowski %>% 
   filter(Biofilm_NTS > 0) %>% 
   mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
@@ -767,7 +761,7 @@ plot(c1)
 
 TEXT
 
-```{r, yeastComp}
+```{r yeastComp}
 g_list <- gilbona %>% 
   filter(EV1_peptides > 0 | EV2_peptides > 0 | EV3_peptides > 0) %>% 
   mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
@@ -815,6 +809,54 @@ knitr::kable(yeast_comp_tab[1,],
 ```
 
 # EV marker protein selection
+
+TEXT.
+
+```{r markerComparison}
+
+marker_comp <- list("yev up" = yeast_res %>% 
+                      filter(group == "ev up") %>% 
+                      pull(CGD_gene_name), 
+                    "yev ex" = yeast_res %>% 
+                      filter(group == "ev ex") %>% 
+                      pull(CGD_gene_name), 
+                    "bev up" = biofilm_res %>% 
+                      filter(group == "ev up") %>% 
+                      pull(CGD_gene_name), 
+                    "bev ex" = biofilm_res %>% 
+                      filter(group == "ev ex") %>% 
+                      pull(CGD_gene_name))
+
+upset(fromList(marker_comp), 
+      point.size = 4.5, 
+      line.size = 2, 
+      mainbar.y.label = "\n\nIntersection protein number", 
+      mainbar.y.max = 400, 
+      sets.x.label = "Total protein number", 
+      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
+      order.by = "degree")
+marker_comp_tab <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "list")
+
+knitr::kable(marker_comp_tab, 
+             caption = "A table caption")
+
+
+```
+
+TEXT.
+
+```{r markerExtract}
+# marker_candidates <- marker_comp_tab %>% 
+#   filter(..count.. > 0 & ..count.. < 40) %>% 
+#   pull(..values..) %>% 
+#   set_names(c("both ex", "yev up bev ex", "yev ex bev up", "both up"))
+
+marker_candidates <- marker_comp_tab %>% 
+  filter(..count.. > 0 & apply(.[, 1:4], 1, sum) > 1) %>% 
+  pull(..values..) %>% 
+  unlist()
+
+```
 
 
 # Different strains test
@@ -1040,6 +1082,8 @@ atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=",
                         pat3 = "A90028_EV", val3 = 2, 
                         pat4 = "A90028_W", val4 = 2)
 
+
+
 knitr::kable(summarise_lfq(atcc_both), 
              caption = "A table caption", 
              col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
@@ -1067,13 +1111,13 @@ TEXT.
 # use left censored imputation method
 atcc_imp <- impute_QRILC(atcc_both)
 
-plot_imputation2(atcc_exp, atcc_both, atcc_imp)
+plot_imputation2(atcc_exp, atcc_both, atcc_imp) #a6
 
 ```
 
 TEXT.
 
-```{r atccDE, eval=FALSE}
+```{r atccDE}
 # recombine imputed proteins and non-imputed proteins in matrix
 atcc_de <- rbind(atcc_excl, atcc_imp)
 
@@ -1096,17 +1140,142 @@ atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_
 atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
 
 # extract overall results
-atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, type = "overall")
+atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "overall")
 
 # extract results for individual comparisons defined in atcc_contrasts
-atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, type = "individual")
+atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "individual")
+
+a1_res <- atcc_ind[[1]]
+
+a9_res <- atcc_ind[[2]]
+
+aev_res <- atcc_ind[[3]]
+
+aw_res <- atcc_ind[[4]]
 
 ```
 
 
 TEXT.
 
+```{r atccVolcano}
 
+a7a <- plot_volcano(data = a1_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("orange", "purple"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+a7b <- plot_volcano(data = a9_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("red", "blue"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+a7c <- plot_volcano(data = aev_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("orange", "red"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+a7d <- plot_volcano(data = aw_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("purple", "blue"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+ggarrange(a7a, a7c,
+          a7b, a7d,
+          labels = c("A", "C", "B", "D"), 
+          ncol = 2, 
+          nrow = 2)
+
+```
+
+TEXT.
+
+```{r atccHeatmap}
+atcc_htmp <- atcc_overall %>% 
+  select(1, 4:15, 24) %>% 
+  tibble::column_to_rownames(var = "UP_accession") %>% 
+  as.matrix()
+
+plot_heatmap2(atcc_htmp, atcc_exp, uniprot, kmeans = TRUE, k = 5, clustering_distance = "euclidean", show_row_names = FALSE)
+
+
+```
+
+TEXT.
+
+```{r markerComparison2}
+
+marker_comp2 <- list("a1_ev up" = a1_res %>% 
+                      filter(group == "A1_EV up") %>% 
+                      pull(CGD_gene_name), 
+                    "a1_ev ex" = a1_res %>% 
+                      filter(group == "A1_EV ex") %>% 
+                      pull(CGD_gene_name), 
+                    "a9_ev up" = a9_res %>% 
+                      filter(group == "A9_EV up") %>% 
+                      pull(CGD_gene_name), 
+                    "a9_ev ex" = a9_res %>% 
+                      filter(group == "A9_EV ex") %>% 
+                      pull(CGD_gene_name))
+
+upset(fromList(marker_comp2), 
+      point.size = 4.5, 
+      line.size = 2, 
+      mainbar.y.label = "\n\nIntersection protein number", 
+      mainbar.y.max = 400, 
+      sets.x.label = "Total protein number", 
+      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
+      order.by = "degree")
+marker_comp_tab2 <- plot_venn(vlist = marker_comp2, use_uniprot = FALSE, type = "list")
+
+knitr::kable(marker_comp_tab2, 
+             caption = "A table caption")
+
+
+```
+
+TEXT.
+
+```{r markerExtract2}
+marker_candidates2 <- marker_comp_tab2 %>% 
+  filter(..count.. > 0 & apply(.[, 1:4], 1, sum) > 1) %>% 
+  pull(..values..) %>% 
+  unlist()
+
+test_can <- intersect(marker_candidates, marker_candidates2) %>% 
+  stringr::str_extract_all(., "[^;]+") %>% 
+  unlist()
+
+test <- uniprot %>% 
+  filter(CGD_gene_name %in% test_can)
+
+DT::datatable(test, 
+              caption = "This is a table caption.", 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(targets = c(7:10, 13:21), 
+                                       render = DT::JS(
+                                         "function(data, type, row, meta) {",
+                                         "return type === 'display' && data.length > 40 ?",
+                                         "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
+                                         "}"))
+                                  )
+                )
+              )
+
+```
 
 
 

@@ -1,4 +1,20 @@
-get_results <- function(efit, mat, cutoff = 0.01, type = c("overall", "individual")) {
+#' Title
+#'
+#' Description.
+#'
+#' @param efit Description
+#' @param mat Description
+#' @param p_val Description
+#' @param lfc Description
+#' @param type Description
+#'
+#' @return Description
+#'
+#' @examples
+#' # example
+#'
+#' @export
+get_results <- function(efit, mat, p_val = 0.01, lfc = 0, type = c("overall", "individual")) {
   if(type == "overall") {
     df <- as.data.frame(mat) %>%
       tibble::rownames_to_column(var = "UP_accession")
@@ -7,8 +23,8 @@ get_results <- function(efit, mat, cutoff = 0.01, type = c("overall", "individua
       tibble::rownames_to_column(var = "UP_accession")
 
     result <- left_join(df, tt, by = "UP_accession") %>%
-      mutate(significant = case_when(adj.P.Val < cutoff ~ TRUE,
-                                     adj.P.Val > cutoff ~ FALSE),
+      mutate(significant = case_when(adj.P.Val < p_val ~ TRUE,
+                                     adj.P.Val > p_val ~ FALSE),
              CGD_gene_name = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name"),
              Protein_name = match_id(UP_accession, uniprot, "UP_accession", "Protein_name")) %>%
       select(UP_accession, CGD_gene_name, Protein_name, everything())
@@ -45,11 +61,13 @@ get_results <- function(efit, mat, cutoff = 0.01, type = c("overall", "individua
 
       result[[i]] <- tt %>%
         left_join(lfq_df, ., by = "UP_accession") %>%
-        mutate(significant = case_when(adj.P.Val < cutoff ~ TRUE,
-                                       adj.P.Val > cutoff ~ FALSE),
+        mutate(significant = case_when(adj.P.Val < p_val & logFC > lfc ~ TRUE,
+                                       adj.P.Val < p_val & logFC < -lfc ~ TRUE,
+                                       adj.P.Val < p_val & logFC < lfc & logFC > -lfc ~ FALSE,
+                                       adj.P.Val > p_val ~ FALSE),
                group = case_when(significant == FALSE ~ "not sig",
-                                 significant == TRUE & logFC > 0 ~ paste(c1, "up"),
-                                 significant == TRUE & logFC < 0 ~ paste(c2, "up"),
+                                 significant == TRUE & logFC > lfc ~ paste(c1, "up"),
+                                 significant == TRUE & logFC < -lfc ~ paste(c2, "up"),
                                  is.na(significant) == TRUE & is.na(.[[c1_labels[1]]]) == TRUE ~ paste(c2, "ex"),
                                  is.na(significant) == TRUE & is.na(.[[c2_labels[1]]]) == TRUE ~ paste(c1, "ex")),
                CGD_gene_name = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name"),

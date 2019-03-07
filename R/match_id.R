@@ -12,6 +12,7 @@
 #' values to be matched against
 #' @param new string: column name of character column in reference table with new
 #' information to replace matches
+#' @param concat Description.
 #'
 #' @return A vector with the same length as \code{id} but with the values replaced
 #' with corresponding information from the reference table.

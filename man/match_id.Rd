@@ -4,7 +4,7 @@
 \alias{match_id}
 \title{Replace values based on match}
 \usage{
-match_id(id, ref, match, new)
+match_id(id, ref, match, new, concat = TRUE)
 }
 \arguments{
 \item{id}{character vector: the values to be matched}
@@ -16,6 +16,8 @@ values to be matched against}
 
 \item{new}{string: column name of character column in reference table with new
 information to replace matches}
+
+\item{concat}{Description.}
 }
 \value{
 A vector with the same length as \code{id} but with the values replaced
