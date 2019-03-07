@@ -7,33 +7,65 @@
 assert_exd(df)
 }
 \arguments{
-\item{df}{data frame: experimental design for proteomics experiment}
+\item{df}{data frame: the experimental design for proteomics experiment. See
+examples section for an example of a correct experimental design.}
 }
 \value{
-\code{TRUE} if experimental design has correct columns.
+Return \code{TRUE} if experimental design has correct columns.
 
-Prints an error messages if there are extra and/or missing columns, with
+Print an error message if there are extra and/or missing columns, with
 the names of those extra and/or missing columns.
 }
 \description{
-Certain plot functions adapted from the \href{doi.org/10.18129/B9.bioc.DEP}{DEP}
+Certain plot functions in this package which are adapted from the
+\href{http://doi.org/10.18129/B9.bioc.DEP}{DEP}
 package require an experimental design to define data groups and labels.
 This internal function ensures that only the exact, correct columns are
 present in the experimental design data frame.
-}
-\details{
+
 Extraneous columns are named so they can be removed and missing
 columns are also named so they can be added to the experimental
 design.
+
+This function a slightly modified version of the \code{assert_colnames} function
+from the \href{https://cran.r-project.org/web/packages/assertable/index.html}{assertable}
+package. \code{assert_exd} is meant to be used with the \code{assert_that} function from the
+\href{https://cran.r-project.org/web/packages/assertthat/index.html}{assertthat}
+package.
 }
 \examples{
-# example of a correct experimental design
-exp <- c(ID = c("A", "B", "C"),
-         label = c("LFQ.intensity.A", "LFQ.intensity.B", "LFQ.intensity.C"),
-         condition = c("sample", "sample", "control"),
-         replicate = c(1, 2, 1))
+# example of a correct experimental design for
+# a MaxQuant proteinGroups.txt file
+exp <- data.frame(ID = c("A", "B", "C"),
+                  label = c("LFQ.intensity.A",
+                            "LFQ.intensity.B",
+                            "LFQ.intensity.C"),
+                  condition = c("sample",
+                                "sample",
+                                "control"),
+                  replicate = c(1, 2, 1))
+
+# use assert_exd within a function definition
+my_fun <- function(x) {
+  assertthat::assert_that(assert_exd(x))
+
+  # rest of function goes here
+}
+
+# function will stop if exp is not correct
+my_fun(exp)
 
 }
 \seealso{
-This function is used in \code{\link{plot_heatmap2}}, etc.
+This function is used in the following
+\pkg{candidaev} package functions:
+\itemize{
+\item \code{\link{convert_lfq}}
+\item \code{\link{get_annotation2}}
+\item \code{\link{plot_heatmap2}}
+\item \code{\link{plot_imputation2}}
+\item \code{\link{plot_normalization2}}
+\item \code{\link{plot_numbers2}}
+\item \code{\link{plot_volcano2}}
+}
 }
