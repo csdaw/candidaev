@@ -1,0 +1,1306 @@
+---
+title: "Analysis"
+author: "Charlotte Dawson"
+date: "2018-01-20"
+output:
+  bookdown::html_document2:
+    toc: true
+    toc_float: true
+    df_print: kable
+vignette: > 
+  %\VignetteIndexEntry{Vignette title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(collapse = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      echo = FALSE,
+                      comment = "#>")
+# use fig.path="../vignettes/figures" to save generated figures
+library(limma)
+library(dplyr)
+library(ggplot2)
+library(candidaev)
+library(tidyNano)
+library(ggpubr)
+library(UpSetR)
+
+set.seed(1)
+```
+
+# Introduction
+
+# EV characterisation
+
+Text.
+
+```{r nta_tech_avg}
+data(nta)
+
+df <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
+                        "Biofilm_1", "Biofilm_2", "Biofilm_3", "Biofilm_4", "Biofilm_5", 
+                        "DAY286_1", "DAY286_2", "DAY286_3"), 
+                 Protein_conc = c(0.192, 0.282, 0.287, 0.424, 0.716, 0.584, 0.204, 0.198, 0.297, 0.193, 0.416, 0.437, 0.360, 0.447), 
+                 Culture_vol = c(rep(150, 6), rep(1000, 5), rep(200, 3)), 
+                 OD600 = c(0.455*20, 0.557*20, 0.615*20, 0.310*50, 0.337*50, 0.297*50, rep(NA, 5), 36.2, 39.7, 34.0), 
+                 stringsAsFactors = FALSE)
+
+nta_techavg <- nta %>% 
+  nanolyze(particle_size, Strain, Bio_rep, Dilution, 
+           name = "Tech_rep", 
+           param_var = True_count)
+
+nta_techavg %>% 
+  ggplot(aes(x = particle_size, y = Tech_rep_mean, colour = Bio_rep)) + 
+  geom_line(size = 1) + 
+  facet_wrap(~ Strain, scales = "free") + 
+  theme_classic()
+
+```
+
+Text.
+
+```{r}
+nta_bioavg <- nta_techavg %>% 
+  nanolyze(particle_size, Strain,
+           name = "Bio_rep", 
+           param_var = Tech_rep_mean) %>% 
+  mutate(facet = case_when(Strain == "Biofilm" ~ "first", TRUE ~ "second"))
+
+nta_bioavg %>% 
+  ggplot(aes(x = particle_size, y = Bio_rep_mean, colour = Strain)) + 
+  geom_line(size = 1) + 
+  facet_wrap(~ facet, scales = "free") + 
+  theme_classic()
+  
+```
+
+Text
+
+```{r}
+nta_total <- nta_techavg %>% 
+  nanocount(Strain, Bio_rep, Dilution, 
+            param_var = Tech_rep_mean) %>% 
+  tidyr::unite("id", Strain, Bio_rep) %>% 
+  mutate(protein_conc = as.numeric(match_id(id, df, "id", "Protein_conc")), 
+         od = match_id(id, df, "id", "OD600"), 
+         part_per_prot = Particle_count / protein_conc / 1000) %>% 
+  tidyr::separate(col = id, into = c("Strain", "Bio_rep"), sep = "_", remove = TRUE)
+
+nanoShapiro(nta_total, Strain, value = part_per_prot)
+
+nanoShapiro(nta_total, Strain, value = Particle_count)
+
+```
+
+Text.
+
+```{r}
+tukey_hsd <- function(x, ...) {
+  res <- TukeyHSD(x, ...) %>%
+    broom::tidy() %>%
+    mutate(comparison2 = comparison) %>%
+    tidyr::separate(comparison2, into= c("group2", "group1"), sep = "-") %>%
+    rename(p.adj = adj.p.value) %>%
+    mutate(p.adj = signif(p.adj, 2)) %>%
+    select(term, group1, group2, everything(), -term)
+  res
+}
+
+dunns_test <- function(x, g, method, ...) {
+  # capture console output before it prints
+  dtres <- utils::capture.output(res <- dunn.test::dunn.test(x, g, method, ...))
+  
+  # convert returned list `res` to data.frame
+  res <- res %>% 
+    as.data.frame() %>% 
+    rename(p.adj = P.adjusted, p.val = P, comparison = comparisons) %>% 
+    tidyr::separate(comparison, into = c("group2", "group1"), sep = " - ", remove= FALSE) %>% 
+    mutate(p.adj = signif(p.adj, 2)) %>% 
+    select(group1, group2, comparison, everything())
+    res
+}
+```
+
+
+```{r}
+# total particle concentration not normally distributed for biofilm
+# use Kruskal Wallis then Dunn's test
+stat.test <- dunns_test(x = nta_total$Particle_count, 
+                        g = nta_total$Strain, method = "bh")
+
+# total particle number per ug protein all normally distributed
+# use ANOVA then Tukey's HSD
+stat.test2 <- aov(part_per_prot ~ Strain, data = nta_total) %>% 
+  tukey_hsd()
+
+# save total particle concentration plot
+total_pconc <- nta_total %>% 
+  ggboxplot(x = "Strain", y = "Particle_count", 
+            color = "Strain", palette = "jco", add = "jitter") 
+total_pconc <- ggpar(total_pconc, 
+                     yscale = "log10", 
+                     format.scale = TRUE, 
+                     ylim = c(1e11, 1e13)) + 
+  stat_pvalue_manual(stat.test[c(1,2), ], label = "p.adj", 
+                     y.position = c(12.4, 13), 
+                     tip.length = 4e-3)
+
+# save total particle number per ug protein plot
+total_pnum <- nta_total %>% 
+  ggboxplot(x = "Strain", y = "part_per_prot", 
+            color = "Strain", palette = "jco", add = "jitter")
+total_pnum <- ggpar(total_pnum, 
+                    yscale = "log10", 
+                    format.scale = TRUE, 
+                    ylim = c(8e8, 8e10)) + 
+  stat_pvalue_manual(stat.test2[c(2,4,6), ], label = "p.adj", 
+                     y.position = c(10.7, 10.5, 10.9), 
+                     tip.length = 1e-2)
+
+# plot both
+ggarrange(total_pconc, total_pnum, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+  
+```
+
+# Yeast DAY286 
+
+## Analysis
+
+Text.
+
+```{r yeastInit}
+yeast <- yeast %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", 
+         Only.identified.by.site != "+", Unique.peptides >= 2)
+
+yeast_lfq <- convert_lfq(yeast, yeast_exp)
+
+y1a <- plot_frequency2(yeast_lfq)
+
+y1b <- plot_numbers2(yeast_lfq, yeast_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggarrange(y1a, y1b, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+knitr::kable(summarise_lfq(yeast_lfq), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+```
+
+Text.
+
+```{r yeastFilt}
+# filter for proteins identified in min 3/4 reps of EV or WCL
+yeast_filt <- filter_na2(yeast_lfq, logic = "or", 
+                         op = "<=", 
+                         pat1 = "EV", val1 = 1, 
+                         pat2 = "W", val2 = 1)
+
+y2a <- plot_frequency2(yeast_filt)
+
+y2b <- plot_numbers2(yeast_filt, yeast_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+y2c <- plot_mds(yeast_filt)
+
+ggarrange(ggarrange(y2a, y2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
+                    font.label = list(size = 24, color = "black")), 
+          y2c, 
+          labels = c("", "C"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+```
+
+Text.
+
+```{r yeastNorm}
+yeast_norm <- normalizeCyclicLoess(yeast_filt)
+
+y3a <- plot_normalization2(yeast_exp, yeast_filt, yeast_norm)
+
+y3b <- plot_mds(yeast_norm)
+
+y3c <- plot_dendro(yeast_norm)
+
+ggarrange(y3a, 
+          ggarrange(y3b, y3c, labels = c("B", "C"), ncol = 1, nrow = 2, font.label = list(size = 24, color = "black")), 
+          labels = c("A", ""), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+```
+
+Text.
+
+```{r yeastFilt2}
+# drop EV_1 and WCL_2
+yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_2")]
+
+# filter for proteins identified in min 2/3 reps of EV or WCL
+yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
+                          pat1 = "EV", val1 = 1, 
+                          pat2 = "W", val2 = 1)
+
+# create plots
+y4a <- plot_frequency2(yeast_filt2)
+
+y4b <- plot_numbers2(yeast_filt2, yeast_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+y4c <- plot_mds(yeast_filt2)
+
+ggarrange(ggarrange(y4a, y4b, labels = c("A", "B"), ncol = 1, nrow = 2, 
+                    font.label = list(size = 24, color = "black")), 
+          y4c, 
+          labels = c("", "C"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+
+
+```
+
+Text.
+
+```{r yeastNorm2}
+yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
+
+y5a <- plot_normalization2(yeast_exp, yeast_filt2, yeast_norm2)
+
+y5b <- plot_mds(yeast_norm2)
+
+y5c <- plot_dendro(yeast_norm2)
+
+ggarrange(y5a, 
+          ggarrange(y5b, y5c, labels = c("B", "C"), ncol = 1, nrow = 2, 
+                    font.label = list(size = 24, color = "black")), 
+          labels = c("A", ""), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+```
+
+```{r yeastVenn}
+# filter for proteins identified in min 1/3 reps of EV
+y_ev <- filter_na(yeast_norm2, op = "<=", 
+                  pat = "EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of WCL
+y_wcl <- filter_na(yeast_norm2, op = "<=", 
+                   pat = "W", val = 2)
+
+y6 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl), 
+                 use_uniprot = TRUE, type = "plot")
+
+y6 <- as_ggplot(y6) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+
+plot(y6)
+
+```
+
+Text
+
+```{r yeastTop10}
+# get top 10 most abundant protein exclusive to yeast EVs
+# in descending order of abundance
+yeast_top10 <- y_ev %>% 
+  tibble::as_tibble(rownames = "id") %>% 
+  filter_na(., op = "==", pat = "W", val = 3) %>% 
+  select(-contains("W")) %>% 
+  mutate(mean = rowMeans(select(., contains("EV")))) %>% 
+  top_n(n = 10, wt = mean) %>% 
+  arrange(desc(mean)) %>% 
+  mutate(protein_name = match_id(id, uniprot, "UP_accession", "CGD_gene_name"), 
+         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+
+knitr::kable(yeast_top10, 
+             caption = "This is a table caption", 
+             digits = 1)
+  
+
+```
+
+Text.
+
+```{r yeastSum}
+# explore percentage missing values in each sample
+knitr::kable(summarise_lfq(yeast_norm2), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+```
+
+TEXT.
+
+```{r yeastSum2}
+
+# should not impute with so many missing values
+yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
+                         pat1 = "EV", val1 = 3, 
+                         pat2 = "W", val2 = 3)
+
+yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=", 
+                         pat1 = "EV", val1 = 2, 
+                         pat2 = "W", val2 = 2)
+
+knitr::kable(summarise_lfq(yeast_both), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+y7a <- grid::grid.grabExpr(plot_missval2(yeast_both))
+
+y7b <- grid::grid.grabExpr(plot_detect2(yeast_both))
+
+ggarrange(y7a, y7b, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, colour = "black"))
+
+```
+
+TEXT. 
+
+```{r yeastImpute}
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+yeast_imp <- impute_QRILC(yeast_both)
+
+plot_imputation2(yeast_exp, yeast_both, yeast_imp)
+
+```
+
+TEXT.
+
+```{r yeastDE}
+# recombine imputed proteins and non-imputed proteins in matrix
+yeast_de <- rbind(yeast_excl, yeast_imp)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+y_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+y_design <- stats::model.matrix(~ 0 + T, data = y_samp)
+colnames(y_design) <- c("EV", "WCL")
+
+# make all pair-wise comparisons between EV and WCL
+y_cm <- makeContrasts("EV_vs_WCL" = EV - WCL, levels = y_design)
+y_fit <- lmFit(yeast_de, design = y_design)
+y_fit_cm <- contrasts.fit(y_fit, y_cm)
+y_efit <- eBayes(y_fit_cm)
+
+# extract DE results and create results table
+yeast_tt <- topTable(y_efit, sort.by = "none", number = Inf) %>% 
+  as.matrix()
+
+yeast_res <- combine_result(mat = yeast_de, toptab = yeast_tt) %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "UP_accession") %>% 
+  mutate(group = case_when(significant == 0 ~ "not sig",
+                           significant == 1 & logFC > 0 ~ "ev up",
+                           significant == 1 & logFC < 0 ~ "wcl up",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(y_ev) ~ "ev ex",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(y_wcl) ~ "wcl ex"),
+         in_ev = ifelse(UP_accession %in% rownames(y_ev), TRUE, FALSE),
+         in_wcl = ifelse(UP_accession %in% rownames(y_wcl), TRUE, FALSE),
+         CGD_gene_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "CGD_gene_name"),
+         Protein_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "Protein_name"), 
+         significant = as.logical(significant)) %>%
+  select(UP_accession, CGD_gene_name, Protein_name, everything())
+
+yeast_res_short <- yeast_res %>% 
+  select(CGD_gene_name, Protein_name, logFC, AveExpr, adj.P.Val, significant, group) %>% 
+  mutate_at(.vars = vars(logFC, AveExpr), 
+            .funs = list(~round(., digits = 2))) %>% 
+  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
+         group = as.factor(group))
+
+DT::datatable(yeast_res_short, 
+              caption = "This is a table caption. Note that adjusted p values have been shortened
+              to three significant figures for ease of display.", 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name", 
+                           "Protein" = "Protein_name", 
+                           "p.adj" = "adj.P.Val", 
+                           "sig" = "significant"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(width = "40%", targets = 1), 
+                                  list(width = "10%", targets = c(0, 2:6)), 
+                                  list(targets = 1, 
+                                       render = DT::JS(
+                                         "function(data, type, row, meta) {",
+                                         "return type === 'display' && data.length > 40 ?",
+                                         "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
+                                         "}")), 
+                                  list(targets = 0, 
+                                       render = DT::JS("function(data, type, row, meta) {",
+                                         "return type === 'display' && data.length > 12 ?",
+                                         "'<span title=\"' + data + '\">' + data.substr(0, 12) + '...</span>' : data;",
+                                         "}"))
+                                  )
+                )
+              )
+
+
+```
+
+
+# Biofilm DAY286
+
+## Analysis
+
+Text.
+
+```{r biofilmInit}
+biofilm <- biofilm %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", 
+         Only.identified.by.site != "+", Unique.peptides >= 2)
+
+biofilm_lfq <- convert_lfq(biofilm, biofilm_exp)
+
+b1a <- plot_frequency2(biofilm_lfq)
+
+b1b <- plot_numbers2(biofilm_lfq, biofilm_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggarrange(b1a, b1b, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+knitr::kable(summarise_lfq(biofilm_lfq), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+```
+
+Text.
+
+Text.
+
+```{r, biofilmFilt}
+# filter for proteins identified in min 4/5 reps of EV or WCL
+biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=", 
+                           pat1 = "EV", val1 = 1, 
+                           pat2 = "W", val2 = 1)
+
+b2a <- plot_frequency2(biofilm_filt)
+
+b2b <- plot_numbers2(biofilm_filt, biofilm_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+b2c <- plot_mds(biofilm_filt)
+
+ggarrange(ggarrange(b2a, b2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
+                    font.label = list(size = 24, color = "black")), 
+          b2c, 
+          labels = c("", "C"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+```
+
+Text.
+
+```{r, biofilmNorm}
+biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
+
+b3a <- plot_normalization2(biofilm_exp, biofilm_filt, biofilm_norm)
+
+b3b <- plot_mds(biofilm_norm)
+
+b3c <- plot_dendro(biofilm_norm)
+
+ggarrange(b3a, 
+          ggarrange(b3b, b3c, labels = c("B", "C"), ncol = 1, nrow = 2, font.label = list(size = 24, color = "black")), 
+          labels = c("A", ""), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+```
+
+Text.
+
+
+```{r biofilmVenn}
+# filter for proteins identified in min 1/5 reps of EV
+b_ev <- filter_na(biofilm_norm, op = "<=", 
+                  pat = "EV", val = 4)
+
+# filter for proteins identified in min 1/5 reps of WCL
+b_wcl <- filter_na(biofilm_norm, op = "<=", 
+                   pat = "W", val = 4)
+
+b4 <- plot_venn(list("EV" = b_ev, "WCL" = b_wcl), 
+                 use_uniprot = TRUE, type = "plot")
+
+b4 <- as_ggplot(b4) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+
+plot(b4)
+
+```
+
+Text
+
+```{r biofilmTop10}
+# get top 10 most abundant protein exclusive to biofilm EVs
+# in descending order of abundance
+biofilm_top10 <- b_ev %>% 
+  tibble::as_tibble(rownames = "id") %>% 
+  filter_na(., op = "==", pat = "W", val = 5) %>% 
+  select(-contains("W")) %>% 
+  mutate(mean = rowMeans(select(., contains("EV")), na.rm = TRUE)) %>% 
+  top_n(n = 10, wt = mean) %>% 
+  arrange(desc(mean)) %>% 
+  mutate(protein_name = match_id(id, uniprot, "UP_accession", "CGD_gene_name"), 
+         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+
+knitr::kable(biofilm_top10, 
+             caption = "This is a table caption", 
+             digits = 1)
+  
+
+```
+
+Text.
+
+```{r biofilmSum}
+# explore percentage missing values in each sample
+knitr::kable(summarise_lfq(biofilm_norm), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+```
+
+TEXT.
+
+TEXT.
+
+```{r biofilmSum2, cache=TRUE}
+# should not impute with so many missing values
+# filter for proteins with 4-5 NA values in EV or WCL
+biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=", 
+                         pat1 = "EV", val1 = 4, 
+                         pat2 = "W", val2 = 4)
+
+# filter for proteins with min 3 valid values in EV and WCL
+biofilm_both <- filter_na2(biofilm_norm, logic = "and", op = "<=", 
+                         pat1 = "EV", val1 = 3, 
+                         pat2 = "W", val2 = 3)
+
+knitr::kable(summarise_lfq(biofilm_both), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+b5a <- grid::grid.grabExpr(plot_missval2(biofilm_both))
+
+b5b <- grid::grid.grabExpr(plot_detect2(biofilm_both))
+
+ggarrange(b5a, b5b, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, colour = "black"))
+
+```
+
+TEXT. 
+
+```{r biofilmImpute}
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+biofilm_imp <- impute_QRILC(biofilm_both)
+
+plot_imputation2(biofilm_exp, biofilm_both, biofilm_imp)
+
+```
+
+TEXT.
+
+```{r biofilmDE}
+# recombine imputed proteins and non-imputed proteins in matrix
+biofilm_de <- rbind(biofilm_excl, biofilm_imp)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
+colnames(b_design) <- c("EV", "WCL")
+
+# make all pair-wise comparisons between EV and WCL
+b_cm <- makeContrasts("EV_vs_WCL" = EV - WCL, levels = b_design)
+b_fit <- lmFit(biofilm_de, design = b_design)
+b_fit_cm <- contrasts.fit(b_fit, b_cm)
+b_efit <- eBayes(b_fit_cm)
+
+# extract DE results and create results table
+biofilm_tt <- topTable(b_efit, sort.by = "none", number = Inf) %>% 
+  as.matrix()
+
+biofilm_res <- combine_result(mat = biofilm_de, toptab = biofilm_tt) %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "UP_accession") %>% 
+  mutate(group = case_when(significant == 0 ~ "not sig",
+                           significant == 1 & logFC > 0 ~ "ev up",
+                           significant == 1 & logFC < 0 ~ "wcl up",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(b_ev) ~ "ev ex",
+                           is.na(significant) == TRUE & UP_accession %in% rownames(b_wcl) ~ "wcl ex"),
+         in_ev = ifelse(UP_accession %in% rownames(b_ev), TRUE, FALSE),
+         in_wcl = ifelse(UP_accession %in% rownames(b_wcl), TRUE, FALSE),
+         CGD_gene_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "CGD_gene_name"),
+         Protein_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "Protein_name"), 
+         significant = as.logical(significant)) %>%
+  select(UP_accession, CGD_gene_name, Protein_name, everything())
+
+biofilm_res_short <- biofilm_res %>% 
+  select(CGD_gene_name, Protein_name, logFC, AveExpr, adj.P.Val, significant, group) %>% 
+  mutate_at(.vars = vars(logFC, AveExpr), 
+            .funs = list(~round(., digits = 2))) %>% 
+  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
+         group = as.factor(group))
+
+DT::datatable(biofilm_res_short, 
+              caption = "This is a table caption. Note that adjusted p values have been shortened
+              to three significant figures for ease of display.", 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name", 
+                           "Protein" = "Protein_name", 
+                           "p.adj" = "adj.P.Val", 
+                           "sig" = "significant"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(width = "40%", targets = 1), 
+                                  list(width = "10%", targets = c(0, 2:6)), 
+                                  list(targets = 1, 
+                                       render = DT::JS(
+                                         "function(data, type, row, meta) {",
+                                         "return type === 'display' && data.length > 40 ?",
+                                         "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
+                                         "}")), 
+                                  list(targets = 0, 
+                                       render = DT::JS("function(data, type, row, meta) {",
+                                         "return type === 'display' && data.length > 12 ?",
+                                         "'<span title=\"' + data + '\">' + data.substr(0, 12) + '...</span>' : data;",
+                                         "}"))
+                                  )
+                )
+              )
+
+
+```
+
+
+# Comparison to previous data
+
+TEXT
+
+```{r biofilmComp}
+z_list_b <- zarnowski %>% 
+  filter(Biofilm_NTS > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+b_ev_list <- match_id(rownames(b_ev), uniprot, "UP_accession", "CGD_gene_name", concat = FALSE)
+
+c1 <- plot_venn(list("mylist" = b_ev_list, "Zarn" = z_list_b), 
+                 use_uniprot = FALSE, type = "plot")
+
+c1 <- as_ggplot(c1) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+
+plot(c1)
+
+```
+
+TEXT
+
+```{r yeastComp}
+g_list <- gilbona %>% 
+  filter(EV1_peptides > 0 | EV2_peptides > 0 | EV3_peptides > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+v_list <- vargas %>% 
+  filter(S11_peptides > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+w_list <- wolf %>% 
+  filter(WT_pep > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+z_list_y <- zarnowski %>% 
+  filter(Planktonic_NTS > 0) %>% 
+  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
+  pull(gn)
+
+y_ev_list <- match_id(rownames(y_ev), uniprot, "UP_accession", "CGD_gene_name", concat = FALSE)
+
+yeast_comp <- list("This paper" = y_ev_list, "Gil-Bona" = g_list, "Vargas" = v_list, "Wolf" = w_list, "Zarnowski" = z_list_y)
+
+upset(fromList(yeast_comp), 
+      point.size = 4.5, 
+      line.size = 2, 
+      mainbar.y.label = "\n\nIntersection protein number", 
+      mainbar.y.max = 400, 
+      sets.x.label = "Total protein number", 
+      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
+      order.by = "degree", 
+      queries = list(list(query = intersects, 
+                          params = list(c("This paper", "Gil-Bona", "Vargas", "Wolf", "Zarnowski")), 
+                          color = "limegreen", 
+                          active = TRUE)))
+yeast_comp_tab <- plot_venn(vlist = yeast_comp, use_uniprot = FALSE, type = "list") %>% 
+  mutate(..values.. = lapply(..values.., function(x) paste(x, collapse = ", ")))
+
+knitr::kable(yeast_comp_tab[1,], 
+             caption = "A table caption")
+
+
+
+```
+
+# EV marker protein selection
+
+TEXT.
+
+```{r markerComparison}
+
+marker_comp <- list("yev up" = yeast_res %>% 
+                      filter(group == "ev up") %>% 
+                      pull(CGD_gene_name), 
+                    "yev ex" = yeast_res %>% 
+                      filter(group == "ev ex") %>% 
+                      pull(CGD_gene_name), 
+                    "bev up" = biofilm_res %>% 
+                      filter(group == "ev up") %>% 
+                      pull(CGD_gene_name), 
+                    "bev ex" = biofilm_res %>% 
+                      filter(group == "ev ex") %>% 
+                      pull(CGD_gene_name))
+
+upset(fromList(marker_comp), 
+      point.size = 4.5, 
+      line.size = 2, 
+      mainbar.y.label = "\n\nIntersection protein number", 
+      mainbar.y.max = 400, 
+      sets.x.label = "Total protein number", 
+      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
+      order.by = "degree")
+marker_comp_tab <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "list")
+
+knitr::kable(marker_comp_tab, 
+             caption = "A table caption")
+
+
+```
+
+TEXT.
+
+```{r markerExtract}
+# marker_candidates <- marker_comp_tab %>% 
+#   filter(..count.. > 0 & ..count.. < 40) %>% 
+#   pull(..values..) %>% 
+#   set_names(c("both ex", "yev up bev ex", "yev ex bev up", "both up"))
+
+marker_candidates <- marker_comp_tab %>% 
+  filter(..count.. > 0 & apply(.[, 1:4], 1, sum) > 1) %>% 
+  pull(..values..) %>% 
+  unlist()
+
+```
+
+
+# Different strains test
+## Introduction
+
+Aim is to determine whether identified potential biomarkers work in other 
+*C. albicans* strains.
+
+## Experimental design info
+Strain used:
+
+<div id="left">
+- ATCC10231
+- zzzzzz
+</div>
+
+<div id="right">
+- ATCC90028
+- zzzzzzz
+</div>
+
+## Analysis
+    
+### Prepare data
+
+The untouched proteinGroups.txt file has `r nrow(atcc)` rows and `r ncol(atcc)`  columns.
+
+Each of the `r nrow(atcc)` rows corresponds to a single protein group. 
+
+```{r atccInit}
+atcc_lfq <- atcc %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2) %>% 
+  convert_lfq(., atcc_exp)
+
+```
+
+First, filter any reverse and contaminant proteins. 
+Then select only proteins identified by at least 2 unique peptides.
+
+Now the dataset contains `r nrow(atcc_lfq)` proteins across the 12 samples.
+
+```{r atccInit2, fig.cap="This is a figure caption"}
+a1a <- plot_frequency2(atcc_lfq)
+
+a1b <- plot_numbers2(atcc_lfq, atcc_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggpubr::ggarrange(a1a, a1b,
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  font.label = list(size = 24, color = "black"))
+
+```
+
+
+Table goes here.
+
+More text goes here.
+
+```{r atccInit3}
+
+knitr::kable(summarise_lfq(atcc_lfq), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+```
+
+### Filter data
+
+Filter for proteins identified in 2/3 reps of at least 1 condition.
+
+
+
+```{r atccFilt}
+atcc_filt <- filter_na4(atcc_lfq, "or", "<=", 
+                        pat1 = "A10231_EV", 1, 
+                        pat2 = "A10231_W", 1, 
+                        pat3 = "A90028_EV", 1, 
+                        pat4 = "A90028_W", 1)
+
+a2a <- plot_frequency2(atcc_filt)
+
+a2b <- plot_numbers2(atcc_filt, atcc_exp) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+a2c <- plot_mds(atcc_filt)
+
+ggarrange(ggarrange(a2a, a2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
+                    font.label = list(size = 24, color = "black")), 
+          a2c, 
+          labels = c("", "C"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+```
+
+Reduces `r nrow(atcc_lfq)` proteins to `r nrow(atcc_filt)`.
+
+Text.
+
+```{r atccNorm}
+atcc_norm <- normalizeCyclicLoess(atcc_filt)
+
+a3a <- plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
+
+a3b <- plot_mds(atcc_norm)
+
+a3c <- plot_dendro(atcc_norm)
+
+ggarrange(a3a, 
+          ggarrange(a3b, a3c, labels = c("B", "C"), ncol = 1, nrow = 2, font.label = list(size = 24, color = "black")), 
+          labels = c("A", ""), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, color = "black"))
+
+```
+
+Text.
+
+```{r atccVenn}
+
+# filter for proteins identified in min 1/3 reps of 10231 EV
+atcc1_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A10231_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 10231 WCL
+atcc1_w <- filter_na(atcc_norm, op = "<=", 
+                     pat = "A10231_W", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 EV
+atcc9_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 WCL
+atcc9_w <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_W", val = 2)
+
+a4 <- plot_venn(list("ATCC10231 EV" = atcc1_ev, "ATCC10231 WCL" = atcc1_w, 
+                     "ATCC90028 EV" = atcc9_ev, "ATCC90028 WCL" = atcc9_w), 
+                use_uniprot = TRUE, type = "plot")
+
+a4 <- as_ggplot(a4) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+
+plot(a4)
+
+```
+
+Text. 
+
+```{r atcc1Top10}
+# get top 10 most abundant protein exclusive to 10231 EVs
+# in descending order of abundance
+atcc1_top10 <- atcc1_ev %>% 
+  tibble::as_tibble(rownames = "id") %>% 
+  filter_na(., op = "==", pat = "A10231_W", val = 3) %>% 
+  select(id, contains("A10231_EV")) %>% 
+  mutate(mean = rowMeans(select(., contains("A10231_EV")), na.rm = TRUE)) %>% 
+  top_n(n = 10, wt = mean) %>% 
+  arrange(desc(mean)) %>% 
+  mutate(protein_name = match_id(id = id, uniprot, "UP_accession", "CGD_gene_name"), 
+         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+
+knitr::kable(atcc1_top10, 
+             caption = "This is a table caption", 
+             digits = 1)
+  
+
+```
+
+TEXT.
+
+```{r atcc9Top10}
+atcc9_top10 <- atcc9_ev %>% 
+  tibble::as_tibble(rownames = "id") %>% 
+  filter_na(., op = "==", pat = "A90028_W", val = 3) %>% 
+  select(id, contains("A90028_EV")) %>% 
+  mutate(mean = rowMeans(select(., contains("A90028_EV")), na.rm = TRUE)) %>% 
+  top_n(n = 10, wt = mean) %>% 
+  arrange(desc(mean)) %>% 
+  mutate(protein_name = match_id(id = id, uniprot, "UP_accession", "CGD_gene_name"), 
+         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+
+knitr::kable(atcc9_top10, 
+             caption = "This is a table caption", 
+             digits = 1)
+  
+```
+
+TEXT. 
+
+```{r atccSum}
+# explore percentage missing values in each sample
+knitr::kable(summarise_lfq(atcc_norm), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+```
+
+TEXT
+
+```{r atccSum2}
+# should not impute with so many missing values
+# filter for exclusive to 10231 EV or WCL or 90028 EV or WCL
+atcc_excl <- filter_na4(atcc_norm, logic = "or", op = "==", 
+                        pat1 = "A10231_EV", val1 = 3, 
+                        pat2 = "A10231_W", val2 = 3, 
+                        pat3 = "A90028_EV", val3 = 3, 
+                        pat4 = "A90028_W", val4 = 3)
+
+# filter for proteins with min 1 valid value in all 4 sample types
+atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=", 
+                        pat1 = "A10231_EV", val1 = 2, 
+                        pat2 = "A10231_W", val2 = 2, 
+                        pat3 = "A90028_EV", val3 = 2, 
+                        pat4 = "A90028_W", val4 = 2)
+
+
+
+knitr::kable(summarise_lfq(atcc_both), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
+                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             digits = 1)
+
+a5a <- grid::grid.grabExpr(plot_missval2(atcc_both))
+
+a5b <- grid::grid.grabExpr(plot_detect2(atcc_both))
+
+ggarrange(a5a, a5b, 
+          labels = c("A", "B"), 
+          ncol = 2, 
+          nrow = 1, 
+          font.label = list(size = 24, colour = "black"))
+```
+
+TEXT.
+
+```{r atccImpute}
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+atcc_imp <- impute_QRILC(atcc_both)
+
+plot_imputation2(atcc_exp, atcc_both, atcc_imp) #a6
+
+```
+
+TEXT.
+
+```{r atccDE}
+# recombine imputed proteins and non-imputed proteins in matrix
+atcc_de <- rbind(atcc_excl, atcc_imp)
+
+colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de), 
+                                                     c("A10231_", "A90028_"), 
+                                                     c("A1_", "A9_"), 
+                                                     vectorize_all = FALSE)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3)))
+
+atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
+colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+
+atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W")
+
+# make all pair-wise comparisons for specified contrasts
+# and perform limma::eBayes()
+atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
+
+# extract overall results
+atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "overall")
+
+# extract results for individual comparisons defined in atcc_contrasts
+atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "individual")
+
+a1_res <- atcc_ind[[1]]
+
+a9_res <- atcc_ind[[2]]
+
+aev_res <- atcc_ind[[3]]
+
+aw_res <- atcc_ind[[4]]
+
+```
+
+
+TEXT.
+
+```{r atccVolcano}
+
+a7a <- plot_volcano(data = a1_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("orange", "purple"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+a7b <- plot_volcano(data = a9_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("red", "blue"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+a7c <- plot_volcano(data = aev_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("orange", "red"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+a7d <- plot_volcano(data = aw_res, 
+                    p_val = adj.P.Val, 
+                    lfc = logFC,
+                    grp = group, 
+                    colour = c("purple", "blue"), 
+                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
+
+ggarrange(a7a, a7c,
+          a7b, a7d,
+          labels = c("A", "C", "B", "D"), 
+          ncol = 2, 
+          nrow = 2)
+
+```
+
+TEXT.
+
+```{r atccHeatmap}
+atcc_htmp <- atcc_overall %>% 
+  select(1, 4:15, 24) %>% 
+  tibble::column_to_rownames(var = "UP_accession") %>% 
+  as.matrix()
+
+plot_heatmap2(atcc_htmp, atcc_exp, uniprot, kmeans = TRUE, k = 5, clustering_distance = "euclidean", show_row_names = FALSE)
+
+
+```
+
+TEXT.
+
+```{r markerComparison2}
+
+marker_comp2 <- list("a1_ev up" = a1_res %>% 
+                      filter(group == "A1_EV up") %>% 
+                      pull(CGD_gene_name), 
+                    "a1_ev ex" = a1_res %>% 
+                      filter(group == "A1_EV ex") %>% 
+                      pull(CGD_gene_name), 
+                    "a9_ev up" = a9_res %>% 
+                      filter(group == "A9_EV up") %>% 
+                      pull(CGD_gene_name), 
+                    "a9_ev ex" = a9_res %>% 
+                      filter(group == "A9_EV ex") %>% 
+                      pull(CGD_gene_name))
+
+upset(fromList(marker_comp2), 
+      point.size = 4.5, 
+      line.size = 2, 
+      mainbar.y.label = "\n\nIntersection protein number", 
+      mainbar.y.max = 400, 
+      sets.x.label = "Total protein number", 
+      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
+      order.by = "degree")
+marker_comp_tab2 <- plot_venn(vlist = marker_comp2, use_uniprot = FALSE, type = "list")
+
+knitr::kable(marker_comp_tab2, 
+             caption = "A table caption")
+
+
+```
+
+TEXT.
+
+```{r markerExtract2}
+marker_candidates2 <- marker_comp_tab2 %>% 
+  filter(..count.. > 0 & apply(.[, 1:4], 1, sum) > 1) %>% 
+  pull(..values..) %>% 
+  unlist()
+
+test_can <- intersect(marker_candidates, marker_candidates2) %>% 
+  stringr::str_extract_all(., "[^;]+") %>% 
+  unlist()
+
+test <- uniprot %>% 
+  filter(CGD_gene_name %in% test_can)
+
+DT::datatable(test, 
+              caption = "This is a table caption.", 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(targets = c(7:10, 13:21), 
+                                       render = DT::JS(
+                                         "function(data, type, row, meta) {",
+                                         "return type === 'display' && data.length > 40 ?",
+                                         "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
+                                         "}"))
+                                  )
+                )
+              )
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
