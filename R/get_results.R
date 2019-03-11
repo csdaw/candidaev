@@ -73,7 +73,7 @@ get_results <- function(efit, mat, p_val = 0.01, lfc = 0, type = c("overall", "i
                CGD_gene_name = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name"),
                Protein_name = match_id(UP_accession, uniprot, "UP_accession", "Protein_name")) %>%
         filter(is.na(.[[c1_labels[1]]]) == FALSE | is.na(.[[c2_labels[1]]]) == FALSE) %>%
-        select(UP_accession, CGD_gene_name, Protein_name, everything())
+        select(UP_accession, CGD_gene_name, Protein_name, everything(), -AveExpr)
     }
 
     names(result) <- gsub(" - ", ".vs.", contrasts)

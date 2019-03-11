@@ -81,33 +81,19 @@ yeast_de <- rbind(yeast_excl, yeast_imp)
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
 y_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+
 y_design <- stats::model.matrix(~ 0 + T, data = y_samp)
 colnames(y_design) <- c("EV", "WCL")
 
+y_contrasts <- c("EV - WCL")
+
 # make all pair-wise comparisons between EV and WCL
-y_cm <- makeContrasts("EV_vs_WCL" = EV - WCL, levels = y_design)
-y_fit <- lmFit(yeast_de, design = y_design)
-y_fit_cm <- contrasts.fit(y_fit, y_cm)
-y_efit <- eBayes(y_fit_cm)
+# and perform limma::eBayes()
+y_efit <- limma_eBayes(yeast_de, design = y_design, contrasts = y_contrasts)
 
-# extract DE results and create results table
-yeast_tt <- topTable(y_efit, sort.by = "none", number = Inf) %>% 
-  as.matrix()
+# extract DE results
+yeast_res <- get_results(efit = y_efit, mat = yeast_de, p_val = 0.01, lfc = 0, type = "individual")[[1]]
 
-yeast_res <- combine_result(mat = yeast_de, toptab = yeast_tt) %>% 
-  as.data.frame() %>% 
-  tibble::rownames_to_column(var = "UP_accession") %>% 
-  mutate(group = case_when(significant == 0 ~ "not sig",
-                           significant == 1 & logFC > 0 ~ "ev up",
-                           significant == 1 & logFC < 0 ~ "wcl up",
-                           is.na(significant) == TRUE & UP_accession %in% rownames(y_ev) ~ "ev ex",
-                           is.na(significant) == TRUE & UP_accession %in% rownames(y_wcl) ~ "wcl ex"),
-         in_ev = ifelse(UP_accession %in% rownames(y_ev), TRUE, FALSE),
-         in_wcl = ifelse(UP_accession %in% rownames(y_wcl), TRUE, FALSE),
-         CGD_gene_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "CGD_gene_name"),
-         Protein_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "Protein_name"), 
-         significant = as.logical(significant)) %>%
-  select(UP_accession, CGD_gene_name, Protein_name, everything())
 
 ```
 
@@ -164,34 +150,18 @@ biofilm_de <- rbind(biofilm_excl, biofilm_imp)
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
 b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+
 b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
 colnames(b_design) <- c("EV", "WCL")
 
+b_contrasts <- c("EV - WCL")
+
 # make all pair-wise comparisons between EV and WCL
-b_cm <- makeContrasts("EV_vs_WCL" = EV - WCL, levels = b_design)
-b_fit <- lmFit(biofilm_de, design = b_design)
-b_fit_cm <- contrasts.fit(b_fit, b_cm)
-b_efit <- eBayes(b_fit_cm)
+# and perform limma::eBayes()
+b_efit <- limma_eBayes(biofilm_de, design = b_design, contrasts = b_contrasts)
 
-# extract DE results and create results table
-biofilm_tt <- topTable(b_efit, sort.by = "none", number = Inf) %>% 
-  as.matrix()
-
-biofilm_res <- combine_result(mat = biofilm_de, toptab = biofilm_tt) %>% 
-  as.data.frame() %>% 
-  tibble::rownames_to_column(var = "UP_accession") %>% 
-  mutate(group = case_when(significant == 0 ~ "not sig",
-                           significant == 1 & logFC > 0 ~ "ev up",
-                           significant == 1 & logFC < 0 ~ "wcl up",
-                           is.na(significant) == TRUE & UP_accession %in% rownames(b_ev) ~ "ev ex",
-                           is.na(significant) == TRUE & UP_accession %in% rownames(b_wcl) ~ "wcl ex"),
-         in_ev = ifelse(UP_accession %in% rownames(b_ev), TRUE, FALSE),
-         in_wcl = ifelse(UP_accession %in% rownames(b_wcl), TRUE, FALSE),
-         CGD_gene_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "CGD_gene_name"),
-         Protein_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "Protein_name"), 
-         significant = as.logical(significant)) %>%
-  select(UP_accession, CGD_gene_name, Protein_name, everything())
-
+# extract DE results
+biofilm_res <- get_results(efit = b_efit, mat = biofilm_de, p_val = 0.01, lfc = 0, type = "individual")[[1]]
 
 ```
 
@@ -304,9 +274,107 @@ a1_res <- atcc_ind[[1]]
 
 a9_res <- atcc_ind[[2]]
 
-aev_res <- atcc_ind[[3]]
+```
 
-aw_res <- atcc_ind[[4]]
+TEXT.
+
+```{r combinedVenn}
+comp <- list("DAY286 Y" = rownames(y_ev), 
+             "DAY286 B" = rownames(b_ev),
+             "ATCC90028" = rownames(atcc9_ev), 
+             "ATCC10231" = rownames(atcc1_ev))
+
+comp2 <- lapply(comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
+
+f1 <- plot_venn(vlist = comp2, use_uniprot = FALSE, type = "plot")
+
+f1 <- as_ggplot(f1) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+
+plot(f1)
+
+f1_overlap <- plot_venn(vlist = comp2, use_uniprot = FALSE, type = "list") %>% 
+  mutate(..values.. = lapply(..values.., function(x) paste(x, collapse = ", "))) %>% 
+  filter(..count.. == 405) %>% 
+  pull(..values..) %>% 
+  unlist()
+```
+
+
+TEXT.
+
+```{r combinedPCA}
+test <- cbind(atcc_de, 
+              biofilm_de[match(rownames(atcc_de), rownames(biofilm_de)), ])
+
+colnames(test)[13:22] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", "B_W1", "B_W2", "B_W3", "B_W4", "B_W5")
+
+test2 <- cbind(test, 
+               yeast_de[match(rownames(test), rownames(yeast_de)), ])
+
+plot_mds(test2) + 
+  geom_text(aes(label = colnames(test2)), hjust = 1.2, vjust = 0.5)
+
+
+
+```
+
+TEXT.
+
+```{r combinedHeatmap}
+
+test3 <- a9_res %>% 
+  select(logFC, CGD_gene_name) %>% 
+  full_join(., select(a1_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
+  full_join(., select(yeast_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
+  full_join(., select(biofilm_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
+  rename(a9_lfc = logFC.x, 
+         a1_lfc = logFC.y, 
+         y_lfc = logFC.x.x, 
+         b_lfc = logFC.y.y) %>% 
+  select(CGD_gene_name, everything())
+
+
+
+test4 <- test3 %>% 
+  mutate(nna = apply(is.na(.), 1, sum)) %>% 
+  filter(nna < 2) %>% 
+  select(-nna) %>% 
+  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
+  as.matrix()
+
+test5 <- test3 %>% 
+  filter_at(.vars = vars(contains("lfc")), 
+            any_vars(!is.na(.))) %>% 
+  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
+  as.matrix()
+
+test6 <- test3 %>% 
+  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
+  tidyr::drop_na()
+
+
+my_palette <- colorRampPalette(c("blue", "white", "red")) (n = 20)
+breaks <- seq(-7, 7, length.out = 21)
+
+gplots::heatmap.2(test4, trace = "none", na.color = "black", 
+                  col = my_palette, breaks = breaks, distfun = function(x) cluster::daisy(x, metric = "gower"), 
+                  hclustfun = function(x) hclust(x))
+
+test8 <- hclust(cluster::daisy(test4, metric = "gower")) %>% 
+  cutree(., k = 3)
+
+test9 <- cbind(test4, test8)
+
+test10 <- gplots::heatmap.2(test4, trace = "none", na.color = "black", 
+                  col = my_palette, breaks = breaks, distfun = function(x) cluster::daisy(x, metric = "gower"), 
+                  hclustfun = function(x) hclust(x))
+
+test11 <- test4[rev(test10$rowInd), test10$colInd]
+
+
+
+htmp2(test5, col_limit = 7, plot = TRUE)
 
 
 
@@ -319,18 +387,17 @@ aw_res <- atcc_ind[[4]]
 TEXT.
 
 ```{r markerComparison}
-
-marker_comp <- list("yev up" = yeast_res %>% 
-                      filter(group == "ev up") %>% 
+marker_comp <- list("yeast" = yeast_res %>% 
+                      filter(group == "EV up" | group == "EV ex") %>% 
                       pull(CGD_gene_name), 
-                    "yev ex" = yeast_res %>% 
-                      filter(group == "ev ex") %>% 
+                    "biofilm" = biofilm_res %>% 
+                      filter(group == "EV up" | group == "EV ex") %>% 
                       pull(CGD_gene_name), 
-                    "bev up" = biofilm_res %>% 
-                      filter(group == "ev up") %>% 
+                    "ATCC10231" = a1_res %>% 
+                      filter(group == "A1_EV up" | group == "A1_EV ex") %>% 
                       pull(CGD_gene_name), 
-                    "bev ex" = biofilm_res %>% 
-                      filter(group == "ev ex") %>% 
+                    "ATCC90028" = a9_res %>% 
+                      filter(group == "A9_EV up" | group == "A9_EV ex") %>% 
                       pull(CGD_gene_name))
 
 upset(fromList(marker_comp), 
@@ -343,37 +410,6 @@ upset(fromList(marker_comp),
       order.by = "degree")
 marker_comp_tab <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "list")
 
-knitr::kable(marker_comp_tab, 
-             caption = "A table caption")
-
-
-marker_comp2 <- list("a1_ev up" = a1_res %>% 
-                      filter(group == "A1_EV up") %>% 
-                      pull(CGD_gene_name), 
-                    "a1_ev ex" = a1_res %>% 
-                      filter(group == "A1_EV ex") %>% 
-                      pull(CGD_gene_name), 
-                    "a9_ev up" = a9_res %>% 
-                      filter(group == "A9_EV up") %>% 
-                      pull(CGD_gene_name), 
-                    "a9_ev ex" = a9_res %>% 
-                      filter(group == "A9_EV ex") %>% 
-                      pull(CGD_gene_name))
-
-upset(fromList(marker_comp2), 
-      point.size = 4.5, 
-      line.size = 2, 
-      mainbar.y.label = "\n\nIntersection protein number", 
-      mainbar.y.max = 400, 
-      sets.x.label = "Total protein number", 
-      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
-      order.by = "degree")
-marker_comp_tab2 <- plot_venn(vlist = marker_comp2, use_uniprot = FALSE, type = "list")
-
-knitr::kable(marker_comp_tab2, 
-             caption = "A table caption")
-
-
 ```
 
 TEXT.
@@ -385,39 +421,82 @@ TEXT.
 #   set_names(c("both ex", "yev up bev ex", "yev ex bev up", "both up"))
 
 marker_candidates <- marker_comp_tab %>% 
-  filter(..count.. > 0 & apply(.[, 1:4], 1, sum) > 1) %>% 
+  filter(apply(.[, 1:4], 1, sum) == 4) %>% 
   pull(..values..) %>% 
-  unlist()
+  unlist() %>% 
+  as.data.frame(stringsAsFactors = FALSE) %>% 
+  rename(Gene = 1)
 
-marker_candidates2 <- marker_comp_tab2 %>% 
-  filter(..count.. > 0 & apply(.[, 1:4], 1, sum) > 1) %>% 
-  pull(..values..) %>% 
-  unlist()
+marker_longlist <- marker_candidates %>% 
+  mutate(Protein = match_id(Gene, uniprot, "CGD_gene_name", "Protein_name"),
+         DAY.Y = match_id(Gene, yeast_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         DAY.B = match_id(Gene, biofilm_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         A1 = match_id(Gene, a1_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         A9 = match_id(Gene, a9_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         TM = match_id(Gene, uniprot, "CGD_gene_name", "Transmembrane"), 
+         SP = match_id(Gene, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
+  mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
+            .funs = list(~ signif(as.numeric(.), digits = 3))) %>% 
+  mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
+            .funs = list(~ case_when(is.na(.) == TRUE ~ "ex", 
+                                     TRUE ~ as.character(.)))) %>% 
+  mutate(TM = stringr::str_count(TM, "Helical"), 
+         SP = case_when(grepl("SIGNAL", SP) ~ "Y", 
+                        TRUE ~ ""), 
+         TM = case_when(TM == 0 ~ "", 
+                        TRUE ~ as.character(TM))) %>% 
+  arrange(Gene)
 
-test_can <- intersect(marker_candidates, marker_candidates2) %>% 
-  stringr::str_extract_all(., "[^;]+") %>% 
-  unlist()
+marker_longlist[3, 7] <- "12;12"
 
-test <- uniprot %>% 
-  filter(CGD_gene_name %in% test_can)
+protein_desc <- c("1,3-beta-glucanosyltransferase", 
+                  "Rho family GTPase", 
+                  "Multidrug transporter of ABC superfamily", 
+                  "Major chitin synthase of yeast and hyphae", 
+                  "GPI-anchored cell wall transglycosylase", 
+                  "GPI-anchored cell wall protein", 
+                  "Predicted P-type ATPase sodium pump", 
+                  "ER oxidoreductin", 
+                  "Long-chain fatty acid-CoA ligase", 
+                  "Multicopper feroxidase", 
+                  "High-affinity S-adenosylmethionine permease", 
+                  "Surface protein similar to glycerol-3-phosphate dehydrogenase", 
+                  "1,3-beta-glucan synthase", 
+                  "High-affinity MFS glucose transporter", 
+                  "Putative high-affinity MFS glucose transporter", 
+                  "Putative mitochondrial phosphate transporter", 
+                  "Glycolipid 2-alpha-mannosyltransferase", 
+                  "Cell surface mannoprotein", 
+                  "Mucin family adhesin-like protein", 
+                  "Sphingolipid C9-methyltransferase", 
+                  "S. cerevisiae ortholog is POM33, transmembrane nucleoporin", 
+                  "S. cerevisiae ortholog is RTN1, reticulon protein", 
+                  "Hexadecenal dehydrogenase", 
+                  "S. cerevisiae ortholog is PUN1, plasma membrane protein", 
+                  "1,3-beta-glucanosyltransferase", 
+                  "GPI-anchored cell surface protein of unknown function", 
+                  "Putative ion transporter", 
+                  "Cell surface glycosidase", 
+                  "Glycosidase", 
+                  "Phospholipase B", 
+                  "Plasma membrane ATPase", 
+                  "Mitochondrial outer membrane porin", 
+                  "G-protein of RAC subfamily", 
+                  "Rho family GTPase", 
+                  "Rho family GTPase", 
+                  "Secreted aspartyl protease", 
+                  "Rab family GTPase", 
+                  "Protein required for normal cell wall, plasma membrane", 
+                  "Protein involved in vacuolar inheritance", 
+                  "S. cerevisiae ortholog is YCK2, casein kinase", 
+                  "Palmitoyltransferase, putative vacuolar SNARE complex protein", 
+                  "Rab family GTPase", 
+                  "Putative vacuolar cation channel")
+marker_longlist <- marker_longlist %>% 
+  mutate(Protein = protein_desc)
 
-DT::datatable(test, 
-              caption = "This is a table caption.", 
-              rownames = FALSE, 
-              colnames = c("Gene" = "CGD_gene_name"), 
-              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
-              class = "display compact", 
-              options = list(
-                autowidth = TRUE, 
-                columnDefs = list(list(targets = c(7:10, 13:21), 
-                                       render = DT::JS(
-                                         "function(data, type, row, meta) {",
-                                         "return type === 'display' && data.length > 40 ?",
-                                         "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
-                                         "}"))
-                                  )
-                )
-              )
+                         
+knitr::kable(marker_longlist)
 
 ```
 

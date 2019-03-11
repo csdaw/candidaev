@@ -13,6 +13,7 @@
 #' @param new string: column name of character column in reference table with new
 #' information to replace matches
 #' @param concat Description.
+#' @param str_split Description.
 #'
 #' @return A vector with the same length as \code{id} but with the values replaced
 #' with corresponding information from the reference table.
@@ -34,17 +35,22 @@
 #' my_names$last <- match_id(my_names$id, ref_df, "id", "last_name")
 #'
 #' @export
-match_id <- function(id, ref, match, new, concat = TRUE) {
-  if(concat == TRUE) {
+match_id <- function(id, ref, match, new, concat = TRUE, str_split = TRUE) {
+  if(concat == TRUE & str_split == TRUE) {
     stringr::str_extract_all(id, "[^;]+") %>%
       lapply(., function(x) match(x, ref[[match]])) %>%
       Map("[", list(as.character(ref[[new]])), .) %>%
       lapply(., function(x) paste(x, collapse = ";")) %>%
       unlist()
-  } else if(concat == FALSE) {
+  } else if(concat == FALSE & str_split == TRUE) {
     stringr::str_extract_all(id, "[^;]+") %>%
       lapply(., function(x) match(x, ref[[match]])) %>%
       Map("[", list(as.character(ref[[new]])), .) %>%
+      unlist()
+  } else if (concat == TRUE & str_split == FALSE) {
+    lapply(id, function(x) match(x, ref[[match]])) %>%
+      Map("[", list(as.character(ref[[new]])), .) %>%
+      lapply(., function(x) paste(x, collapse = ";")) %>%
       unlist()
   }
 }
