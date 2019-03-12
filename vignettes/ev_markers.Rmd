@@ -291,8 +291,6 @@ f1 <- plot_venn(vlist = comp2, use_uniprot = FALSE, type = "plot")
 f1 <- as_ggplot(f1) + 
   theme(plot.margin = unit(c(0,2,0,2), "lines"))
 
-plot(f1)
-
 f1_overlap <- plot_venn(vlist = comp2, use_uniprot = FALSE, type = "list") %>% 
   filter(..count.. == 405) %>% 
   pull(..values..) %>% 
@@ -303,129 +301,45 @@ f1_overlap <- plot_venn(vlist = comp2, use_uniprot = FALSE, type = "list") %>%
 
 TEXT.
 
-```{r combinedPCA}
-test <- cbind(atcc_de, 
-              biofilm_de[match(rownames(atcc_de), rownames(biofilm_de)), ])
+```{r combinedPCA, fig.height=6, fig.width=6}
 
-colnames(test)[13:22] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", "B_W1", "B_W2", "B_W3", "B_W4", "B_W5")
+pca_data <- cbind(atcc_de, 
+                  biofilm_de[match(rownames(atcc_de), rownames(biofilm_de)), ])
 
-test2 <- cbind(test, 
-               yeast_de[match(rownames(test), rownames(yeast_de)), ])
+pca_data <- cbind(pca_data, 
+                  yeast_de[match(rownames(pca_data), rownames(yeast_de)), ])
 
-colnames(test2)[23:28] <- c("Y_EV1", "Y_EV2", "Y_EV3", "Y_W1", "Y_W2", "Y_W3")
+colnames(pca_data)[13:28] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", 
+                               "B_W1", "B_W2", "B_W3", "B_W4", "B_W5", 
+                               "Y_EV1", "Y_EV2", "Y_EV3", 
+                               "Y_W1", "Y_W2", "Y_W3")
 
-test17 <- plot_mds(test2) + 
-  geom_text(aes(label = colnames(test2)), hjust = 1.2, vjust = 0.5)
+f2 <- plot_mds(pca_data) + 
+  geom_text(aes(label = colnames(pca_data)), hjust = 1.2, vjust = 0.5)
 
+f3 <- NULL
 
+ggarrange(f1, f2,
+          f3, f3, 
+          labels = c("A", "B", "C"), 
+          ncol = 2, 
+          nrow = 2, 
+          font.label = list(size = 24, color = "black"), 
+          heights = c(1,2))
 
 ```
 
 TEXT.
 
-```{r heatmapFunctions}
-htmp <- function(x, k = 6, col_limit = 6, plot = TRUE) {
-  
-  df <- x
-  
-  # facultative kmeans clustering
-  set.seed(1)
-  df_kmeans <- kmeans(df, k)
-  order <- data.frame(df) %>%
-    cbind(., cluster = df_kmeans$cluster) %>%
-    mutate(row = apply(.[, seq_len(ncol(.) - 1)], 1, function(x) max(x))) %>%
-    group_by(cluster) %>%
-    summarize(index = sum(row)/n()) %>%
-    arrange(desc(index)) %>%
-    pull(cluster) %>%
-    match(seq_len(k), .)
-  df_kmeans$cluster <- order[df_kmeans$cluster]
-  
-  clust_dist <- function(x) {
+```{r heatmapClustering, fig.width=3, fig.height=6}
+clust_dist <- function(x) {
     dist <- cluster::daisy(x, metric = "gower")
     dist[is.na(dist)] <- max(dist, na.rm = TRUE)
     return(dist)
-  }
-  
-  ht1 = ComplexHeatmap::Heatmap(df,
-                col = circlize::colorRamp2(
-                  seq(-col_limit, col_limit, (col_limit/5)),
-                  rev(RColorBrewer::brewer.pal(11, "RdBu"))),
-                split = df_kmeans$cluster,
-                cluster_rows = TRUE,
-                cluster_columns = TRUE,
-                row_names_side = "left",
-                column_names_side = "top",
-                clustering_distance_rows = clust_dist,
-                clustering_distance_columns = clust_dist,
-                heatmap_legend_param = list(color_bar = "continuous",
-                                            legend_direction = "horizontal",
-                                            legend_width = unit(5, "cm"),
-                                            title_position = "lefttop"))
-  if(plot) {
-    # Plot
-    ComplexHeatmap::draw(ht1, heatmap_legend_side = "top")
-  } else {
-    # Return data.frame
-    colnames(df) <- gsub(" ", "_", colnames(df))
-    df <- df[, unlist(ComplexHeatmap::column_order(ht1))]
-    df <- cbind(df, k = df_kmeans$cluster)
-    df[unlist(ComplexHeatmap::row_order(ht1)),] %>%
-      tibble::rownames_to_column(var = "gene_name") %>%
-      as.data.frame() %>%
-      mutate(order = row_number())
-  }
 }
 
-
-htmp2 <- function(x, col_limit = 6, plot = TRUE, ...) {
-  df <- x
-  
-  
-  
-  clust_dist <- function(x) {
-    dist <- cluster::daisy(x, metric = "gower")
-    dist[is.na(dist)] <- max(dist, na.rm = TRUE)
-    return(dist)
-  }
-  
-  ht1 = ComplexHeatmap::Heatmap(df,
-                                col = circlize::colorRamp2(
-                                  seq(-col_limit, col_limit, (col_limit/5)),
-                                  rev(RColorBrewer::brewer.pal(11, "RdBu"))),
-                                cluster_rows = TRUE,
-                                cluster_columns = TRUE,
-                                row_names_side = "left",
-                                column_names_side = "top",
-                                clustering_distance_rows = clust_dist,
-                                clustering_distance_columns = clust_dist,
-                                heatmap_legend_param = list(color_bar = "continuous",
-                                                            legend_direction = "horizontal",
-                                                            legend_width = unit(5, "cm"),
-                                                            title_position = "lefttop"), 
-                                na_col = "black", ...)
-  if(plot) {
-    # Plot
-    ComplexHeatmap::draw(ht1, heatmap_legend_side = "top")
-  } else {
-    # Return data.frame
-    colnames(df) <- gsub(" ", "_", colnames(df))
-    df <- df[, unlist(ComplexHeatmap::column_order(ht1))]
-    df[unlist(ComplexHeatmap::row_order(ht1)),] %>%
-      tibble::rownames_to_column(var = "gene_name") %>%
-      as.data.frame() %>%
-      mutate(order = row_number())
-  }
-}
-
-```
-
-
-TEXT.
-
-```{r combinedHeatmap}
-
-test3 <- a9_res %>% 
+# combine logFC data from all 4 datasets
+logfc_table <- a9_res %>% 
   select(logFC, CGD_gene_name) %>% 
   full_join(., select(a1_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
   full_join(., select(yeast_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
@@ -437,104 +351,46 @@ test3 <- a9_res %>%
   select(CGD_gene_name, everything()) %>% 
   filter(CGD_gene_name %in% f1_overlap)
 
-# select rows with max 1/4 NA
-test4 <- test3 %>% 
-  mutate(nna = apply(is.na(.), 1, sum)) %>% 
-  filter(nna < 2) %>% 
-  select(-nna) %>% 
-  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
-  as.matrix()
-
-# select rows with max 2/4 NA
-test5 <- test3 %>% 
-  mutate(nna = apply(is.na(.), 1, sum)) %>% 
-  filter(nna < 3) %>% 
-  select(-nna) %>% 
-  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
-  as.matrix()
-
-# select rows with max 3/4 NA
-test6 <- test3 %>% 
+# filter for rows with min 1/4 valid values
+# otherwise clustering will not work
+logfc_table2 <- logfc_table %>% 
   filter_at(.vars = vars(contains("lfc")), 
             any_vars(!is.na(.))) %>% 
   tibble::column_to_rownames(var = "CGD_gene_name") %>% 
   as.matrix()
 
-# select rows with max 0/4 NA
-test7 <- test3 %>% 
+# excluded proteins
+logfc_table_exc <- logfc_table %>% 
+  filter_at(.vars = vars(contains("lfc")), 
+            all_vars(is.na(.))) %>% 
   tibble::column_to_rownames(var = "CGD_gene_name") %>% 
-  tidyr::drop_na() %>% 
   as.matrix()
 
-# test heatmap with data with no missing values
-htmp(test7, k = 3, plot = TRUE)
+# cluster rows
+hr <- hclust(clust_dist(logfc_table2))
 
-test8 <- htmp(as.data.frame(test7), plot = FALSE)
+# define row clusters
+logfc_cutree <- cutree(hr, h = max(hr$height/1.5))
 
+# get colour palette equal to number of clusters
+# and create vector of colours for side bar
+clusterCols <- rainbow(length(unique(logfc_cutree)))
+myClusterSideBar <- clusterCols[logfc_cutree]
+
+# create palette and breaks for heatmap colours
 my_palette <- colorRampPalette(c("blue", "white", "red")) (n = 15)
 breaks <- seq(-8, 8, length.out = 16)
 
-gplots::heatmap.2(test7, trace = "none", na.color = "black", 
-                  col = my_palette, breaks = breaks)
-
-gplots::heatmap.2(test7, trace = "none", na.color = "black", 
-                  col = my_palette, breaks = breaks, 
-                  reorderfun = function(d,w) reorder(d, w, agglo.FUN = mean),
-                  cexRow = 0.2,
-                  cexCol = 0.8,
-                  distfun = function(x) dist(x, method = "euclidean"),
-                  hclustfun = function(x) hclust(x))
-
-# get dataframe in order of heatmap
-test10 <- test6[rev(test9$rowInd), test9$colInd]
-
-
-# test heatmap with data with missing values
-
-# cluster rows and columns
-hr <- hclust(clust_dist(test6))
-
-hc <- hclust(clust_dist(t(test6)))
-
-# define row clusters
-test11 <- cutree(hr, h = max(hr$height/1.5))
-
-# get colour palette equal to number of clusters
-clusterCols <- rainbow(length(unique(test11)))
-
-# create vector of colours for side bar
-myClusterSideBar <- clusterCols[test11]
-
-# add cluster ID to data
-test12 <- cbind(test6, clusterID = test11)
-
-# examine data with cluster ID, ordered as in heatmap
-test13 <- test12[hr$order,]
-
-test14 <- test12 %>% 
-  as.data.frame()
-
-test14$clusterID %<>% as.factor()
-
-new_order <- c("5", "1", "2", "3", "4")
-
-test14$clusterID <- gdata::reorder.factor(test14$clusterID, new.order = new_order)
-
-test15 <- test14 %>% 
-  tibble::rownames_to_column(var = "id") %>% 
-  arrange(clusterID) %>% 
-  tibble::column_to_rownames(var = "id")
-
-test16 <- test14 %>% 
-  select(clusterID)
-
-test16$clusterID %<>% as.factor()
-
-test9 <- gplots::heatmap.2(test6, trace = "none", na.color = "black", 
-                  reorderfun = function(d,w) reorder(d, w, agglo.FUN = mean),
-                  col = my_palette, breaks = breaks, distfun = function(x) clust_dist(x), 
+# draw heatmap
+gplots::heatmap.2(logfc_table2, 
+                  distfun = function(x) clust_dist(x), 
                   hclustfun = function(x) hclust(x), 
+                  reorderfun = function(d,w) reorder(d, w, agglo.FUN = mean),
+                  col = my_palette, 
+                  breaks = breaks, 
                   RowSideColors = myClusterSideBar, 
+                  trace = "none", 
+                  na.color = "black", 
                   labRow = FALSE, 
                   srtCol = 0, 
                   dendrogram = "both",
@@ -543,54 +399,9 @@ test9 <- gplots::heatmap.2(test6, trace = "none", na.color = "black",
                   key.par=list(mgp=c(1.5, 0.5, 0),
                        mar=c(4, 2.5, 2.5, 0)))
 
-htmp2(test6, split = test16, show_row_names = FALSE)
-
-ggarrange(test9_grob, test17)
-
 ```
 
 TEXT.
-
-```{r combinedHeatmapSig}
-# test overlap of significant/EV exclusive proteins across all 4 datasets
-pull_list <- function(x, my_cats) {
-  result <- x %>% 
-    filter(group %in% my_cats) %>% 
-    pull(CGD_gene_name)
-}
-
-comp3 <- list("DAY286 Y" = pull_list(yeast_res, c("EV up", "EV ex", "WCL up")), 
-              "DAY286 B" = pull_list(biofilm_res, c("EV up", "EV ex", "WCL up")), 
-              "ATCC90028" = pull_list(a9_res, c("A9_EV up", "A9_EV ex", "A9_W up")), 
-              "ATCC10231" = pull_list(a1_res, c("A1_EV up", "A1_EV ex", "A1_W up")))
-
-f2 <- plot_venn(vlist = comp3, use_uniprot = FALSE, type = "plot")
-
-f2 <- as_ggplot(f2) + 
-  theme(plot.margin = unit(c(0,2,0,2), "lines"))
-
-plot(f2)
-
-f2_overlap <- plot_venn(vlist = comp3, use_uniprot = FALSE, type = "list") %>% 
-  filter(..count.. == 55) %>% 
-  pull(..values..) %>% 
-  unlist()
-
-test9 <- test3 %>% 
-  filter(CGD_gene_name %in% f2_overlap) %>% 
-  filter_at(.vars = vars(contains("lfc")), 
-            any_vars(!is.na(.))) %>% 
-  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
-  as.matrix()
-  
-gplots::heatmap.2(test9, trace = "none", na.color = "black", 
-                  reorderfun = function(d,w) reorder(d, w, agglo.FUN = mean),
-                  col = my_palette, breaks = breaks, distfun = function(x) clust_dist(x), 
-                  hclustfun = function(x) hclust(x))
-
-```
-
-
 
 # EV marker protein selection
 

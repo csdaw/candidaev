@@ -3,18 +3,17 @@ title: "**Defining protein biomarkers for *Candida albicans* extracellular vesic
 author: "*Charlotte Dawson^a^, Mark Bleackley^a^, Marilyn Anderson^a^*"
 date: "*^a^Department of Biochemistry and Genetics, La Trobe University, Victoria, Australia*"
 output: 
-    html_notebook: default
-    bookdown::word_document2:
-      pandoc_args:
-        '--lua-filter=components/pagebreak.lua'
-      reference_docx: "components/draft_template.docx"
-      fig_caption: yes
     bookdown::pdf_document2:
       latex_engine: xelatex
       fig_caption: yes
       number_sections: yes
       toc: no
       keep_tex: no
+    bookdown::word_document2:
+      pandoc_args:
+        '--lua-filter=components/pagebreak.lua'
+      reference_docx: "components/draft_template.docx"
+      fig_caption: yes
 bibliography: "components/references.bib" 
 csl: "components/molecular-and-cellular-proteomics.csl"
 link-citations: yes
@@ -46,18 +45,225 @@ header-includes:
 
 <!-- This is the format for text comments that will be ignored during renderings. Do not put R code in these comments because it will not be ignored. -->
 
-```{r, setup, echo = FALSE}
+```{r setup, echo = FALSE, warning=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
   message = FALSE,
   echo = FALSE,
-  comment = "#>",
-  fig.path = "../figures/"
-)
+  comment = "#>")
 
-library(candidaev) # Or use devtools::load_all('.', quiet = T) if your code is in script files, rather than as functions in the `/R` diretory
+library(candidaev)
+library(multipanelfigure)
+library(limma)
+library(dplyr)
+library(ggplot2)
+library(candidaev)
+library(ggpubr)
+library(UpSetR)
+set.seed(1)
+
 ```
+
+```{r yeast}
+yeast <- yeast %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", 
+         Only.identified.by.site != "+", Unique.peptides >= 2)
+
+yeast_lfq <- convert_lfq(yeast, yeast_exp)
+
+# drop EV_1 and WCL_2
+yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_2")]
+
+# filter for proteins identified in min 2/3 reps of EV or WCL
+yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
+                          pat1 = "EV", val1 = 1, 
+                          pat2 = "W", val2 = 1)
+
+yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
+
+# filter for proteins identified in min 1/3 reps of EV
+y_ev <- filter_na(yeast_norm2, op = "<=", 
+                  pat = "EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of WCL
+y_wcl <- filter_na(yeast_norm2, op = "<=", 
+                   pat = "W", val = 2)
+
+# should not impute with so many missing values
+yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
+                         pat1 = "EV", val1 = 3, 
+                         pat2 = "W", val2 = 3)
+
+yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=", 
+                         pat1 = "EV", val1 = 2, 
+                         pat2 = "W", val2 = 2)
+
+yeast_imp <- impute_QRILC(yeast_both)
+
+# recombine imputed proteins and non-imputed proteins in matrix
+yeast_de <- rbind(yeast_excl, yeast_imp)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+y_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+
+y_design <- stats::model.matrix(~ 0 + T, data = y_samp)
+colnames(y_design) <- c("EV", "WCL")
+
+y_contrasts <- c("EV - WCL")
+
+# make all pair-wise comparisons between EV and WCL
+# and perform limma::eBayes()
+y_efit <- limma_eBayes(yeast_de, design = y_design, contrasts = y_contrasts)
+
+# extract DE results
+yeast_res <- get_results(efit = y_efit, mat = yeast_de, p_val = 0.01, lfc = 0, type = "individual")[[1]]
+
+```
+
+```{r biofilm}
+biofilm <- biofilm %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", 
+         Only.identified.by.site != "+", Unique.peptides >= 2)
+
+biofilm_lfq <- convert_lfq(biofilm, biofilm_exp)
+
+# filter for proteins identified in min 4/5 reps of EV or WCL
+biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=", 
+                           pat1 = "EV", val1 = 1, 
+                           pat2 = "W", val2 = 1)
+
+biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
+
+# filter for proteins identified in min 1/5 reps of EV
+b_ev <- filter_na(biofilm_norm, op = "<=", 
+                  pat = "EV", val = 4)
+
+# filter for proteins identified in min 1/5 reps of WCL
+b_wcl <- filter_na(biofilm_norm, op = "<=", 
+                   pat = "W", val = 4)
+
+# should not impute with so many missing values
+# filter for proteins with 4-5 NA values in EV or WCL
+biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=", 
+                         pat1 = "EV", val1 = 4, 
+                         pat2 = "W", val2 = 4)
+
+# filter for proteins with min 3 valid values in EV and WCL
+biofilm_both <- filter_na2(biofilm_norm, logic = "and", op = "<=", 
+                         pat1 = "EV", val1 = 3, 
+                         pat2 = "W", val2 = 3)
+
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+biofilm_imp <- impute_QRILC(biofilm_both)
+
+# recombine imputed proteins and non-imputed proteins in matrix
+biofilm_de <- rbind(biofilm_excl, biofilm_imp)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+
+b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
+colnames(b_design) <- c("EV", "WCL")
+
+b_contrasts <- c("EV - WCL")
+
+# make all pair-wise comparisons between EV and WCL
+# and perform limma::eBayes()
+b_efit <- limma_eBayes(biofilm_de, design = b_design, contrasts = b_contrasts)
+
+# extract DE results
+biofilm_res <- get_results(efit = b_efit, mat = biofilm_de, p_val = 0.01, lfc = 0, type = "individual")[[1]]
+
+```
+
+```{r atcc}
+atcc_lfq <- atcc %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2) %>% 
+  convert_lfq(., atcc_exp)
+
+atcc_filt <- filter_na4(atcc_lfq, "or", "<=", 
+                        pat1 = "A10231_EV", 1, 
+                        pat2 = "A10231_W", 1, 
+                        pat3 = "A90028_EV", 1, 
+                        pat4 = "A90028_W", 1)
+
+atcc_norm <- normalizeCyclicLoess(atcc_filt)
+
+# filter for proteins identified in min 1/3 reps of 10231 EV
+atcc1_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A10231_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 10231 WCL
+atcc1_w <- filter_na(atcc_norm, op = "<=", 
+                     pat = "A10231_W", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 EV
+atcc9_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 WCL
+atcc9_w <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_W", val = 2)
+
+# should not impute with so many missing values
+# filter for exclusive to 10231 EV or WCL or 90028 EV or WCL
+atcc_excl <- filter_na4(atcc_norm, logic = "or", op = "==", 
+                        pat1 = "A10231_EV", val1 = 3, 
+                        pat2 = "A10231_W", val2 = 3, 
+                        pat3 = "A90028_EV", val3 = 3, 
+                        pat4 = "A90028_W", val4 = 3)
+
+# filter for proteins with min 1 valid value in all 4 sample types
+atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=", 
+                        pat1 = "A10231_EV", val1 = 2, 
+                        pat2 = "A10231_W", val2 = 2, 
+                        pat3 = "A90028_EV", val3 = 2, 
+                        pat4 = "A90028_W", val4 = 2)
+
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+atcc_imp <- impute_QRILC(atcc_both)
+
+atcc_de <- rbind(atcc_excl, atcc_imp)
+
+colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de), 
+                                                     c("A10231_", "A90028_"), 
+                                                     c("A1_", "A9_"), 
+                                                     vectorize_all = FALSE)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3)))
+
+atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
+colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+
+atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W")
+
+# make all pair-wise comparisons for specified contrasts
+# and perform limma::eBayes()
+atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
+
+# extract overall results
+atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "overall")
+
+# extract results for individual comparisons defined in atcc_contrasts
+atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "individual")
+
+a1_res <- atcc_ind[[1]]
+
+a9_res <- atcc_ind[[2]]
+
+```
+
 
 # Abbreviations
 
@@ -79,28 +285,152 @@ And another [@lin2014].
 
 Here is a citation [@marwick2017].
 
-# Background
+# Experimental procedures
 
-```{r demo, eval = FALSE}
-1 + 1
-```
+## Subsection 1
 
-# Methods
+## Subsection 2
 
 # Results
 
-```{r get-data, eval = FALSE}
-# Note the path that we need to use to access our data files when rendering this document
-my_data <- readr::read_csv(here::here('analysis'))
-```
-
 # Discussion
 
-# Conclusion
+# Acknowledgements
+
+# Data availability
 
 # Acknowledgements
+
 
 # References 
 <!-- The following line ensures the references appear here for the MS Word or HTML output files, rather than right at the end of the document (this will not work for PDF files):  -->
 <div id="refs"></div>
+
+\newpage
+
+
+```{r figure1, fig.cap='Workflow'}
+plot(mtcars[,1:2])
+```
+
+
+
+
+```{r figure2, fig.cap='EV characterisation', fig.width=7.1, fig.height=7}
+fig2 <- multi_panel_figure(width = 7.1, height = 7, unit = "inches", columns = 3, rows = 3, 
+                           row_spacing = 0, column_spacing = 0)
+fig2
+
+```
+
+
+```{r figure3, fig.cap='Volcano plots', fig.width=6, fig.height=7}
+f3a1 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl), 
+                  use_uniprot = TRUE, type = "plot", 
+                  fontfamily = "sans", 
+                  cat.fontfamily = "sans", 
+                  cat.just = list(c(0.5, 0.8), c(0,2)))
+
+f3a1 <- as_ggplot(f3a1)
+
+f3a2 <- plot_volcano(data = yeast_res, 
+                     p_val = adj.P.Val, 
+                     lfc = logFC,
+                     grp = group, 
+                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+                      values = c("orange", "grey", "purple"), 
+                      breaks = c("EV up", "WCL up", "not sig"))
+
+f3b1 <- plot_venn(list("EV" = b_ev, "WCL" = b_wcl), 
+                  use_uniprot = TRUE, type = "plot", 
+                  fontfamily = "sans", 
+                  cat.fontfamily = "sans", 
+                  cat.just = list(c(0.5,0.8), c(0,2)))
+
+f3b1 <- as_ggplot(f3b1)
+
+f3b2 <- plot_volcano(data = biofilm_res, 
+                     p_val = adj.P.Val, 
+                     lfc = logFC,
+                     grp = group, 
+                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+                      values = c("red", "gray", "blue"), 
+                      breaks = c("EV up", "WCL up", "not sig"))
+
+f3c1 <- plot_venn(list("EV" = atcc9_ev, "WCL" = atcc9_w), 
+                  use_uniprot = TRUE, type = "plot", 
+                  fontfamily = "sans", 
+                  cat.fontfamily = "sans", 
+                  cat.just = list(c(0.5,0.8), c(0,2)))
+
+f3c1 <- as_ggplot(f3c1)
+
+f3c2 <- plot_volcano(data = a9_res, 
+                     p_val = adj.P.Val, 
+                     lfc = logFC,
+                     grp = group, 
+                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+                      values = c("red", "green", "gray"))
+
+f3d1 <- plot_venn(list("EV" = atcc1_ev, "WCL" = atcc1_w), 
+                 use_uniprot = TRUE, type = "plot", 
+                  fontfamily = "sans", 
+                  cat.fontfamily = "sans", 
+                  cat.just = list(c(0.5,0.8), c(0,2)))
+
+f3d1 <- as_ggplot(f3d1)
+
+f3d2 <- plot_volcano(data = a1_res, 
+                     p_val = adj.P.Val, 
+                     lfc = logFC,
+                     grp = group, 
+                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+                      values = c("pink", "cyan", "gray"))
+
+# fig3 <- multi_panel_figure(width = c(40,60), height = c(40,40,40,40)) %>% 
+#   fill_panel(f3a, column = 1, row = 1) %>% 
+#   fill_panel(f3b, column = 2, row = 1) %>% 
+#   fill_panel(f3a, column = 1, row = 2) %>% 
+#   fill_panel(f3b, column = 2, row = 2) %>% 
+#   fill_panel(f3a, column = 1, row = 3) %>% 
+#   fill_panel(f3b, column = 2, row = 3) %>% 
+#   fill_panel(f3a, column = 1, row = 4) %>% 
+#   fill_panel(f3b, column = 2, row = 4)
+#   
+# fig3
+
+ggarrange(f3a1, f3a2,
+          f3b1, f3b2,
+          f3c1, f3c2,
+          f3d1, f3d2,
+          labels = c("A", "DAY286 yeast", "B", "DAY286 biofilm", "C", "ATCC90028", "D", "ATCC10231"), 
+          hjust = c(-0.5, 0.4, -0.5, 0.4, -0.5, 0.4, -0.5, 0.4), 
+          ncol = 2, 
+          nrow = 4, 
+          widths = c(1,1.5))
+```
+
+
+```{r figure4, fig.cap='GO terms', fig.width=7.2, fig.height=4}
+fig4 <- multi_panel_figure(width = 7.1, height = 4, unit = "inches", columns = 2, rows = 2, 
+                           row_spacing = 0, column_spacing = 0)
+fig4
+
+```
+
+```{r figure5, fig.cap='heatmap etc.'}
+plot(mtcars[,1:2])
+```
+
+```{r figure6, fig.cap='4tm domain'}
+plot(mtcars[,1:2])
+```
+
+```{r figure7, fig.cap='final candidates'}
+plot(mtcars[,1:2])
+```
 
