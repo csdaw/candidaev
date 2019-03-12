@@ -485,15 +485,58 @@ gplots::heatmap.2(test7, trace = "none", na.color = "black",
                   distfun = function(x) dist(x, method = "euclidean"),
                   hclustfun = function(x) hclust(x))
 
+# get dataframe in order of heatmap
+test10 <- test6[rev(test9$rowInd), test9$colInd]
 
 
 # test heatmap with data with missing values
-gplots::heatmap.2(test6, trace = "none", na.color = "black", 
+
+# cluster rows and columns
+hr <- hclust(clust_dist(test6))
+
+hc <- hclust(clust_dist(t(test6)))
+
+# define row clusters
+test11 <- cutree(hr, h = max(hr$height/1.5))
+
+# get colour palette equal to number of clusters
+clusterCols <- rainbow(length(unique(test11)))
+
+# create vector of colours for side bar
+myClusterSideBar <- clusterCols[test11]
+
+# add cluster ID to data
+test12 <- cbind(test6, clusterID = test11)
+
+# examine data with cluster ID, ordered as in heatmap
+test13 <- test12[hr$order,]
+
+test14 <- test12 %>% 
+  as.data.frame() %>% 
+  select(clusterID)
+
+test14$clusterID %<>% as.factor()
+
+test9 <- gplots::heatmap.2(test6, trace = "none", na.color = "black", 
                   reorderfun = function(d,w) reorder(d, w, agglo.FUN = mean),
                   col = my_palette, breaks = breaks, distfun = function(x) clust_dist(x), 
-                  hclustfun = function(x) hclust(x))
+                  hclustfun = function(x) hclust(x), 
+                  RowSideColors = myClusterSideBar)
 
 htmp2(test6, col_limit = 7, plot = TRUE)
+
+# test pheatmap
+pheatmap::pheatmap(test12, 
+                   cluster_rows = hr, 
+                   cluster_cols = hc, 
+                   show_rownames = FALSE, 
+                   annotation_row = test14, 
+                   na_col = "black", 
+                   cutree_rows = 5, 
+                   scale = "none", 
+                   color = my_palette, 
+                   breaks = breaks, 
+                   treeheight_row = 0)
 
 
 
