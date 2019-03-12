@@ -314,7 +314,7 @@ test2 <- cbind(test,
 
 colnames(test2)[23:28] <- c("Y_EV1", "Y_EV2", "Y_EV3", "Y_W1", "Y_W2", "Y_W3")
 
-plot_mds(test2) + 
+test17 <- plot_mds(test2) + 
   geom_text(aes(label = colnames(test2)), hjust = 1.2, vjust = 0.5)
 
 
@@ -378,7 +378,7 @@ htmp <- function(x, k = 6, col_limit = 6, plot = TRUE) {
 }
 
 
-htmp2 <- function(x, col_limit = 6, plot = TRUE) {
+htmp2 <- function(x, col_limit = 6, plot = TRUE, ...) {
   df <- x
   
   
@@ -403,7 +403,7 @@ htmp2 <- function(x, col_limit = 6, plot = TRUE) {
                                                             legend_direction = "horizontal",
                                                             legend_width = unit(5, "cm"),
                                                             title_position = "lefttop"), 
-                                na_col = "green")
+                                na_col = "black", ...)
   if(plot) {
     # Plot
     ComplexHeatmap::draw(ht1, heatmap_legend_side = "top")
@@ -512,33 +512,40 @@ test12 <- cbind(test6, clusterID = test11)
 test13 <- test12[hr$order,]
 
 test14 <- test12 %>% 
-  as.data.frame() %>% 
-  select(clusterID)
+  as.data.frame()
 
 test14$clusterID %<>% as.factor()
+
+new_order <- c("5", "1", "2", "3", "4")
+
+test14$clusterID <- gdata::reorder.factor(test14$clusterID, new.order = new_order)
+
+test15 <- test14 %>% 
+  tibble::rownames_to_column(var = "id") %>% 
+  arrange(clusterID) %>% 
+  tibble::column_to_rownames(var = "id")
+
+test16 <- test14 %>% 
+  select(clusterID)
+
+test16$clusterID %<>% as.factor()
 
 test9 <- gplots::heatmap.2(test6, trace = "none", na.color = "black", 
                   reorderfun = function(d,w) reorder(d, w, agglo.FUN = mean),
                   col = my_palette, breaks = breaks, distfun = function(x) clust_dist(x), 
                   hclustfun = function(x) hclust(x), 
-                  RowSideColors = myClusterSideBar)
+                  RowSideColors = myClusterSideBar, 
+                  labRow = FALSE, 
+                  srtCol = 0, 
+                  dendrogram = "both",
+                  denscol = "black", 
+                  keysize = 1.3,
+                  key.par=list(mgp=c(1.5, 0.5, 0),
+                       mar=c(4, 2.5, 2.5, 0)))
 
-htmp2(test6, col_limit = 7, plot = TRUE)
+htmp2(test6, split = test16, show_row_names = FALSE)
 
-# test pheatmap
-pheatmap::pheatmap(test12, 
-                   cluster_rows = hr, 
-                   cluster_cols = hc, 
-                   show_rownames = FALSE, 
-                   annotation_row = test14, 
-                   na_col = "black", 
-                   cutree_rows = 5, 
-                   scale = "none", 
-                   color = my_palette, 
-                   breaks = breaks, 
-                   treeheight_row = 0)
-
-
+ggarrange(test9_grob, test17)
 
 ```
 
