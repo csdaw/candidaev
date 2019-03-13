@@ -1,0 +1,94 @@
+---
+title: "**Defining protein biomarkers for *Candida albicans* extracellular vesicles**"
+author: "*Charlotte Dawson^a^, Mark Bleackley^a^, Marilyn Anderson^a^*"
+date: "*^a^Department of Biochemistry and Genetics, La Trobe University, Victoria, Australia*"
+output: 
+    bookdown::pdf_document2:
+      latex_engine: xelatex
+      fig_caption: yes
+      number_sections: yes
+      toc: no
+      keep_tex: no
+bibliography: "components/references.bib" 
+csl: "components/molecular-and-cellular-proteomics.csl"
+link-citations: yes
+linkcolor: blue
+fontsize: 12pt
+geometry: margin=1in
+classoption: letterpaper
+mainfont: Times New Roman
+linestretch: 1.5
+header-includes:
+  - \usepackage{titling}
+  - \pretitle{\begin{center}\fontsize{14bp}{14bp}\selectfont}
+  - \posttitle{\par\end{center}}
+  - \preauthor{\begin{center}\fontsize{12bp}{12bp}\selectfont}
+  - \postauthor{\par\end{center}}
+  - \predate{\begin{center}\fontsize{10bp}{10bp}\selectfont}
+  - \postdate{\par\end{center}}
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \pagestyle{fancy}
+  - \fancyhead[L]{This is the running title it is rather long}
+  - \usepackage{float}
+  - \newcommand{\beginsupplement}{
+      \setcounter{table}{0} 
+      \renewcommand{\thetable}{S\arabic{table}} 
+      \setcounter{figure}{0} 
+      \renewcommand{\thefigure}{S\arabic{figure}}
+    }
+
+---
+
+**Running title:** Running title goes here
+
+**Corresponding author:**
+
+\newpage
+
+```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  echo = FALSE,
+  comment = "#>")
+
+library(candidaev)
+library(tidyNano)
+library(multipanelfigure)
+library(limma)
+library(dplyr)
+library(ggplot2)
+library(candidaev)
+library(ggpubr)
+library(UpSetR)
+set.seed(1)
+
+```
+
+# Supplementary data {-}
+
+\beginsupplement
+
+```{r figureS1, fig.cap='Individual biological replicates for NTA', fig.height=4, fig.width=4}
+nta_techavg <- nta %>% 
+  nanolyze(particle_size, Strain, Bio_rep, Dilution, 
+           name = "Tech_rep", 
+           param_var = True_count)
+
+nta_techavg %>% 
+  ggplot(aes(x = particle_size, y = Tech_rep_mean, colour = Bio_rep)) + 
+  geom_line(size = 0.5) + 
+  facet_wrap(~ Strain, scales = "free", ncol = 2, nrow = 2) + 
+  theme_classic() + 
+  theme(strip.background = element_blank(), 
+        legend.position = "top", 
+        plot.margin = margin(t = 0, l = 0, r = 0, b = 0, unit = "inches")) + 
+  xlab(label = "Particle size (nm)") + 
+  ylab(label = "Particles / mL") + 
+  labs(colour = "Biological replicate")
+
+
+```
+

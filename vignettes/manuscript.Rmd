@@ -35,6 +35,12 @@ header-includes:
   - \usepackage{lipsum}
   - \pagestyle{fancy}
   - \fancyhead[L]{This is the running title it is rather long}
+  - \usepackage{float}
+  - \let\origfigure\figure
+  - \let\endorigfigure\endfigure
+  - \renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[H]
+    } {\endorigfigure}
 ---
 
 **Running title:** Running title goes here
@@ -45,7 +51,7 @@ header-includes:
 
 <!-- This is the format for text comments that will be ignored during renderings. Do not put R code in these comments because it will not be ignored. -->
 
-```{r setup, echo = FALSE, warning=FALSE}
+```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
@@ -54,6 +60,7 @@ knitr::opts_chunk$set(
   comment = "#>")
 
 library(candidaev)
+library(tidyNano)
 library(multipanelfigure)
 library(limma)
 library(dplyr)
@@ -301,30 +308,141 @@ Here is a citation [@marwick2017].
 
 # Acknowledgements
 
-
+\newpage
 # References 
 <!-- The following line ensures the references appear here for the MS Word or HTML output files, rather than right at the end of the document (this will not work for PDF files):  -->
 <div id="refs"></div>
 
 \newpage
 
+# Figures
 
 ```{r figure1, fig.cap='Workflow'}
 plot(mtcars[,1:2])
 ```
 
+\newpage
 
+```{r figure2Data}
+nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", 
+                                  "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
+                                  "Biofilm_1", "Biofilm_2", "Biofilm_3", "Biofilm_4", "Biofilm_5", 
+                                  "DAY286_1", "DAY286_2", "DAY286_3"), 
+                           Protein_conc = c(0.192, 0.282, 0.287, 
+                                            0.424, 0.716, 0.584, 
+                                            0.204, 0.198, 0.297, 0.193, 0.416, 
+                                            0.437, 0.360, 0.447), 
+                           Culture_vol = c(rep(150, 6), rep(1000, 5), rep(200, 3)), 
+                           OD600 = c(0.455*20, 0.557*20, 0.615*20, 
+                                     0.310*50, 0.337*50, 0.297*50, 
+                                     rep(NA, 5), 
+                                     36.2, 39.7, 34.0), 
+                           stringsAsFactors = FALSE)
 
+nta_techavg <- nta %>% 
+  nanolyze(particle_size, Strain, Bio_rep, Dilution, 
+           name = "Tech_rep", 
+           param_var = True_count)
 
-```{r figure2, fig.cap='EV characterisation', fig.width=7.1, fig.height=7}
-fig2 <- multi_panel_figure(width = 7.1, height = 7, unit = "inches", columns = 3, rows = 3, 
-                           row_spacing = 0, column_spacing = 0)
-fig2
+nta_bioavg <- nta_techavg %>% 
+  nanolyze(particle_size, Strain,
+           name = "Bio_rep", 
+           param_var = Tech_rep_mean) %>% 
+  mutate(facet = case_when(Strain == "Biofilm" ~ "first", TRUE ~ "second"))
+
+nta_total <- nta_techavg %>% 
+  nanocount(Strain, Bio_rep, Dilution, 
+            param_var = Tech_rep_mean) %>% 
+  tidyr::unite("id", Strain, Bio_rep) %>% 
+  mutate(protein_conc = as.numeric(match_id(id, nta_metadata, "id", "Protein_conc")), 
+         od = match_id(id, nta_metadata, "id", "OD600"), 
+         part_per_prot = Particle_count / protein_conc / 1000) %>% 
+  tidyr::separate(col = id, into = c("Strain", "Bio_rep"), sep = "_", remove = TRUE)
+
+nta_total_tukey <- aov(part_per_prot ~ Strain, data = nta_total) %>% 
+  tukey_hsd()
+
+nta_total_dunns <- dunns_test(x = nta_total$Particle_count, 
+                              g = nta_total$Strain, 
+                              method = "bh")
 
 ```
 
 
-```{r figure3, fig.cap='Volcano plots', fig.width=6, fig.height=7}
+```{r figure2plots}
+f2a_img <- png::readPNG("./vignettes/figures/figure2-v2.png")
+
+f2a <- ggplot() + 
+  background_image(f2a_img) + 
+  theme(plot.margin = margin(t = 0.3, l = 0, r = 0, b = 0, unit = "inches"))
+
+f2b <- nta_bioavg %>% 
+  ggplot(aes(x = particle_size, y = Bio_rep_mean, colour = Strain)) + 
+  scale_colour_manual(values = c("green", "red", "blue", "purple"), 
+                      breaks = c("Biofilm", "DAY286", "ATCC90028", "ATCC10231"), 
+                      labels = c("DAY286 B", "DAY286 Y", "ATCC90028", "ATCC10231")) + 
+  geom_line(size = 1) + 
+  facet_wrap(~ facet, scales = "free", ncol = 2, nrow = 1) + 
+  theme_classic() + 
+  theme(strip.background = element_blank(), 
+        strip.text = element_blank(), 
+        legend.position = c(0.88, 0.6), 
+        legend.title = element_blank(), 
+        plot.margin = margin(t = 0.2, l = 0, r = 0, b = 0, unit = "inches")) + 
+  xlab(label = "Particle size (nm)") + 
+  ylab(label = "Particles / mL")
+
+f2c1 <- nta_total %>% 
+  ggboxplot(x = "Strain", y = "Particle_count", 
+            color = "Strain", palette = "jco", add = "jitter")
+f2c1 <- ggpar(f2c1, 
+              yscale = "log10", 
+              format.scale = TRUE,
+              ylim = c(1e11, 1e13)) + 
+  stat_pvalue_manual(nta_total_dunns[c(1,2), ], 
+                     label = "p.adj", 
+                     y.position = c(12.4, 13), 
+                     tip.length = 4e-3)
+
+f2c2 <- nta_total %>% 
+  ggboxplot(x = "Strain", y = "part_per_prot", 
+            color = "Strain", palette = c("green", "red", "blue", "purple"), add = "jitter", 
+            ylab = expression("Particles /"~paste(mu,g)~"protein"))
+f2c2 <- ggpar(f2c2, 
+              yscale = "log10", 
+              format.scale = TRUE, 
+              ylim = c(8e8, 8e10), 
+              legend = "none") + 
+  stat_pvalue_manual(nta_total_tukey[c(2,4,6), ], label = "p.adj", 
+                     y.position = c(10.7, 10.5, 10.85), 
+                     tip.length = 1e-2, 
+                     label.size = 3) + 
+  theme(axis.text.x = element_blank(), 
+        axis.title.x = element_blank(), 
+        axis.ticks.x = element_blank(), 
+        plot.margin = margin(t = 0.2, l = 0.2, r = 0, b = 0, unit = "inches"))
+
+```
+
+
+```{r figure2, fig.cap='EV characterisation', fig.width=7.1, fig.height=4}
+
+ggarrange(f2a, 
+          ggarrange(f2b, f2c2, 
+                    labels = c("B", "C"), 
+                    ncol = 2,
+                    nrow = 1, 
+                    widths = c(1.8,1)), 
+          labels = c("A", ""), 
+          nrow = 2, 
+          ncol = 1, 
+          heights = c(1,1))
+
+```
+
+\newpage
+
+```{r figure3Data}
 f3a1 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl), 
                   use_uniprot = TRUE, type = "plot", 
                   fontfamily = "sans", 
@@ -391,29 +509,23 @@ f3d2 <- plot_volcano(data = a1_res,
   scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
                       values = c("pink", "cyan", "gray"))
 
-# fig3 <- multi_panel_figure(width = c(40,60), height = c(40,40,40,40)) %>% 
-#   fill_panel(f3a, column = 1, row = 1) %>% 
-#   fill_panel(f3b, column = 2, row = 1) %>% 
-#   fill_panel(f3a, column = 1, row = 2) %>% 
-#   fill_panel(f3b, column = 2, row = 2) %>% 
-#   fill_panel(f3a, column = 1, row = 3) %>% 
-#   fill_panel(f3b, column = 2, row = 3) %>% 
-#   fill_panel(f3a, column = 1, row = 4) %>% 
-#   fill_panel(f3b, column = 2, row = 4)
-#   
-# fig3
 
-ggarrange(f3a1, f3a2,
-          f3b1, f3b2,
-          f3c1, f3c2,
-          f3d1, f3d2,
-          labels = c("A", "DAY286 yeast", "B", "DAY286 biofilm", "C", "ATCC90028", "D", "ATCC10231"), 
-          hjust = c(-0.5, 0.4, -0.5, 0.4, -0.5, 0.4, -0.5, 0.4), 
-          ncol = 2, 
-          nrow = 4, 
-          widths = c(1,1.5))
 ```
 
+
+```{r figure3, fig.cap='Volcano plots', fig.width=6, fig.height=7}
+# ggarrange(f3a1, f3a2,
+#           f3b1, f3b2,
+#           f3c1, f3c2,
+#           f3d1, f3d2,
+#           labels = c("A", "DAY286 yeast", "B", "DAY286 biofilm", "C", "ATCC90028", "D", "ATCC10231"), 
+#           hjust = c(-0.5, 0.4, -0.5, 0.4, -0.5, 0.4, -0.5, 0.4), 
+#           ncol = 2, 
+#           nrow = 4, 
+#           widths = c(1,1.5))
+```
+
+\newpage
 
 ```{r figure4, fig.cap='GO terms', fig.width=7.2, fig.height=4}
 fig4 <- multi_panel_figure(width = 7.1, height = 4, unit = "inches", columns = 2, rows = 2, 
@@ -422,15 +534,23 @@ fig4
 
 ```
 
+\newpage
+
 ```{r figure5, fig.cap='heatmap etc.'}
 plot(mtcars[,1:2])
 ```
+
+\newpage
 
 ```{r figure6, fig.cap='4tm domain'}
 plot(mtcars[,1:2])
 ```
 
+\newpage
+
 ```{r figure7, fig.cap='final candidates'}
 plot(mtcars[,1:2])
 ```
+
+
 
