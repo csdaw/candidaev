@@ -4,7 +4,7 @@
 \alias{plot_volcano}
 \title{Title}
 \usage{
-plot_volcano(data, p_val, lfc, grp, colour = c("red1", "blue1"), label)
+plot_volcano(data, p_val, lfc, grp, label)
 }
 \arguments{
 \item{data}{Description.}
@@ -15,9 +15,9 @@ plot_volcano(data, p_val, lfc, grp, colour = c("red1", "blue1"), label)
 
 \item{grp}{Description.}
 
-\item{colour}{Description.}
-
 \item{label}{Description.}
+
+\item{colour}{Description.}
 }
 \value{
 Description.
