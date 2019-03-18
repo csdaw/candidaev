@@ -35,6 +35,7 @@ header-includes:
   - \usepackage{lipsum}
   - \pagestyle{fancy}
   - \fancyhead[L]{This is the running title it is rather long}
+  - \setlength{\headheight}{15pt}
   - \usepackage{float}
   - \let\origfigure\figure
   - \let\endorigfigure\endfigure
@@ -68,6 +69,7 @@ library(ggplot2)
 library(candidaev)
 library(ggpubr)
 library(UpSetR)
+library(kableExtra)
 set.seed(1)
 
 ```
@@ -315,6 +317,142 @@ Here is a citation [@marwick2017].
 
 \newpage
 
+# Tables
+
+```{r markerTableData}
+marker_comp <- list("yeast" = yeast_res %>% 
+                      filter(group == "EV up" | group == "EV ex") %>% 
+                      pull(CGD_gene_name), 
+                    "biofilm" = biofilm_res %>% 
+                      filter(group == "EV up" | group == "EV ex") %>% 
+                      pull(CGD_gene_name), 
+                    "ATCC10231" = a1_res %>% 
+                      filter(group == "A1_EV up" | group == "A1_EV ex") %>% 
+                      pull(CGD_gene_name), 
+                    "ATCC90028" = a9_res %>% 
+                      filter(group == "A9_EV up" | group == "A9_EV ex") %>% 
+                      pull(CGD_gene_name))
+
+marker_comp_tab <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "list")
+
+marker_candidates <- marker_comp_tab %>% 
+  filter(apply(.[, 1:4], 1, sum) == 4) %>% 
+  pull(..values..) %>% 
+  unlist() %>% 
+  as.data.frame(stringsAsFactors = FALSE) %>% 
+  rename(Gene = 1)
+
+marker_longlist <- marker_candidates %>% 
+  mutate(Protein = match_id(Gene, uniprot, "CGD_gene_name", "Protein_name"),
+         DAY.Y = match_id(Gene, yeast_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         DAY.B = match_id(Gene, biofilm_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         A1 = match_id(Gene, a1_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         A9 = match_id(Gene, a9_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         TM = match_id(Gene, uniprot, "CGD_gene_name", "Transmembrane"), 
+         SP = match_id(Gene, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
+  mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
+            .funs = list(~ signif(as.numeric(.), digits = 3))) %>% 
+  mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
+            .funs = list(~ case_when(is.na(.) == TRUE ~ "ex", 
+                                     TRUE ~ as.character(.)))) %>% 
+  mutate(TM = stringr::str_count(TM, "Helical"), 
+         SP = case_when(grepl("SIGNAL", SP) ~ "Y", 
+                        TRUE ~ ""), 
+         TM = case_when(TM == 0 ~ "", 
+                        TRUE ~ as.character(TM))) %>% 
+  rename("DAY Y" = DAY.Y, "DAY B" = DAY.B) %>% 
+  arrange(Gene)
+
+protein_desc <- c("1,3-beta-glucanosyltransferase", 
+                  "Rho family GTPase", 
+                  "Multidrug transporter of ABC superfamily", 
+                  "Major chitin synthase of yeast and hyphae", 
+                  "GPI-anchored cell wall transglycosylase", 
+                  "GPI-anchored cell wall protein", 
+                  paste0("Predicted P-type ATPase sodium pump", footnote_marker_alphabet(1)), 
+                  "ER oxidoreductin", 
+                  paste0("Long-chain fatty acid-CoA ligase", footnote_marker_alphabet(1)),
+                  "Multicopper feroxidase", 
+                  "High-affinity S-adenosylmethionine permease", 
+                  "Surface protein similar to glycerol-3-phosphate dehydrogenase", 
+                  "1,3-beta-glucan synthase", 
+                  "High-affinity MFS glucose transporter", 
+                  "Putative high-affinity MFS glucose transporter", 
+                  paste0("Putative mitochondrial phosphate transporter", footnote_marker_alphabet(1)), 
+                  paste0("Glycolipid 2-alpha-mannosyltransferase", footnote_marker_alphabet(1)), 
+                  "Cell surface mannoprotein", 
+                  "Mucin family adhesin-like protein", 
+                  "Sphingolipid C9-methyltransferase", 
+                  paste0( "\\textit{S. cerevisiae} ortholog is POM33, transmembrane nucleoporin", footnote_marker_alphabet(2)), 
+                  paste0("\\textit{S. cerevisiae} ortholog is RTN1, reticulon protein", footnote_marker_alphabet(2)), 
+                  paste0("Hexadecenal dehydrogenase", footnote_marker_alphabet(2)), 
+                  paste0("\\textit{S. cerevisiae} ortholog is PUN1, plasma membrane protein", footnote_marker_alphabet(2)), 
+                  "1,3-beta-glucanosyltransferase", 
+                  "GPI-anchored cell surface protein of unknown function", 
+                  "Putative ion transporter", 
+                  "Cell surface glycosidase", 
+                  "Glycosidase", 
+                  "Phospholipase B", 
+                  "Plasma membrane ATPase", 
+                  paste0("Mitochondrial outer membrane porin", footnote_marker_alphabet(1)), 
+                  "G-protein of RAC subfamily", 
+                  "Rho family GTPase", 
+                  "Rho family GTPase", 
+                  "Secreted aspartyl protease", 
+                  "Rab family GTPase", 
+                  paste0("Protein required for normal cell wall, plasma membrane", footnote_marker_alphabet(3)), 
+                  paste0("Protein involved in vacuolar inheritance", footnote_marker_alphabet(1)), 
+                  "\\textit{S. cerevisiae} ortholog is YCK2, casein kinase", 
+                  paste0("Palmitoyltransferase, putative vacuolar SNARE complex protein", footnote_marker_alphabet(1)), 
+                  paste0("Rab family GTPase", footnote_marker_alphabet(1)),  
+                  "Putative vacuolar cation channel")
+marker_longlist <- marker_longlist %>% 
+  mutate(Protein = protein_desc, 
+         VF = c("Y", rep("",3), rep("Y", 2), "", "Y", rep("", 9), rep("Y", 2), 
+                rep("", 4), rep("Y", 3), rep("", 2), rep("Y", 2), rep("", 5), "Y", rep("", 7)), 
+         pack_row = c(5, rep(1,3), rep(5,2), 1, 2, rep(1,3), 5, rep(1,3), 4, 2, rep(5,2), 
+                      1, rep(2,2), 4, 1, rep(5,2), 1, rep(5,3), 1, 4, rep(1,3), 5, 2, 1, 
+                      3, 1, rep(2,2), 3)) %>% 
+  arrange(pack_row)
+
+# fix number of TM domains for CDR1;CDR2
+marker_longlist[2, 7] <- "12;12" 
+
+# UniProt says SUR7 has 3 TM domains and a signal peptide
+# Much of literature says SUR7 has 4 TM domains
+# TMHMM v2.0 says SUR7 has 4 TM domains
+# SignalP v5.0 has a 0.2988 likelihood of a signal peptide and 0.7012 of 'Other'
+# fix SUR7 entries
+marker_longlist[18, 7] <- "4"
+marker_longlist[18, 8] <- ""
+
+                     
+```
+
+```{r markerTable}
+knitr::kable(marker_longlist[ ,-10],
+             caption = "Description of table", 
+             format = "latex", 
+             booktabs = TRUE, 
+             longtable = TRUE, 
+             linesep = "", 
+             escape = FALSE)  %>% 
+  row_spec(row = c(1, 5, 6, 11, 12, 15:19, 21:27, 35, 40), underline = TRUE) %>% 
+  add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs Cell" = 4, " " = 2), escape = FALSE) %>% 
+  kable_styling(font_size = 8) %>% 
+  pack_rows("Plasma membrane", 1, 19) %>% 
+  pack_rows("Golgi, ER, secretory pathway", 20, 26) %>% 
+  pack_rows("Vacuole", 27, 28) %>% 
+  pack_rows("Mitochondria", 29, 31) %>% 
+  pack_rows("Cell wall, cell surface", 32, 43) %>% 
+  footnote(alphabet = c("Protein localisation was inferred from sequence similarity with \\\\textit{S. cerevisiae} ortholog (see CGD)", 
+                        "Protein localisation was predicted using DeepLoc-1.0", 
+                        "Presence of transmembrane domains and signal peptide predicted with TMHMM v2.0 and SignalP 5.0 respectively"), 
+           escape = FALSE)
+
+```
+
+
 # Figures
 
 ```{r figure1, fig.cap='Workflow'}
@@ -370,7 +508,7 @@ nta_total_dunns <- dunns_test(x = nta_total$Particle_count,
 
 
 ```{r figure2plots}
-f2a_img <- png::readPNG("./vignettes/figures/figure2-v2.png")
+f2a_img <- png::readPNG("./vignettes/figures/figure2a.png")
 
 f2a <- ggplot() + 
   background_image(f2a_img) + 
@@ -381,14 +519,15 @@ f2b <- nta_bioavg %>%
   scale_colour_manual(values = c("green", "red", "blue", "purple"), 
                       breaks = c("Biofilm", "DAY286", "ATCC90028", "ATCC10231"), 
                       labels = c("DAY286 B", "DAY286 Y", "ATCC90028", "ATCC10231")) + 
-  geom_line(size = 1) + 
+  geom_vline(xintercept = 100, colour = "#990000", linetype = "dashed") +
+  geom_line(size = 0.5) + 
   facet_wrap(~ facet, scales = "free", ncol = 2, nrow = 1) + 
   theme_classic() + 
   theme(strip.background = element_blank(), 
         strip.text = element_blank(), 
         legend.position = c(0.88, 0.6), 
         legend.title = element_blank(), 
-        plot.margin = margin(t = 0.2, l = 0, r = 0, b = 0, unit = "inches")) + 
+        plot.margin = margin(t = 0.2, l = 0, r = 0.2, b = 0, unit = "inches")) + 
   xlab(label = "Particle size (nm)") + 
   ylab(label = "Particles / mL")
 
@@ -442,7 +581,7 @@ ggarrange(f2a,
 
 \newpage
 
-```{r figure3Data}
+```{r figure3Data, cache=TRUE, eval=FALSE}
 f3a1 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl), 
                   use_uniprot = TRUE, type = "plot", 
                   fontfamily = "sans", 
@@ -458,7 +597,8 @@ f3a2 <- plot_volcano(data = yeast_res,
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
   scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
                       values = c("orange", "grey", "purple"), 
-                      breaks = c("EV up", "WCL up", "not sig"))
+                      breaks = c("EV up", "WCL up", "not sig"), 
+                      name = "DAY286 yeast")
 
 f3b1 <- plot_venn(list("EV" = b_ev, "WCL" = b_wcl), 
                   use_uniprot = TRUE, type = "plot", 
@@ -475,7 +615,8 @@ f3b2 <- plot_volcano(data = biofilm_res,
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
   scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
                       values = c("red", "gray", "blue"), 
-                      breaks = c("EV up", "WCL up", "not sig"))
+                      breaks = c("EV up", "WCL up", "not sig"), 
+                      name = "DAY286 biofilm")
 
 f3c1 <- plot_venn(list("EV" = atcc9_ev, "WCL" = atcc9_w), 
                   use_uniprot = TRUE, type = "plot", 
@@ -491,7 +632,8 @@ f3c2 <- plot_volcano(data = a9_res,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
   scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
-                      values = c("red", "green", "gray"))
+                      values = c("red", "green", "gray"), 
+                      name = "ATCC90028")
 
 f3d1 <- plot_venn(list("EV" = atcc1_ev, "WCL" = atcc1_w), 
                  use_uniprot = TRUE, type = "plot", 
@@ -507,27 +649,65 @@ f3d2 <- plot_volcano(data = a1_res,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
   scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
-                      values = c("pink", "cyan", "gray"))
+                      values = c("pink", "cyan", "gray"), 
+                      name = "ATCC10231")
 
 
 ```
 
 
-```{r figure3, fig.cap='Volcano plots', fig.width=6, fig.height=7}
-# ggarrange(f3a1, f3a2,
-#           f3b1, f3b2,
-#           f3c1, f3c2,
-#           f3d1, f3d2,
-#           labels = c("A", "DAY286 yeast", "B", "DAY286 biofilm", "C", "ATCC90028", "D", "ATCC10231"), 
-#           hjust = c(-0.5, 0.4, -0.5, 0.4, -0.5, 0.4, -0.5, 0.4), 
-#           ncol = 2, 
-#           nrow = 4, 
-#           widths = c(1,1.5))
+```{r figure3, fig.cap='Volcano plots', fig.width=6, fig.height=7, cache=TRUE, eval=FALSE}
+ggarrange(f3a1, f3a2,
+          f3b1, f3b2,
+          f3c1, f3c2,
+          f3d1, f3d2,
+          labels = c("A", "", "B", "", "C", "", "D", ""),
+          hjust = c(-0.5, 0.4, -0.5, 0.4, -0.5, 0.4, -0.5, 0.4),
+          ncol = 2,
+          nrow = 4,
+          widths = c(1,1.5))
 ```
 
 \newpage
 
-```{r figure4, fig.cap='GO terms', fig.width=7.2, fig.height=4}
+```{r figure4Data}
+# figure 4a PCA
+f4a_data <- cbind(atcc_de, 
+                  biofilm_de[match(rownames(atcc_de), rownames(biofilm_de)), ])
+
+f4a_data <- cbind(f5a_data, 
+                  yeast_de[match(rownames(f4a_data), rownames(yeast_de)), ])
+
+colnames(f4a_data)[13:28] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", 
+                               "B_W1", "B_W2", "B_W3", "B_W4", "B_W5", 
+                               "Y_EV1", "Y_EV2", "Y_EV3", 
+                               "Y_W1", "Y_W2", "Y_W3")
+
+f4a <- plot_mds(f4a_data) + 
+  geom_text(aes(label = colnames(f5a_data)), hjust = 1.2, vjust = 0.5)
+
+# figure 5b 4 way venn
+f4b_comp <- list("DAY286 Y" = rownames(y_ev), 
+                 "DAY286 B" = rownames(b_ev),
+                 "ATCC90028" = rownames(atcc9_ev), 
+                 "ATCC10231" = rownames(atcc1_ev))
+f4b_comp <- lapply(f4b_comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
+
+f4b <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "plot")
+
+f4b <- as_ggplot(f4b) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+
+f4b_overlap <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "list") %>% 
+  filter(..count.. == 405) %>% 
+  pull(..values..) %>% 
+  unlist()
+
+
+```
+
+
+```{r figure4, fig.cap='Combined comparison', fig.width=7.2, fig.height=4}
 fig4 <- multi_panel_figure(width = 7.1, height = 4, unit = "inches", columns = 2, rows = 2, 
                            row_spacing = 0, column_spacing = 0)
 fig4
@@ -536,9 +716,183 @@ fig4
 
 \newpage
 
-```{r figure5, fig.cap='heatmap etc.'}
-plot(mtcars[,1:2])
+```{r figure5Data}
+# figure 5c heatmap
+clust_dist <- function(x) {
+    dist <- cluster::daisy(x, metric = "gower")
+    dist[is.na(dist)] <- max(dist, na.rm = TRUE)
+    return(dist)
+}
+
+f5_table <- a9_res %>% 
+  select(logFC, CGD_gene_name) %>% 
+  full_join(., select(a1_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
+  full_join(., select(yeast_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
+  full_join(., select(biofilm_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
+  rename(a9_lfc = logFC.x, 
+         a1_lfc = logFC.y, 
+         y_lfc = logFC.x.x, 
+         b_lfc = logFC.y.y) %>% 
+  select(CGD_gene_name, everything()) %>% 
+  filter(CGD_gene_name %in% f4b_overlap)
+
+# filter for rows with min 1/4 valid values
+# otherwise clustering will not work
+f5_table_filt <- f5_table %>% 
+  filter_at(.vars = vars(contains("lfc")), 
+            any_vars(!is.na(.))) %>% 
+  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
+  as.matrix()
+
+# excluded proteins
+f5_table_excl <- f5_table %>% 
+  filter_at(.vars = vars(contains("lfc")), 
+            all_vars(is.na(.))) %>% 
+  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
+  as.matrix()
+
+# cluster rows
+f5_hr <- hclust(clust_dist(f5_table_filt))
+
+# define row clusters
+f5_cutree <- cutree(f5_hr, h = max(f5_hr$height/1.5))
+
+# get cluster ID data for heatmap splitting
+f5_split <- f5_cutree %>% 
+  as.factor() %>% 
+  relevel("5")
+
+# ComplexHeatmap legend colours
+col_fun <- circlize::colorRamp2(c(-4,0,4), c("blue", "white", "red"))
+
+# heatmap
+f5_htmp <- ComplexHeatmap::Heatmap(f5_table_filt, 
+                                    cluster_rows = TRUE,
+                                    cluster_columns = TRUE,
+                                    clustering_distance_rows = clust_dist, 
+                                    clustering_distance_columns = clust_dist, 
+                                    na_col = "black", 
+                                    col = col_fun, 
+                                    show_row_names = FALSE, 
+                                    heatmap_legend_param = list(title = expression(bold(log[2]("FC"))), 
+                                                                direction = "horizontal", 
+                                                                legend_width = unit(2, "cm"), 
+                                                                title_position = "lefttop", 
+                                                                title_gp = grid::gpar(colour = "black", fontsize = 5), 
+                                                                labels_gp = grid::gpar(colour = "black", fontsize = 5), 
+                                                                at = c(-6, -4, -2, 0, 2, 4, 6)), 
+                                    column_labels = c("ATCC90028", "ATCC10231", "DAY286 Y", "DAY286 B"),
+                                    column_names_gp = grid::gpar(colour = "black", fontsize = 6), 
+                                    column_names_rot = 45, 
+                                    row_title = c("1", "2", "3", "4", "5"),
+                                    row_title_gp = grid::gpar(colour = "black", fontsize = 6), 
+                                    row_title_rot = 0,
+                                    cluster_row_slices = FALSE, 
+                                    row_split = f5c_split)
+
+# save heatmap as pdf file for editing in inkscape
+# not run in rmarkdown but manually in console
+# pdf(file = "./vignettes/figures/figure5_unf.pdf", width = 1.7, height = 4)
+# ComplexHeatmap::draw(f5_htmp,
+#                      heatmap_legend_side = "bottom")
+# dev.off()
+
+# protein lists for heatmap table in order of appearance in heatmap
+f5_clust1 <- f5_split[f5_hr$order] %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "accession") %>% 
+  filter(. == 5) %>% 
+  pull(accession)
+
+f5_clust2 <- f5_split[f5_hr$order] %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "accession") %>% 
+  filter(. == 1) %>% 
+  pull(accession)
+
+f5_clust3 <- f5_split[f5_hr$order] %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "accession") %>% 
+  filter(. == 2) %>% 
+  pull(accession)
+
+f5_clust4 <- f5_split[f5_hr$order] %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "accession") %>% 
+  filter(. == 3) %>% 
+  pull(accession)
+
+# cluster 5 has too many proteins to fit in table
+# but GO enrichment still possible
+f5_clust5 <- f5_split[f5_hr$order] %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "accession") %>% 
+  filter(. == 4) %>% 
+  pull(accession)
+
+f5_clust6 <- sort(rownames(f5_table_excl))
+
+process_fungifun <- function(filename) {
+  df <- read.csv(filename, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+  df$N.prot.found <- as.numeric(gsub(" /.*", "", df$X..genes...category))
+  df$N.prot.cat <- as.numeric(gsub(".* / ", "", df$X..genes...category))
+  df$N.prot.input <- as.numeric(gsub(".* / ", "", df$X..genes...input))
+  df$Cat.ratio <- df$N.prot.found / df$N.prot.cat
+  df$Input.ratio <- df$N.prot.found / df$N.prot.input
+  
+  df <- df[, -c(7:8)]
+  
+  colnames(df)[1:6] <- c("GO.ID", "GO.term", "GO.type", "Prot.found", "p.val", "adj.p.val")
+  
+  df$Prot.found <- as.character(df$Prot.found)
+  df$Prot.found <- gsub(" | ", ";", df$Prot.found, fixed = TRUE)
+  
+  return(df)
+}
+f5_go1 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust1.csv")
+
+# issue with PEP1, ambiguous ID in FungiFun, used CaO19.3767 as identifier
+f5_go2 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust2.csv") %>% 
+  mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found))
+
+
+f5_go3 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust3.csv")
+
+# issue with CHS3, ambiguous ID in FungiFun, used CaO19.4937 as identifier
+f5_go4 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust4.csv") %>% 
+  mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found))
+
+# issue with ALA1, MDH1, used CaO19.5746 and CaO19.7481 as identifiers
+f5_go5 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust5.csv") %>% 
+  mutate(Prot.found = gsub("CaO19.5746", "ALA1", Prot.found), 
+         Prot.found = gsub("CaO19.7481", "MDH1", Prot.found))
+
+f5_go6 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust6.csv")
+
 ```
+
+
+```{r figure5, fig.cap='heatmap etc.', fig.height=6}
+# load f5c
+f5 <- png::readPNG("./vignettes/figures/figure5.png")
+
+ggplot() + 
+  background_image(f5) + 
+  theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, unit = "inches"))
+
+# plot figure5
+# ggarrange(ggarrange(f5a, f5b, 
+#                     labels = c("A", "B"), 
+#                     ncol = 2, 
+#                     nrow = 1), 
+#           f5c,
+#           labels = c("", "C"), 
+#           ncol = 1,
+#           nrow = 2, 
+#           heights = c(1,3))
+
+```
+
 
 \newpage
 
