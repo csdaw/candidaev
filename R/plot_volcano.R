@@ -27,7 +27,7 @@ plot_volcano <- function(data, p_val, lfc, grp, label) {
     geom_point(mapping = aes(colour = !!grp), size = 0.6) +
     theme_classic(base_size = 8) +
     theme(legend.position = "left",
-          legend.title = element_blank(),
+          legend.title = element_text(size = 11, face = "bold"),
           axis.text = element_text(colour = "black", size = 10)) +
     guides(colour = guide_legend(override.aes = list(size = 3))) +
     ggrepel::geom_text_repel(data = dplyr::filter(data, !is.na(!!lfc)),
