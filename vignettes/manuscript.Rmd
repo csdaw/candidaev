@@ -452,6 +452,7 @@ knitr::kable(marker_longlist[ ,-10],
 
 ```
 
+\newpage
 
 # Figures
 
@@ -675,7 +676,7 @@ ggarrange(f3a1, f3a2,
 f4a_data <- cbind(atcc_de, 
                   biofilm_de[match(rownames(atcc_de), rownames(biofilm_de)), ])
 
-f4a_data <- cbind(f5a_data, 
+f4a_data <- cbind(f4a_data, 
                   yeast_de[match(rownames(f4a_data), rownames(yeast_de)), ])
 
 colnames(f4a_data)[13:28] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", 
@@ -683,34 +684,59 @@ colnames(f4a_data)[13:28] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5",
                                "Y_EV1", "Y_EV2", "Y_EV3", 
                                "Y_W1", "Y_W2", "Y_W3")
 
-f4a <- plot_mds(f4a_data) + 
-  geom_text(aes(label = colnames(f5a_data)), hjust = 1.2, vjust = 0.5)
-
+f4a_labels <- c(rep("EV", 3), rep("WCL", 3), 
+                rep("EV", 3), rep("WCL", 3), 
+                rep("EV", 5), rep("WCL", 5), 
+                rep("EV", 3), rep("WCL", 3))
+  
+f4a <- plot_mds(f4a_data, mat_labels = f4a_labels, shape_size = 3) + 
+  theme(legend.position = "top") + 
+  scale_x_continuous(limits = c(-2.5, 1.5), 
+                     expand = c(0,0)) + 
+  scale_y_continuous(limits = c(-1.5, 3), 
+                     expand = c(0,0)) + 
+  scale_colour_manual(breaks = c("A1", "A9", "B", "Y"), 
+                      values = c("red", "green", "orange", "blue"), 
+                      labels = c("A10231", "A90028", "DAY B", "DAY Y")) + 
+  scale_shape_manual(breaks = c("A1", "A9", "B", "Y"), 
+                     values = c(15:18), 
+                     labels = c("A10231", "A90028", "DAY B", "DAY Y")) + 
+  theme_bw() + 
+  theme(legend.title = element_blank(),
+        legend.position = c(0.82, 0.76))
+  
 # figure 5b 4 way venn
-f4b_comp <- list("DAY286 Y" = rownames(y_ev), 
-                 "DAY286 B" = rownames(b_ev),
+f4b_comp <- list("DAY Y" = rownames(y_ev), 
+                 "DAY B" = rownames(b_ev),
                  "ATCC90028" = rownames(atcc9_ev), 
                  "ATCC10231" = rownames(atcc1_ev))
 f4b_comp <- lapply(f4b_comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
 
-f4b <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "plot")
+f4b <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "plot", 
+                 fontfamily = "sans", 
+                 cat.fontfamily = "sans")
 
 f4b <- as_ggplot(f4b) + 
-  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+  theme(plot.margin = unit(c(2,0,2,0), "lines"))
 
 f4b_overlap <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "list") %>% 
   filter(..count.. == 405) %>% 
   pull(..values..) %>% 
   unlist()
 
+# f4b_b_excl <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "list") %>% 
+#   filter(..count.. == 116) %>% 
+#   pull(..values..) %>% 
+#   unlist()
 
 ```
 
 
-```{r figure4, fig.cap='Combined comparison', fig.width=7.2, fig.height=4}
-fig4 <- multi_panel_figure(width = 7.1, height = 4, unit = "inches", columns = 2, rows = 2, 
-                           row_spacing = 0, column_spacing = 0)
-fig4
+```{r figure4, fig.cap='Combined comparison', fig.width=6, fig.height=3}
+ggarrange(f4a, f4b, 
+          labels = c("A", "B"), 
+          ncol = 2,
+          nrow = 1)
 
 ```
 
@@ -788,7 +814,7 @@ f5_htmp <- ComplexHeatmap::Heatmap(f5_table_filt,
                                     row_title_gp = grid::gpar(colour = "black", fontsize = 6), 
                                     row_title_rot = 0,
                                     cluster_row_slices = FALSE, 
-                                    row_split = f5c_split)
+                                    row_split = f5_split)
 
 # save heatmap as pdf file for editing in inkscape
 # not run in rmarkdown but manually in console
@@ -896,13 +922,36 @@ ggplot() +
 
 \newpage
 
-```{r figure6, fig.cap='4tm domain'}
-plot(mtcars[,1:2])
+```{r figure6, fig.cap='upset plot', fig.width=3.5, fig.height=3}
+upset_data <- marker_comp
+
+names(upset_data) <- c("DAY286 B", "DAY286 Y", "ATCC10231", "ATCC90028")
+
+upset(fromList(upset_data), 
+      mainbar.y.label = "\n\n\nIntersection protein count", 
+      mainbar.y.max = 150,
+      line.size = 1.2, 
+      text.scale = c(1.2, 1.3, 1, 1, 1.1, 1.5), 
+      sets.x.label = "Total protein number", 
+      order.by = "degree", 
+      queries = list(list(query = intersects, 
+                          params = list("DAY286 B", "DAY286 Y", "ATCC10231", "ATCC90028"), 
+                          active = TRUE)))
+
+
 ```
 
 \newpage
 
-```{r figure7, fig.cap='final candidates'}
+```{r figure7, fig.cap='4tm domain'}
+fig7 <- multi_panel_figure(width = 7.1, height = 6, unit = "inches", columns = 2, rows = 4, 
+                           row_spacing = 0, column_spacing = 0)
+fig7
+```
+
+\newpage
+
+```{r figure8, fig.cap='final candidates'}
 plot(mtcars[,1:2])
 ```
 
