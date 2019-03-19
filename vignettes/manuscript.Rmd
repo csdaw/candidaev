@@ -703,7 +703,9 @@ f4a <- plot_mds(f4a_data, mat_labels = f4a_labels, shape_size = 3) +
                      labels = c("A10231", "A90028", "DAY B", "DAY Y")) + 
   theme_bw() + 
   theme(legend.title = element_blank(),
-        legend.position = c(0.82, 0.76))
+        legend.position = c(1.7, -0.1), 
+        legend.text = element_text(size = 8), 
+        legend.direction = "horizontal")
   
 # figure 5b 4 way venn
 f4b_comp <- list("DAY Y" = rownames(y_ev), 
@@ -714,7 +716,11 @@ f4b_comp <- lapply(f4b_comp, function(x) match_id(x, ref = uniprot, match = "UP_
 
 f4b <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "plot", 
                  fontfamily = "sans", 
-                 cat.fontfamily = "sans")
+                 cat.fontfamily = "sans", 
+                 cex = 1, 
+                 cat.cex = 0.8, 
+                 fill = c("blue", "orange", "green", "red"), 
+                 alpha = c(0.3, 0.3, 0.3, 0.3))
 
 f4b <- as_ggplot(f4b) + 
   theme(plot.margin = unit(c(2,0,2,0), "lines"))
@@ -732,11 +738,12 @@ f4b_overlap <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "list") %
 ```
 
 
-```{r figure4, fig.cap='Combined comparison', fig.width=6, fig.height=3}
+```{r figure4, fig.cap='Combined comparison', fig.width=5, fig.height=2.5}
 ggarrange(f4a, f4b, 
           labels = c("A", "B"), 
           ncol = 2,
-          nrow = 1)
+          nrow = 1, 
+          widths = c(1,1))
 
 ```
 
