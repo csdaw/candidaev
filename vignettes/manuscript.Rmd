@@ -77,6 +77,10 @@ library(UpSetR)
 library(kableExtra)
 set.seed(1)
 
+st_pal <- c(y = "#E69F00", b =  "#CC79A7", a9 =  "#56B4E9", a1 = "#009E73")
+  
+ev_pal <- c("#999999", "#D55E00", "#0072B2")
+
 ```
 
 ```{r yeast}
@@ -522,10 +526,10 @@ f2a <- ggplot() +
 
 f2b <- nta_bioavg %>% 
   ggplot(aes(x = particle_size, y = Bio_rep_mean, colour = Strain)) + 
-  scale_colour_manual(values = c("green", "red", "blue", "purple"), 
+  scale_colour_manual(values = rev(unname(st_pal)), 
                       breaks = c("Biofilm", "DAY286", "ATCC90028", "ATCC10231"), 
                       labels = c("DAY286 B", "DAY286 Y", "ATCC90028", "ATCC10231")) + 
-  geom_vline(xintercept = 100, colour = "#990000", linetype = "dashed") +
+  geom_vline(xintercept = 100, colour = "#999999", linetype = "dashed") +
   geom_line(size = 0.5) + 
   facet_wrap(~ facet, scales = "free", ncol = 2, nrow = 1) + 
   theme_classic() + 
@@ -552,7 +556,7 @@ f2c1 <- ggpar(f2c1,
 
 f2c2 <- nta_total %>% 
   ggboxplot(x = "Strain", y = "part_per_prot", 
-            color = "Strain", palette = c("green", "red", "blue", "purple"), add = "jitter", 
+            color = "Strain", palette = rev(unname(st_pal)), add = "jitter", 
             ylab = expression("Particles /"~paste(mu,g)~"protein"))
 f2c2 <- ggpar(f2c2, 
               yscale = "log10", 
@@ -594,7 +598,7 @@ f3a1 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl),
                   fontfamily = "sans", 
                   cex = 0.8,
                   cat.fontfamily = "sans", 
-                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  cat.just = list(c(0.5,1.7), c(0.5,1.5)), 
                   margin = 0.05)
 
 f3a1 <- as_ggplot(f3a1) + 
@@ -606,13 +610,16 @@ f3a2 <- plot_volcano(data = yeast_res,
                      lfc = logFC,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
-  scale_colour_manual(labels = c("EV enriched (80)", "WCL enriched (109)", "Not significant (318)"), 
-                      values = c("orange", "grey", "purple"), 
+  scale_colour_manual(labels = c("EV enriched", "WCL enriched", "Not significant"), 
+                      values = unname(ev_pal[c(2,1,3)]), 
                       breaks = c("EV up", "WCL up", "not sig"), 
-                      name = "DAY286 yeast") + 
-  theme(legend.text = element_text(size = 8))
+                      name = element_blank()) + 
+  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
+  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
+  theme(legend.text = element_text(size = 8)) + 
+  annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 Y')", parse = TRUE)
 
-
+# EV enriched = 80, WCL enriched = 109, NS = 318
 
 ```
 
@@ -624,7 +631,7 @@ f3b1 <- plot_venn(list("EV" = b_ev, "WCL" = b_wcl),
                   fontfamily = "sans", 
                   cex = 0.8, 
                   cat.fontfamily = "sans", 
-                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  cat.just = list(c(0.5,1.7), c(0.5,1.5)), 
                   ext.text = TRUE,
                   ext.percent = c(20,10,0),
                   ext.pos = c(45,315),
@@ -642,10 +649,12 @@ f3b2 <- plot_volcano(data = biofilm_res,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
   scale_colour_manual(labels = c("EV enriched (95)", "WCL enriched (81)", "Not significant (482)"), 
-                      values = c("red", "gray", "blue"), 
-                      breaks = c("EV up", "WCL up", "not sig"), 
-                      name = "DAY286 biofilm") + 
-  theme(legend.text = element_text(size = 8))
+                      values = unname(ev_pal[c(2,1,3)]), 
+                      breaks = c("EV up", "WCL up", "not sig")) + 
+  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
+  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
+  theme(legend.text = element_text(size = 8)) + 
+  annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 B')", parse = TRUE)
 
 
 ```
@@ -658,7 +667,7 @@ f3c1 <- plot_venn(list("EV" = atcc9_ev, "WCL" = atcc9_w),
                   fontfamily = "sans",
                   cex = 0.8,
                   cat.fontfamily = "sans", 
-                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  cat.just = list(c(0.5,1.7), c(0.5,1.55)), 
                   ext.percent = c(30,10,0),
                   ext.pos = c(45,315),
                   ext.dist = -0.05,
@@ -674,10 +683,13 @@ f3c2 <- plot_volcano(data = a9_res,
                      lfc = logFC,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
-  scale_colour_manual(labels = c("EV enriched (105)", "WCL enriched (134)", "Not significant (734)"), 
-                      values = c("red", "green", "gray"), 
-                      name = "ATCC90028") + 
-  theme(legend.text = element_text(size = 8))
+  scale_colour_manual(labels = c("EV enriched (105)", "WCL enriched (134)", "Not significant (734)"),
+                      values = unname(ev_pal[c(2,3,1)])) + 
+  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
+  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
+  theme(legend.text = element_text(size = 8)) + 
+  annotate("text", x = 8, y = 0.5, label = "bold('ATCC90028')", parse = TRUE)
+
 
 
 
@@ -691,7 +703,7 @@ f3d1 <- plot_venn(list("EV" = atcc1_ev, "WCL" = atcc1_w),
                   fontfamily = "sans", 
                   cex = 0.8,
                   cat.fontfamily = "sans",
-                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  cat.just = list(c(0.5,1.7), c(0.5,1.5)), 
                   ext.percent = c(0,20,0),
                   ext.pos = 45,
                   ext.dist = -0.05,
@@ -708,10 +720,12 @@ f3d2 <- plot_volcano(data = a1_res,
                      lfc = logFC,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
-  scale_colour_manual(labels = c("EV enriched (106)", "WCL enriched (134)", "Not significant (445)"), 
-                      values = c("pink", "cyan", "gray"), 
-                      name = "ATCC10231") + 
-  theme(legend.text = element_text(size = 8))
+  scale_colour_manual(labels = c("EV enriched (106)", "WCL enriched (134)", "Not significant (445)"),
+                      values = unname(ev_pal[c(2,3,1)])) + 
+  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
+  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
+  theme(legend.text = element_text(size = 8)) + 
+  annotate("text", x = 8, y = 0.5, label = "bold('ATCC10231')", parse = TRUE)
 
 
 
@@ -719,39 +733,21 @@ f3d2 <- plot_volcano(data = a1_res,
 
 
 ```{r figure3, fig.cap='Volcano plots', fig.width=7.1, fig.height=6, cache=TRUE}
-# ggarrange(ggarrange(f3a1, f3a2, 
-#                     labels = c("A", ""), 
-#                     ncol = 2, 
-#                     nrow = 1, 
-#                     widths = c(1,1.5)), 
-#           ggarrange(f3b1, f3b2, 
-#                     labels = c("B", ""),
-#                     ncol = 2, 
-#                     nrow = 1, 
-#                     widths = c(1,1.5)), 
-#           ggarrange(f3c1, f3c2, 
-#                     labels = c("C", ""), 
-#                     ncol = 2, 
-#                     nrow = 1, 
-#                     widths = c(1,1.5)),
-#           ggarrange(f3d1, f3d2, 
-#                     labels = c("D", ""), 
-#                     ncol = 2, 
-#                     nrow = 1, 
-#                     widths = c(1,1.5)),
-#           ncol = 1,
-#           nrow = 4)
 
 ggarrange(ggarrange(f3a1, f3b1, f3c1, f3d1, 
                     labels = c("A", "", "", ""), 
                     ncol = 4, 
-                    nrow = 1), 
+                    nrow = 1, 
+                    align = "v"), 
           ggarrange(f3a2, f3b2,
                     f3c2, f3d2, 
                     labels = c("B", rep("", 3)), 
                     ncol = 2, 
                     nrow = 2, 
-                    align = "hv"), 
+                    align = "hv", 
+                    common.legend = TRUE, 
+                    legend = "right", 
+                    widths = c(1,1)), 
           ncol = 1,
           nrow = 2, 
           heights = c(1,2))
@@ -1129,7 +1125,7 @@ f6a_venn <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "plot",
                       margin = 0.05)
 
 f6a <- as_ggplot(f6a_venn) + 
-  theme(plot.margin = unit(c(1,0,2,0), "lines"))
+  theme(plot.margin = unit(c(1.2,0,0,0), "lines"))
 
 wcl_comp <- list("yeast" = yeast_res %>% 
                    filter(group == "WCL up" | group == "WCL ex") %>% 
@@ -1157,15 +1153,15 @@ f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot",
                       margin = 0.05)
 
 f6b <- as_ggplot(f6b_venn) + 
-  theme(plot.margin = unit(c(1,0,2,0), "lines"))
+  theme(plot.margin = unit(c(1.2,0,0,0), "lines"))
 
 ```
 
-```{r figure6, fig.cap='Marker venns', fig.width=5, fig.height=2.5}
+```{r figure6, fig.cap='Marker venns', fig.width=2.5, fig.height=4}
 ggarrange(f6a, f6b, 
-          labels = c("", ""), 
-          ncol = 2,
-          nrow = 1)
+          labels = c("A", "B"), 
+          ncol = 1,
+          nrow = 2)
 
 ```
 
