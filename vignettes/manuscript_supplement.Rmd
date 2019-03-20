@@ -67,6 +67,207 @@ set.seed(1)
 
 ```
 
+
+```{r yeast}
+yeast <- yeast %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", 
+         Only.identified.by.site != "+", Unique.peptides >= 2)
+
+yeast_lfq <- convert_lfq(yeast, yeast_exp)
+
+# drop EV_1 and WCL_2
+yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_2")]
+
+# filter for proteins identified in min 2/3 reps of EV or WCL
+yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
+                          pat1 = "EV", val1 = 1, 
+                          pat2 = "W", val2 = 1)
+
+yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
+
+# filter for proteins identified in min 1/3 reps of EV
+y_ev <- filter_na(yeast_norm2, op = "<=", 
+                  pat = "EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of WCL
+y_wcl <- filter_na(yeast_norm2, op = "<=", 
+                   pat = "W", val = 2)
+
+# should not impute with so many missing values
+yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
+                         pat1 = "EV", val1 = 3, 
+                         pat2 = "W", val2 = 3)
+
+yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=", 
+                         pat1 = "EV", val1 = 2, 
+                         pat2 = "W", val2 = 2)
+
+yeast_imp <- impute_QRILC(yeast_both)
+
+# recombine imputed proteins and non-imputed proteins in matrix
+yeast_de <- rbind(yeast_excl, yeast_imp)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+y_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+
+y_design <- stats::model.matrix(~ 0 + T, data = y_samp)
+colnames(y_design) <- c("EV", "WCL")
+
+y_contrasts <- c("EV - WCL")
+
+# make all pair-wise comparisons between EV and WCL
+# and perform limma::eBayes()
+y_efit <- limma_eBayes(yeast_de, design = y_design, contrasts = y_contrasts)
+
+# extract DE results
+yeast_res <- get_results(efit = y_efit, mat = yeast_de, p_val = 0.01, lfc = 0, type = "individual")[[1]]
+
+```
+
+```{r biofilm}
+biofilm <- biofilm %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", 
+         Only.identified.by.site != "+", Unique.peptides >= 2)
+
+biofilm_lfq <- convert_lfq(biofilm, biofilm_exp)
+
+# filter for proteins identified in min 4/5 reps of EV or WCL
+biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=", 
+                           pat1 = "EV", val1 = 1, 
+                           pat2 = "W", val2 = 1)
+
+biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
+
+# filter for proteins identified in min 1/5 reps of EV
+b_ev <- filter_na(biofilm_norm, op = "<=", 
+                  pat = "EV", val = 4)
+
+# filter for proteins identified in min 1/5 reps of WCL
+b_wcl <- filter_na(biofilm_norm, op = "<=", 
+                   pat = "W", val = 4)
+
+# should not impute with so many missing values
+# filter for proteins with 4-5 NA values in EV or WCL
+biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=", 
+                         pat1 = "EV", val1 = 4, 
+                         pat2 = "W", val2 = 4)
+
+# filter for proteins with min 3 valid values in EV and WCL
+biofilm_both <- filter_na2(biofilm_norm, logic = "and", op = "<=", 
+                         pat1 = "EV", val1 = 3, 
+                         pat2 = "W", val2 = 3)
+
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+biofilm_imp <- impute_QRILC(biofilm_both)
+
+# recombine imputed proteins and non-imputed proteins in matrix
+biofilm_de <- rbind(biofilm_excl, biofilm_imp)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+
+b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
+colnames(b_design) <- c("EV", "WCL")
+
+b_contrasts <- c("EV - WCL")
+
+# make all pair-wise comparisons between EV and WCL
+# and perform limma::eBayes()
+b_efit <- limma_eBayes(biofilm_de, design = b_design, contrasts = b_contrasts)
+
+# extract DE results
+biofilm_res <- get_results(efit = b_efit, mat = biofilm_de, p_val = 0.01, lfc = 0, type = "individual")[[1]]
+
+```
+
+```{r atcc}
+atcc_lfq <- atcc %>% 
+  filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2) %>% 
+  convert_lfq(., atcc_exp)
+
+atcc_filt <- filter_na4(atcc_lfq, "or", "<=", 
+                        pat1 = "A10231_EV", 1, 
+                        pat2 = "A10231_W", 1, 
+                        pat3 = "A90028_EV", 1, 
+                        pat4 = "A90028_W", 1)
+
+atcc_norm <- normalizeCyclicLoess(atcc_filt)
+
+# filter for proteins identified in min 1/3 reps of 10231 EV
+atcc1_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A10231_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 10231 WCL
+atcc1_w <- filter_na(atcc_norm, op = "<=", 
+                     pat = "A10231_W", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 EV
+atcc9_ev <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_EV", val = 2)
+
+# filter for proteins identified in min 1/3 reps of 90028 WCL
+atcc9_w <- filter_na(atcc_norm, op = "<=", 
+                      pat = "A90028_W", val = 2)
+
+# should not impute with so many missing values
+# filter for exclusive to 10231 EV or WCL or 90028 EV or WCL
+atcc_excl <- filter_na4(atcc_norm, logic = "or", op = "==", 
+                        pat1 = "A10231_EV", val1 = 3, 
+                        pat2 = "A10231_W", val2 = 3, 
+                        pat3 = "A90028_EV", val3 = 3, 
+                        pat4 = "A90028_W", val4 = 3)
+
+# filter for proteins with min 1 valid value in all 4 sample types
+atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=", 
+                        pat1 = "A10231_EV", val1 = 2, 
+                        pat2 = "A10231_W", val2 = 2, 
+                        pat3 = "A90028_EV", val3 = 2, 
+                        pat4 = "A90028_W", val4 = 2)
+
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+
+# use left censored imputation method
+atcc_imp <- impute_QRILC(atcc_both)
+
+atcc_de <- rbind(atcc_excl, atcc_imp)
+
+colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de), 
+                                                     c("A10231_", "A90028_"), 
+                                                     c("A1_", "A9_"), 
+                                                     vectorize_all = FALSE)
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3)))
+
+atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
+colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+
+atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W")
+
+# make all pair-wise comparisons for specified contrasts
+# and perform limma::eBayes()
+atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
+
+# extract overall results
+atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "overall")
+
+# extract results for individual comparisons defined in atcc_contrasts
+atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "individual")
+
+a1_res <- atcc_ind[[1]]
+
+a9_res <- atcc_ind[[2]]
+
+```
+
+
 # Supplementary data {-}
 
 \beginsupplement
@@ -89,6 +290,59 @@ nta_techavg %>%
   ylab(label = "Particles / mL") + 
   labs(colour = "Biological replicate")
 
+
+```
+
+\newpage
+
+```{r tableS1Data}
+wcl_comp <- list("yeast" = yeast_res %>% 
+                   filter(group == "WCL up" | group == "WCL ex") %>% 
+                   pull(CGD_gene_name), 
+                 "biofilm" = biofilm_res %>% 
+                   filter(group == "WCL up" | group == "WCL ex") %>% 
+                   pull(CGD_gene_name), 
+                 "ATCC10231" = a1_res %>% 
+                   filter(group == "A1_W up" | group == "A1_W ex") %>% 
+                   pull(CGD_gene_name), 
+                 "ATCC90028" = a9_res %>% 
+                   filter(group == "A9_W up" | group == "A9_W ex") %>% 
+                   pull(CGD_gene_name))
+
+wcl_comp_tab <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "list")
+
+wcl_candidates <- wcl_comp_tab %>% 
+  filter(apply(.[, 1:4], 1, sum) == 4) %>% 
+  pull(..values..) %>% 
+  unlist() %>% 
+  as.data.frame(stringsAsFactors = FALSE) %>% 
+  rename(Gene = 1)
+
+wcl_longlist <- wcl_candidates %>% 
+  mutate(Protein = match_id(Gene, uniprot, "CGD_gene_name", "Protein_name", concat = TRUE, str_split = FALSE),
+         DAY.Y = match_id(Gene, yeast_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
+         DAY.B = match_id(Gene, biofilm_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
+         A1 = match_id(Gene, a1_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
+         A9 = match_id(Gene, a9_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
+         TM = match_id(Gene, uniprot, "CGD_gene_name", "Transmembrane"), 
+         SP = match_id(Gene, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
+  mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
+            .funs = list(~ signif(as.numeric(.), digits = 3))) %>% 
+  mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
+            .funs = list(~ case_when(is.na(.) == TRUE ~ "ex", 
+                                     TRUE ~ as.character(.)))) %>% 
+  mutate(TM = stringr::str_count(TM, "Helical"), 
+         SP = case_when(grepl("SIGNAL", SP) ~ "Y", 
+                        TRUE ~ ""), 
+         TM = case_when(TM == 0 ~ "", 
+                        TRUE ~ as.character(TM))) %>% 
+  rename("DAY Y" = DAY.Y, "DAY B" = DAY.B) %>% 
+  arrange(Gene)
+
+```
+
+
+```{r tableS1, fig.cap='WCL enriched marker candidates'}
 
 ```
 

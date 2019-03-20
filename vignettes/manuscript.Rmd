@@ -52,6 +52,11 @@ header-includes:
 
 <!-- This is the format for text comments that will be ignored during renderings. Do not put R code in these comments because it will not be ignored. -->
 
+```{r package_options, include=FALSE}
+knitr::opts_knit$set(progress = TRUE, 
+                     verbose = TRUE)
+```
+
 ```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -528,7 +533,8 @@ f2b <- nta_bioavg %>%
         strip.text = element_blank(), 
         legend.position = c(0.88, 0.6), 
         legend.title = element_blank(), 
-        plot.margin = margin(t = 0.2, l = 0, r = 0.2, b = 0, unit = "inches")) + 
+        plot.margin = margin(t = 0.2, l = 0, r = 0.2, b = 0, unit = "inches"), 
+        axis.text.x = element_text(colour = "black")) + 
   xlab(label = "Particle size (nm)") + 
   ylab(label = "Particles / mL")
 
@@ -551,16 +557,16 @@ f2c2 <- nta_total %>%
 f2c2 <- ggpar(f2c2, 
               yscale = "log10", 
               format.scale = TRUE, 
-              ylim = c(8e8, 8e10), 
+              ylim = c(8e8, 8e10),
+              font.y = 10, 
               legend = "none") + 
   stat_pvalue_manual(nta_total_tukey[c(2,4,6), ], label = "p.adj", 
                      y.position = c(10.7, 10.5, 10.85), 
                      tip.length = 1e-2, 
                      label.size = 3) + 
-  theme(axis.text.x = element_blank(), 
-        axis.title.x = element_blank(), 
-        axis.ticks.x = element_blank(), 
-        plot.margin = margin(t = 0.2, l = 0.2, r = 0, b = 0, unit = "inches"))
+  theme(axis.title.x = element_blank(), 
+        plot.margin = margin(t = 0.2, l = 0.2, r = 0, b = 0.15, unit = "inches")) + 
+  scale_x_discrete(labels = c("ATCC10231" = "A1", "ATCC90028" = "A9", "Biofilm" = "B", "DAY286" = "Y"))
 
 ```
 
@@ -582,114 +588,293 @@ ggarrange(f2a,
 
 \newpage
 
-```{r figure3Data, cache=TRUE, eval=FALSE}
+```{r figure3aData}
 f3a1 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl), 
                   use_uniprot = TRUE, type = "plot", 
                   fontfamily = "sans", 
+                  cex = 0.8,
                   cat.fontfamily = "sans", 
-                  cat.just = list(c(0.5, 0.8), c(0,2)))
+                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  margin = 0.05)
 
-f3a1 <- as_ggplot(f3a1)
+f3a1 <- as_ggplot(f3a1) + 
+  theme(plot.margin = unit(c(1,0.5,1,0.5), "lines")) + 
+  annotate("text", x = 0.5, y = 0.92, label = "bold('DAY286 yeast')", parse = TRUE)
 
 f3a2 <- plot_volcano(data = yeast_res, 
                      p_val = adj.P.Val, 
                      lfc = logFC,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
-  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+  scale_colour_manual(labels = c("EV enriched (80)", "WCL enriched (109)", "Not significant (318)"), 
                       values = c("orange", "grey", "purple"), 
                       breaks = c("EV up", "WCL up", "not sig"), 
-                      name = "DAY286 yeast")
+                      name = "DAY286 yeast") + 
+  theme(legend.text = element_text(size = 8))
 
+
+
+```
+
+
+
+```{r figure3bData}
 f3b1 <- plot_venn(list("EV" = b_ev, "WCL" = b_wcl), 
                   use_uniprot = TRUE, type = "plot", 
                   fontfamily = "sans", 
+                  cex = 0.8, 
                   cat.fontfamily = "sans", 
-                  cat.just = list(c(0.5,0.8), c(0,2)))
+                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  ext.text = TRUE,
+                  ext.percent = c(20,10,0),
+                  ext.pos = c(45,315),
+                  ext.dist = -0.1,
+                  ext.length = 0.5,
+                  margin = 0.05)
 
-f3b1 <- as_ggplot(f3b1)
+f3b1 <- as_ggplot(f3b1) + 
+  theme(plot.margin = unit(c(1,0,1,0), "lines")) + 
+  annotate("text", x = 0.5, y = 0.92, label = "bold('DAY286 biofilm')", parse = TRUE)
 
 f3b2 <- plot_volcano(data = biofilm_res, 
                      p_val = adj.P.Val, 
                      lfc = logFC,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
-  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+  scale_colour_manual(labels = c("EV enriched (95)", "WCL enriched (81)", "Not significant (482)"), 
                       values = c("red", "gray", "blue"), 
                       breaks = c("EV up", "WCL up", "not sig"), 
-                      name = "DAY286 biofilm")
+                      name = "DAY286 biofilm") + 
+  theme(legend.text = element_text(size = 8))
 
+
+```
+
+
+
+```{r figure3cData}
 f3c1 <- plot_venn(list("EV" = atcc9_ev, "WCL" = atcc9_w), 
                   use_uniprot = TRUE, type = "plot", 
-                  fontfamily = "sans", 
+                  fontfamily = "sans",
+                  cex = 0.8,
                   cat.fontfamily = "sans", 
-                  cat.just = list(c(0.5,0.8), c(0,2)))
+                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  ext.percent = c(30,10,0),
+                  ext.pos = c(45,315),
+                  ext.dist = -0.05,
+                  ext.length = 0.5,
+                  margin = 0.05)
 
-f3c1 <- as_ggplot(f3c1)
+f3c1 <- as_ggplot(f3c1) + 
+  theme(plot.margin = unit(c(1,0,1,0.5), "lines")) + 
+  annotate("text", x = 0.5, y = 0.92, label = "bold('ATCC90028')", parse = TRUE)
 
 f3c2 <- plot_volcano(data = a9_res, 
                      p_val = adj.P.Val, 
                      lfc = logFC,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
-  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+  scale_colour_manual(labels = c("EV enriched (105)", "WCL enriched (134)", "Not significant (734)"), 
                       values = c("red", "green", "gray"), 
-                      name = "ATCC90028")
+                      name = "ATCC90028") + 
+  theme(legend.text = element_text(size = 8))
 
+
+
+```
+
+
+
+```{r figure3dData}
 f3d1 <- plot_venn(list("EV" = atcc1_ev, "WCL" = atcc1_w), 
-                 use_uniprot = TRUE, type = "plot", 
+                  use_uniprot = TRUE, type = "plot", 
                   fontfamily = "sans", 
-                  cat.fontfamily = "sans", 
-                  cat.just = list(c(0.5,0.8), c(0,2)))
+                  cex = 0.8,
+                  cat.fontfamily = "sans",
+                  cat.just = list(c(0.5,1.7), c(0,2)), 
+                  ext.percent = c(0,20,0),
+                  ext.pos = 45,
+                  ext.dist = -0.05,
+                  ext.length = 0.5,
+                  margin = 0.05)
 
-f3d1 <- as_ggplot(f3d1)
+f3d1 <- as_ggplot(f3d1) + 
+  theme(plot.margin = unit(c(1,0.5,1,0.5), "lines")) + 
+  annotate("text", x = 0.5, y = 0.92, label = "bold('ATCC10231')", parse = TRUE)
+  
 
 f3d2 <- plot_volcano(data = a1_res, 
                      p_val = adj.P.Val, 
                      lfc = logFC,
                      grp = group, 
                      label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
-  scale_colour_manual(labels = c("EV enriched", "Cell enriched", "ns"), 
+  scale_colour_manual(labels = c("EV enriched (106)", "WCL enriched (134)", "Not significant (445)"), 
                       values = c("pink", "cyan", "gray"), 
-                      name = "ATCC10231")
+                      name = "ATCC10231") + 
+  theme(legend.text = element_text(size = 8))
+
 
 
 ```
 
 
-```{r figure3, fig.cap='Volcano plots', fig.width=6, fig.height=7, cache=TRUE, eval=FALSE}
-ggarrange(f3a1, f3a2,
-          f3b1, f3b2,
-          f3c1, f3c2,
-          f3d1, f3d2,
-          labels = c("A", "", "B", "", "C", "", "D", ""),
-          hjust = c(-0.5, 0.4, -0.5, 0.4, -0.5, 0.4, -0.5, 0.4),
-          ncol = 2,
-          nrow = 4,
-          widths = c(1,1.5))
+```{r figure3, fig.cap='Volcano plots', fig.width=7.1, fig.height=6, cache=TRUE}
+# ggarrange(ggarrange(f3a1, f3a2, 
+#                     labels = c("A", ""), 
+#                     ncol = 2, 
+#                     nrow = 1, 
+#                     widths = c(1,1.5)), 
+#           ggarrange(f3b1, f3b2, 
+#                     labels = c("B", ""),
+#                     ncol = 2, 
+#                     nrow = 1, 
+#                     widths = c(1,1.5)), 
+#           ggarrange(f3c1, f3c2, 
+#                     labels = c("C", ""), 
+#                     ncol = 2, 
+#                     nrow = 1, 
+#                     widths = c(1,1.5)),
+#           ggarrange(f3d1, f3d2, 
+#                     labels = c("D", ""), 
+#                     ncol = 2, 
+#                     nrow = 1, 
+#                     widths = c(1,1.5)),
+#           ncol = 1,
+#           nrow = 4)
+
+ggarrange(ggarrange(f3a1, f3b1, f3c1, f3d1, 
+                    labels = c("A", "", "", ""), 
+                    ncol = 4, 
+                    nrow = 1), 
+          ggarrange(f3a2, f3b2,
+                    f3c2, f3d2, 
+                    labels = c("B", rep("", 3)), 
+                    ncol = 2, 
+                    nrow = 2, 
+                    align = "hv"), 
+          ncol = 1,
+          nrow = 2, 
+          heights = c(1,2))
 ```
 
 \newpage
 
 ```{r figure4Data}
-# figure 4a PCA
-f4a_data <- cbind(atcc_de, 
+# figure 4a GO terms - protein lists
+f4a_y_go <- marker_comp[1] %>% 
+  unlist() %>% 
+  strsplit(., ";") %>% 
+  unlist() %>% 
+  gsub("CHS3", "CaO19.4937", .) %>% 
+  gsub("PEP1", "CaO19.3767", .)
+
+f4a_b_go <- marker_comp[2] %>% 
+  unlist() %>% 
+  strsplit(., ";") %>% 
+  unlist() %>% 
+  stringi::stri_replace_all_regex(., 
+                                  c("CHS3", "PEP1", "ALS3", 
+                                    "PLB3", "PLB4.5"), 
+                                  c("CaO19.4937", "CaO19.3767", "CaO19.1816",
+                                    "CaO19.6594", "CaO19.9017"), 
+                                  vectorize_all = FALSE)
+
+f4a_a1_go <- marker_comp[3] %>% 
+  unlist() %>% 
+  strsplit(., ";") %>% 
+  unlist() %>% 
+  stringi::stri_replace_all_regex(., 
+                                  c("CHS3", "PEP1", "ALS3", 
+                                    "PLB3", "PLB4.5", "^MNN2$", 
+                                    "MNN22", "MNN24", "ECM331", 
+                                    "CAM1-1"), 
+                                  c("CaO19.4937", "CaO19.3767", "CaO19.1816",
+                                    "CaO19.6594", "CaO19.9017", "CaO19.2347", 
+                                    "CaO19.3803", "CaO19.1995", "CaO19.4255", 
+                                    "CaO19.2651"), 
+                                  vectorize_all = FALSE)
+
+  
+  
+
+f4a_a9_go <- marker_comp[4] %>% 
+  unlist() %>% 
+  strsplit(., ";") %>% 
+  unlist() %>% 
+  stringi::stri_replace_all_regex(., 
+                                  c("CHS3", "PEP1", "ALS3", 
+                                    "PLB3", "PLB4.5", "^MNN2$", 
+                                    "MNN22", "MNN24", "ECM331", 
+                                    "CAM1-1", "FCY21"), 
+                                  c("CaO19.4937", "CaO19.3767", "CaO19.1816",
+                                    "CaO19.6594", "CaO19.9017", "CaO19.2347", 
+                                    "CaO19.3803", "CaO19.1995", "CaO19.4255", 
+                                    "CaO19.2651", "CaO19.8937"), 
+                                  vectorize_all = FALSE)
+f4a_a9_go <- f4a_a9_go[!f4a_a9_go %in% c("orf19.7397.1", "orf19.7398")]
+
+
+# figure 4a GO terms bar plots
+process_fungifun <- function(filename) {
+  df <- read.csv(filename, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+  df$N.prot.found <- as.numeric(gsub(" /.*", "", df$X..genes...category))
+  df$N.prot.cat <- as.numeric(gsub(".* / ", "", df$X..genes...category))
+  df$N.prot.input <- as.numeric(gsub(".* / ", "", df$X..genes...input))
+  df$Cat.ratio <- df$N.prot.found / df$N.prot.cat
+  df$Input.ratio <- df$N.prot.found / df$N.prot.input
+  
+  df <- df[, -c(7:8)]
+  
+  colnames(df)[1:6] <- c("GO.ID", "GO.term", "GO.type", "Prot.found", "p.val", "adj.p.val")
+  
+  df$Prot.found <- as.character(df$Prot.found)
+  df$Prot.found <- gsub(" | ", ";", df$Prot.found, fixed = TRUE)
+  
+  return(df)
+}
+
+# import FungiFun GO enrichment results
+f4a_y_go_table <- process_fungifun("./vignettes/figures/f4a_GO_DAY_Y.csv")
+f4a_b_go_table <- process_fungifun("./vignettes/figures/f4a_GO_DAY_B.csv")
+f4a_a1_go_table <- process_fungifun("./vignettes/figures/f4a_GO_ATCC10231.csv")
+f4a_a9_go_table <- process_fungifun("./vignettes/figures/f4a_GO_ATCC90028.csv")
+
+# Define the colour palette
+f4a_palette <- c("#6D2077", "#E4002B", "#FFB81C")
+
+# Bar plots
+f4a1 <- plot_go_bar(f4a_y_go_table, c(1:4, 50,53:55, 80,82:84), f4a_palette) + 
+  annotate("text", x = 1.5, y = 70, label = "bold('DAY286 yeast')", parse = TRUE)
+
+f4a2 <- plot_go_bar(f4a_b_go_table, c(1:4, 69,71:73, 96:97, 100:101), f4a_palette) + 
+  annotate("text", x = 1.5, y = 65, label = "bold('DAY286 biofilm')", parse = TRUE)
+
+f4a3 <- plot_go_bar(f4a_a1_go_table, c(1:4, 63,65:67, 88:91), f4a_palette) + 
+  annotate("text", x = 1.5, y = 75, label = "bold('ATCC10231')", parse = TRUE)
+
+f4a4 <- plot_go_bar(f4a_a9_go_table, c(1:4, 35,37:38,42, 55:56,58:59), f4a_palette) + 
+  annotate("text", x = 1.5, y = 75, label = "bold('ATCC90028')", parse = TRUE)
+
+
+
+# figure 4b PCA
+f4b_data <- cbind(atcc_de, 
                   biofilm_de[match(rownames(atcc_de), rownames(biofilm_de)), ])
 
-f4a_data <- cbind(f4a_data, 
-                  yeast_de[match(rownames(f4a_data), rownames(yeast_de)), ])
+f4b_data <- cbind(f4b_data, 
+                  yeast_de[match(rownames(f4b_data), rownames(yeast_de)), ])
 
-colnames(f4a_data)[13:28] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", 
+colnames(f4b_data)[13:28] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", 
                                "B_W1", "B_W2", "B_W3", "B_W4", "B_W5", 
                                "Y_EV1", "Y_EV2", "Y_EV3", 
                                "Y_W1", "Y_W2", "Y_W3")
 
-f4a_labels <- c(rep("EV", 3), rep("WCL", 3), 
+f4b_labels <- c(rep("EV", 3), rep("WCL", 3), 
                 rep("EV", 3), rep("WCL", 3), 
                 rep("EV", 5), rep("WCL", 5), 
                 rep("EV", 3), rep("WCL", 3))
   
-f4a <- plot_mds(f4a_data, mat_labels = f4a_labels, shape_size = 3) + 
+f4b <- plot_mds(f4b_data, mat_labels = f4b_labels, shape_size = 3) + 
   theme(legend.position = "top") + 
   scale_x_continuous(limits = c(-2.5, 1.5), 
                      expand = c(0,0)) + 
@@ -703,47 +888,63 @@ f4a <- plot_mds(f4a_data, mat_labels = f4a_labels, shape_size = 3) +
                      labels = c("A10231", "A90028", "DAY B", "DAY Y")) + 
   theme_bw() + 
   theme(legend.title = element_blank(),
-        legend.position = c(1.7, -0.1), 
+        legend.position = c(0.5, 1.1), 
         legend.text = element_text(size = 8), 
         legend.direction = "horizontal")
   
-# figure 5b 4 way venn
-f4b_comp <- list("DAY Y" = rownames(y_ev), 
+# figure 4c 4 way venn
+f4c_comp <- list("DAY Y" = rownames(y_ev), 
                  "DAY B" = rownames(b_ev),
                  "ATCC90028" = rownames(atcc9_ev), 
                  "ATCC10231" = rownames(atcc1_ev))
-f4b_comp <- lapply(f4b_comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
+f4c_comp <- lapply(f4c_comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
 
-f4b <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "plot", 
-                 fontfamily = "sans", 
-                 cat.fontfamily = "sans", 
-                 cex = 1, 
-                 cat.cex = 0.8, 
-                 fill = c("blue", "orange", "green", "red"), 
-                 alpha = c(0.3, 0.3, 0.3, 0.3))
+f4c_venn <- plot_venn(vlist = f4c_comp, use_uniprot = FALSE, type = "plot", 
+                      fontfamily = "sans", 
+                      cat.fontfamily = "sans", 
+                      cex = 1, 
+                      cat.cex = 0.8, 
+                      fill = c("blue", "orange", "green", "red"), 
+                      alpha = c(0.3, 0.3, 0.3, 0.3), 
+                      sub = "Common EV proteins", 
+                      sub.fontfamily = "sans")
 
-f4b <- as_ggplot(f4b) + 
-  theme(plot.margin = unit(c(2,0,2,0), "lines"))
+f4c <- as_ggplot(f4c_venn) + 
+  theme(plot.margin = unit(c(0,2,0,2), "lines"))
 
-f4b_overlap <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "list") %>% 
+f4c_overlap <- plot_venn(vlist = f4c_comp, use_uniprot = FALSE, type = "list") %>% 
   filter(..count.. == 405) %>% 
   pull(..values..) %>% 
   unlist()
 
-# f4b_b_excl <- plot_venn(vlist = f4b_comp, use_uniprot = FALSE, type = "list") %>% 
-#   filter(..count.. == 116) %>% 
-#   pull(..values..) %>% 
-#   unlist()
+# figure 4c GO terms
+# marker_comp has list of proteins for each strain
+# that are EV enriched or exclusive
+# use these for GO enrichment analysis using FungiFun
+
 
 ```
 
 
-```{r figure4, fig.cap='Combined comparison', fig.width=5, fig.height=2.5}
-ggarrange(f4a, f4b, 
-          labels = c("A", "B"), 
-          ncol = 2,
-          nrow = 1, 
-          widths = c(1,1))
+```{r figure4, fig.cap='Combined comparison', fig.width=7.1, fig.height=7}
+
+ggarrange(ggarrange(f4a1, f4a2, 
+                    f4a3, f4a4, 
+                    labels = c("A", rep("", 3)), 
+                    ncol = 2, 
+                    nrow = 2, 
+                    common.legend = TRUE, 
+                    legend = "bottom", 
+                    align = "hv"), 
+          ggarrange(f4b, f4c, 
+                    labels = c("B", "C"), 
+                    ncol = 2,
+                    nrow = 1, 
+                    widths = c(1,1.2)), 
+          labels = c("", ""),
+          ncol = 1, 
+          nrow = 2, 
+          heights = c(1.8,1))
 
 ```
 
@@ -767,7 +968,7 @@ f5_table <- a9_res %>%
          y_lfc = logFC.x.x, 
          b_lfc = logFC.y.y) %>% 
   select(CGD_gene_name, everything()) %>% 
-  filter(CGD_gene_name %in% f4b_overlap)
+  filter(CGD_gene_name %in% f4c_overlap)
 
 # filter for rows with min 1/4 valid values
 # otherwise clustering will not work
@@ -865,23 +1066,7 @@ f5_clust5 <- f5_split[f5_hr$order] %>%
 
 f5_clust6 <- sort(rownames(f5_table_excl))
 
-process_fungifun <- function(filename) {
-  df <- read.csv(filename, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
-  df$N.prot.found <- as.numeric(gsub(" /.*", "", df$X..genes...category))
-  df$N.prot.cat <- as.numeric(gsub(".* / ", "", df$X..genes...category))
-  df$N.prot.input <- as.numeric(gsub(".* / ", "", df$X..genes...input))
-  df$Cat.ratio <- df$N.prot.found / df$N.prot.cat
-  df$Input.ratio <- df$N.prot.found / df$N.prot.input
-  
-  df <- df[, -c(7:8)]
-  
-  colnames(df)[1:6] <- c("GO.ID", "GO.term", "GO.type", "Prot.found", "p.val", "adj.p.val")
-  
-  df$Prot.found <- as.character(df$Prot.found)
-  df$Prot.found <- gsub(" | ", ";", df$Prot.found, fixed = TRUE)
-  
-  return(df)
-}
+
 f5_go1 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust1.csv")
 
 # issue with PEP1, ambiguous ID in FungiFun, used CaO19.3767 as identifier
@@ -929,24 +1114,62 @@ ggplot() +
 
 \newpage
 
-```{r figure6, fig.cap='upset plot', fig.width=3.5, fig.height=3}
-upset_data <- marker_comp
+```{r figure6Data}
 
-names(upset_data) <- c("DAY286 B", "DAY286 Y", "ATCC10231", "ATCC90028")
+f6a_venn <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "plot", 
+                      fontfamily = "sans", 
+                      cat.fontfamily = "sans", 
+                      cex = 0.9, 
+                      cat.cex = 0.8, 
+                      fill = c("blue", "orange", "green", "red"), 
+                      alpha = c(0.3, 0.3, 0.3, 0.3), 
+                      sub = "EV exclusive and\nenriched proteins", 
+                      sub.fontfamily = "sans", 
+                      sub.pos = c(0.5, 1.1), 
+                      margin = 0.05)
 
-upset(fromList(upset_data), 
-      mainbar.y.label = "\n\n\nIntersection protein count", 
-      mainbar.y.max = 150,
-      line.size = 1.2, 
-      text.scale = c(1.2, 1.3, 1, 1, 1.1, 1.5), 
-      sets.x.label = "Total protein number", 
-      order.by = "degree", 
-      queries = list(list(query = intersects, 
-                          params = list("DAY286 B", "DAY286 Y", "ATCC10231", "ATCC90028"), 
-                          active = TRUE)))
+f6a <- as_ggplot(f6a_venn) + 
+  theme(plot.margin = unit(c(0,0,2,0), "lines"))
 
+wcl_comp <- list("yeast" = yeast_res %>% 
+                   filter(group == "WCL up" | group == "WCL ex") %>% 
+                   pull(CGD_gene_name), 
+                 "biofilm" = biofilm_res %>% 
+                   filter(group == "WCL up" | group == "WCL ex") %>% 
+                   pull(CGD_gene_name), 
+                 "ATCC10231" = a1_res %>% 
+                   filter(group == "A1_W up" | group == "A1_W ex") %>% 
+                   pull(CGD_gene_name), 
+                 "ATCC90028" = a9_res %>% 
+                   filter(group == "A9_W up" | group == "A9_W ex") %>% 
+                   pull(CGD_gene_name))
+
+f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot", 
+                      fontfamily = "sans", 
+                      cat.fontfamily = "sans", 
+                      cex = 0.9, 
+                      cat.cex = 0.8, 
+                      fill = c("blue", "orange", "green", "red"), 
+                      alpha = c(0.3, 0.3, 0.3, 0.3), 
+                      sub = "WCL exclusive and\nenriched proteins", 
+                      sub.fontfamily = "sans", 
+                      sub.pos = c(0.5, 1.1), 
+                      margin = 0.05)
+
+f6b <- as_ggplot(f6b_venn) + 
+  theme(plot.margin = unit(c(0,0,2,0), "lines"))
 
 ```
+
+```{r figure6, fig.cap='Marker venns', fig.width=5, fig.height=2.5}
+
+ggarrange(f6a, f6b, 
+          labels = c("A", "B"), 
+          ncol = 2,
+          nrow = 1)
+
+```
+
 
 \newpage
 

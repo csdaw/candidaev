@@ -4,7 +4,7 @@
 \alias{plot_mds}
 \title{Title}
 \usage{
-plot_mds(mat)
+plot_mds(mat, mat_labels, shape_size = 2)
 }
 \arguments{
 \item{mat}{Description.}
