@@ -888,7 +888,7 @@ f4b <- plot_mds(f4b_data, mat_labels = f4b_labels, shape_size = 3) +
                      labels = c("A10231", "A90028", "DAY B", "DAY Y")) + 
   theme_bw() + 
   theme(legend.title = element_blank(),
-        legend.position = c(0.5, 1.1), 
+        legend.position = c(0.5, 1.15), 
         legend.text = element_text(size = 8), 
         legend.direction = "horizontal")
   
@@ -926,7 +926,7 @@ f4c_overlap <- plot_venn(vlist = f4c_comp, use_uniprot = FALSE, type = "list") %
 ```
 
 
-```{r figure4, fig.cap='Combined comparison', fig.width=7.1, fig.height=7}
+```{r figure4, fig.cap='Combined comparison', fig.width=7.1, fig.height=6}
 
 ggarrange(ggarrange(f4a1, f4a2, 
                     f4a3, f4a4, 
@@ -1123,13 +1123,13 @@ f6a_venn <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "plot",
                       cat.cex = 0.8, 
                       fill = c("blue", "orange", "green", "red"), 
                       alpha = c(0.3, 0.3, 0.3, 0.3), 
-                      sub = "EV exclusive and\nenriched proteins", 
+                      sub = "EV exclusive + sig. enriched", 
                       sub.fontfamily = "sans", 
-                      sub.pos = c(0.5, 1.1), 
+                      sub.pos = c(0.5, 1.05), 
                       margin = 0.05)
 
 f6a <- as_ggplot(f6a_venn) + 
-  theme(plot.margin = unit(c(0,0,2,0), "lines"))
+  theme(plot.margin = unit(c(1,0,2,0), "lines"))
 
 wcl_comp <- list("yeast" = yeast_res %>% 
                    filter(group == "WCL up" | group == "WCL ex") %>% 
@@ -1151,20 +1151,19 @@ f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot",
                       cat.cex = 0.8, 
                       fill = c("blue", "orange", "green", "red"), 
                       alpha = c(0.3, 0.3, 0.3, 0.3), 
-                      sub = "WCL exclusive and\nenriched proteins", 
+                      sub = "WCL exclusive + sig. enriched", 
                       sub.fontfamily = "sans", 
-                      sub.pos = c(0.5, 1.1), 
+                      sub.pos = c(0.5, 1.05), 
                       margin = 0.05)
 
 f6b <- as_ggplot(f6b_venn) + 
-  theme(plot.margin = unit(c(0,0,2,0), "lines"))
+  theme(plot.margin = unit(c(1,0,2,0), "lines"))
 
 ```
 
 ```{r figure6, fig.cap='Marker venns', fig.width=5, fig.height=2.5}
-
 ggarrange(f6a, f6b, 
-          labels = c("A", "B"), 
+          labels = c("", ""), 
           ncol = 2,
           nrow = 1)
 
