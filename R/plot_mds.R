@@ -21,8 +21,7 @@ plot_mds <- function(mat, mat_labels, shape_size = 2) {
            label = mat_labels)
 
   ggplot(coord, aes(x = dim1, y = dim2)) +
-    geom_point(aes(colour = sample, shape = sample), size = shape_size) +
-    geom_text(aes(label = mat_labels), hjust = 1.4, vjust = 0.5) +
+    geom_point(aes(fill = sample, shape = label), size = shape_size, colour = "black") +
     xlab(label = "Dimension 1") +
     ylab(label = "Dimension 2")
 }

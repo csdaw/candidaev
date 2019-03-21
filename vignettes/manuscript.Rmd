@@ -871,22 +871,24 @@ f4b_labels <- c(rep("EV", 3), rep("WCL", 3),
                 rep("EV", 3), rep("WCL", 3))
   
 f4b <- plot_mds(f4b_data, mat_labels = f4b_labels, shape_size = 3) + 
-  theme(legend.position = "top") + 
-  scale_x_continuous(limits = c(-2.5, 1.5), 
+  scale_x_continuous(limits = c(-2, 1.5), 
                      expand = c(0,0)) + 
   scale_y_continuous(limits = c(-1.5, 3), 
                      expand = c(0,0)) + 
-  scale_colour_manual(breaks = c("A1", "A9", "B", "Y"), 
-                      values = c("red", "green", "orange", "blue"), 
-                      labels = c("A10231", "A90028", "DAY B", "DAY Y")) + 
-  scale_shape_manual(breaks = c("A1", "A9", "B", "Y"), 
-                     values = c(15:18), 
-                     labels = c("A10231", "A90028", "DAY B", "DAY Y")) + 
+  scale_fill_manual(breaks = c("A1", "A9", "B", "Y"), 
+                    values = unname(rev(st_pal)), 
+                    labels = c("A10231", "A90028", "DAY B", "DAY Y"), 
+                    guide = "legend") + 
+  scale_shape_manual(breaks = c("EV", "WCL"), 
+                     values = c(22,24)) + 
   theme_bw() + 
   theme(legend.title = element_blank(),
-        legend.position = c(0.5, 1.15), 
+        legend.position = "right", 
         legend.text = element_text(size = 8), 
-        legend.direction = "horizontal")
+        legend.direction = "vertical", 
+        legend.margin = margin(t = 0, r = 0, b = 0, l = 0), 
+        legend.box.margin = margin(t = -10, r = -6, b = -10, l = -10)) + 
+  guides(fill = guide_legend(override.aes = list(shape = 21)))
   
 # figure 4c 4 way venn
 f4c_comp <- list("DAY Y" = rownames(y_ev), 
@@ -900,10 +902,8 @@ f4c_venn <- plot_venn(vlist = f4c_comp, use_uniprot = FALSE, type = "plot",
                       cat.fontfamily = "sans", 
                       cex = 1, 
                       cat.cex = 0.8, 
-                      fill = c("blue", "orange", "green", "red"), 
-                      alpha = c(0.3, 0.3, 0.3, 0.3), 
-                      sub = "Common EV proteins", 
-                      sub.fontfamily = "sans")
+                      fill = unname(st_pal), 
+                      alpha = c(0.3, 0.3, 0.3, 0.3))
 
 f4c <- as_ggplot(f4c_venn) + 
   theme(plot.margin = unit(c(0,2,0,2), "lines"))
@@ -936,7 +936,7 @@ ggarrange(ggarrange(f4a1, f4a2,
                     labels = c("B", "C"), 
                     ncol = 2,
                     nrow = 1, 
-                    widths = c(1,1.2)), 
+                    widths = c(1,1)), 
           labels = c("", ""),
           ncol = 1, 
           nrow = 2, 
@@ -1117,7 +1117,7 @@ f6a_venn <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "plot",
                       cat.fontfamily = "sans", 
                       cex = 0.9, 
                       cat.cex = 0.8, 
-                      fill = c("blue", "orange", "green", "red"), 
+                      fill = unname(st_pal[c(1,2,4,3)]), 
                       alpha = c(0.3, 0.3, 0.3, 0.3), 
                       sub = "EV exclusive + sig. enriched", 
                       sub.fontfamily = "sans", 
@@ -1133,11 +1133,11 @@ wcl_comp <- list("yeast" = yeast_res %>%
                  "biofilm" = biofilm_res %>% 
                    filter(group == "WCL up" | group == "WCL ex") %>% 
                    pull(CGD_gene_name), 
-                 "ATCC10231" = a1_res %>% 
-                   filter(group == "A1_W up" | group == "A1_W ex") %>% 
-                   pull(CGD_gene_name), 
                  "ATCC90028" = a9_res %>% 
                    filter(group == "A9_W up" | group == "A9_W ex") %>% 
+                   pull(CGD_gene_name), 
+                 "ATCC10231" = a1_res %>% 
+                   filter(group == "A1_W up" | group == "A1_W ex") %>% 
                    pull(CGD_gene_name))
 
 f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot", 
@@ -1145,7 +1145,7 @@ f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot",
                       cat.fontfamily = "sans", 
                       cex = 0.9, 
                       cat.cex = 0.8, 
-                      fill = c("blue", "orange", "green", "red"), 
+                      fill = unname(st_pal), 
                       alpha = c(0.3, 0.3, 0.3, 0.3), 
                       sub = "WCL exclusive + sig. enriched", 
                       sub.fontfamily = "sans", 
