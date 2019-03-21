@@ -30,7 +30,13 @@ header-includes:
   - \usepackage{lipsum}
   - \pagestyle{fancy}
   - \fancyhead[L]{This is the running title it is rather long}
+  - \setlength{\headheight}{15pt}
   - \usepackage{float}
+  - \let\origfigure\figure
+  - \let\endorigfigure\endfigure
+  - \renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[H]
+    } {\endorigfigure}
   - \newcommand{\beginsupplement}{
       \setcounter{table}{0} 
       \renewcommand{\thetable}{S\arabic{table}} 
@@ -265,6 +271,8 @@ a1_res <- atcc_ind[[1]]
 
 a9_res <- atcc_ind[[2]]
 
+
+
 ```
 
 
@@ -272,7 +280,8 @@ a9_res <- atcc_ind[[2]]
 
 \beginsupplement
 
-```{r figureS1, fig.cap='Individual biological replicates for NTA', fig.height=4, fig.width=4}
+```{r figureS1, fig.cap=test_cap, fig.height=4, fig.width=4}
+
 nta_techavg <- nta %>% 
   nanolyze(particle_size, Strain, Bio_rep, Dilution, 
            name = "Tech_rep", 
@@ -290,12 +299,17 @@ nta_techavg %>%
   ylab(label = "Particles / mL") + 
   labs(colour = "Biological replicate")
 
+test_cap <- c("This is a really, really, really, really, really, really, really, 
+              really, really, really, really, really, really, really, really, 
+              really, really, really, really, really, really, really, really, 
+              really, really, really, really, really, really, really, really, 
+              really long figure caption")
 
 ```
 
 \newpage
 
-```{r tableS1Data}
+```{r tableS1Data, eval=FALSE}
 wcl_comp <- list("yeast" = yeast_res %>% 
                    filter(group == "WCL up" | group == "WCL ex") %>% 
                    pull(CGD_gene_name), 
