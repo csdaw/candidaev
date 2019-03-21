@@ -77,8 +77,11 @@ library(UpSetR)
 library(kableExtra)
 set.seed(1)
 
+# define colour palette to distinguish between the 3 Candida strains and 
+# 2 morphologies
 st_pal <- c(y = "#E69F00", b =  "#CC79A7", a9 =  "#56B4E9", a1 = "#009E73")
-  
+
+# define colour palette to distinguish between EVs and whole cell lysate (WCL)
 ev_pal <- c("#999999", "#D55E00", "#0072B2")
 
 ```
@@ -557,6 +560,7 @@ f2c1 <- ggpar(f2c1,
 f2c2 <- nta_total %>% 
   ggboxplot(x = "Strain", y = "part_per_prot", 
             color = "Strain", palette = rev(unname(st_pal)), add = "jitter", 
+            shape = 15,
             ylab = expression("Particles /"~paste(mu,g)~"protein"))
 f2c2 <- ggpar(f2c2, 
               yscale = "log10", 
@@ -575,7 +579,7 @@ f2c2 <- ggpar(f2c2,
 ```
 
 
-```{r figure2, fig.cap='EV characterisation', fig.width=7.1, fig.height=4}
+```{r figure2, fig.cap=f2_cap, fig.width=7.1, fig.height=4}
 
 ggarrange(f2a, 
           ggarrange(f2b, f2c2, 
@@ -587,6 +591,16 @@ ggarrange(f2a,
           nrow = 2, 
           ncol = 1, 
           heights = c(1,1))
+
+f2_cap <- "\\textbf{Characterisation of EVs from different \\textit{C. albicans} strains and morphologies.} 
+           \\textit{A}, Representative TEM images of EVs isolated from 4 different \\textit{C. albicans} cultures.
+           Scale bar indicates 500 nm. \\textit{B}, Size distribution of DAY286 biofilm (n = 5), DAY286 yeast (n = 3), 
+           ATCC90028 yeast (n = 3), and ATCC10231 yeast (n = 3) EVs as measured by nanoparticle tracking analysis. 
+           Line plots shown are the average of the biological replicates and the dashed grey line indicates 100 nm.
+           \\textit{C}, Comparison of the ratio of particle concentration (particles/mL)/protein concentration 
+           ($\\mu$g/mL) across the four EV sources. Each dot represents 1 biological replicate. Sample means were 
+           compared using ANOVA followed by Tukey's HSD \\textit{post-hoc} test. P-values indicating significant 
+           differences are shown."
 
 ```
 
@@ -617,9 +631,11 @@ f3a2 <- plot_volcano(data = yeast_res,
   scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
   scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
   theme(legend.text = element_text(size = 8)) + 
-  annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 Y')", parse = TRUE)
+  annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 Y')", parse = TRUE) + 
+  annotate("text", x = 3.5, y = 7, label = "bold('80')", parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('109')", parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('318')", parse = TRUE, colour = unname(ev_pal[1]))
 
-# EV enriched = 80, WCL enriched = 109, NS = 318
 
 ```
 
@@ -654,7 +670,11 @@ f3b2 <- plot_volcano(data = biofilm_res,
   scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
   scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
   theme(legend.text = element_text(size = 8)) + 
-  annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 B')", parse = TRUE)
+  annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 B')", parse = TRUE) + 
+  annotate("text", x = 3.5, y = 7, label = "bold('95')", parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('81')", parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('482')", parse = TRUE, colour = unname(ev_pal[1]))
+
 
 
 ```
@@ -688,7 +708,11 @@ f3c2 <- plot_volcano(data = a9_res,
   scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
   scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
   theme(legend.text = element_text(size = 8)) + 
-  annotate("text", x = 8, y = 0.5, label = "bold('ATCC90028')", parse = TRUE)
+  annotate("text", x = 8, y = 0.5, label = "bold('ATCC90028')", parse = TRUE) + 
+  annotate("text", x = 3.5, y = 7, label = "bold('105')", parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('134')", parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('734')", parse = TRUE, colour = unname(ev_pal[1]))
+
 
 
 
@@ -725,14 +749,17 @@ f3d2 <- plot_volcano(data = a1_res,
   scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
   scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
   theme(legend.text = element_text(size = 8)) + 
-  annotate("text", x = 8, y = 0.5, label = "bold('ATCC10231')", parse = TRUE)
+  annotate("text", x = 8, y = 0.5, label = "bold('ATCC10231')", parse = TRUE) + 
+  annotate("text", x = 3.5, y = 7, label = "bold('106')", parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('134')", parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('445')", parse = TRUE, colour = unname(ev_pal[1]))
 
 
 
 ```
 
 
-```{r figure3, fig.cap='Volcano plots', fig.width=7.1, fig.height=6, cache=TRUE}
+```{r figure3, fig.cap=f3_cap, fig.width=7.1, fig.height=6, cache=TRUE}
 
 ggarrange(ggarrange(f3a1, f3b1, f3c1, f3d1, 
                     labels = c("A", "", "", ""), 
@@ -751,6 +778,17 @@ ggarrange(ggarrange(f3a1, f3b1, f3c1, f3d1,
           ncol = 1,
           nrow = 2, 
           heights = c(1,2))
+
+f3_cap <- "\\textbf{Differential enrichment analysis of proteins identified in \\textit{C. albicans} 
+           EVs and whole cell lysates (WCL).} \\textit{A}, Venn diagrams comparing the EV and WCL 
+           proteomes from various \\textit{C. albicans} strains; DAY286 yeast (n = 3), DAY286 biofilm (n = 5), 
+           ATCC90028 yeast (n = 3), and ATCC10231 yeast (n = 3). Whole cell lysates were prepared from the EV 
+           source cells. Proteins depicted were identified in minimum 2/3 (yeast) and 4/5 (biofilm) biological 
+           replicates of EV or WCL. \\textit{B}, Volcano plots depicting significantly enriched EV or WCL proteins. 
+           Differential enrichment was performed using the R package \\textit{limma}. Significantly enriched proteins were
+           identified using a Benjamini-Hochberg adjusted p-value cutoff of 0.01. Counts of significant and 
+           non-significant proteins are indicated on each graph. Proteins with a $\\log_2{FC}$ greater than 
+           8 are labelled. Data tables underlying these figures are provided in supplemental File x"
 ```
 
 \newpage
