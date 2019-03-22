@@ -12,7 +12,7 @@
 #' @export
 #'
 plot_mds <- function(mat, mat_labels, shape_size = 2) {
-  mds <- limma::plotMDS(mat, plot = FALSE)
+  mds <- limma::plotMDS(mat, top = 500, gene.selection = "common", plot = FALSE)
 
   coord <- data.frame(dim1 = mds[["x"]],
                       dim2 = mds[["y"]]) %>%

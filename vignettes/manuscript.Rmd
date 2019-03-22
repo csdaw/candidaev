@@ -759,7 +759,7 @@ f3d2 <- plot_volcano(data = a1_res,
 ```
 
 
-```{r figure3, fig.cap=f3_cap, fig.width=7.1, fig.height=6, cache=TRUE}
+```{r figure3, fig.cap=f3_cap, fig.width=7.1, fig.height=6, cache=TRUE, out.extra='trim={0 2cm 0 0},clip'}
 
 ggarrange(ggarrange(f3a1, f3b1, f3c1, f3d1, 
                     labels = c("A", "", "", ""), 
@@ -785,10 +785,13 @@ f3_cap <- "\\textbf{Differential enrichment analysis of proteins identified in \
            ATCC90028 yeast (n = 3), and ATCC10231 yeast (n = 3). Whole cell lysates were prepared from the EV 
            source cells. Proteins depicted were identified in minimum 2/3 (yeast) and 4/5 (biofilm) biological 
            replicates of EV or WCL. \\textit{B}, Volcano plots depicting significantly enriched EV or WCL proteins. 
-           Differential enrichment was performed using the R package \\textit{limma}. Significantly enriched proteins were
-           identified using a Benjamini-Hochberg adjusted p-value cutoff of 0.01. Counts of significant and 
+           Differential enrichment was performed by comparing the mean normalised MaxLFQ intensities of proteins 
+           identified in both EV and WCL (i.e. proteins in venn overlap) using the R package 
+           \\textit{limma} [@cox2014; @ritchie2015]. Significantly enriched proteins were identified using a 
+           Benjamini-Hochberg adjusted p-value cutoff of 0.01. Counts of significant and 
            non-significant proteins are indicated on each graph. Proteins with a $\\log_2{FC}$ greater than 
-           8 are labelled. Data tables underlying these figures are provided in supplemental File x"
+           8 are labelled. Data tables underlying the venn diagrams and volcano plots are provided in 
+           supplemental Files x and y respectively."
 ```
 
 \newpage
@@ -878,7 +881,8 @@ f4a_palette <- c("#6D2077", "#E4002B", "#FFB81C")
 
 # Bar plots
 f4a1 <- plot_go_bar(f4a_y_go_table, c(1:4, 50,53:55, 80,82:84), f4a_palette) + 
-  annotate("text", x = 1.5, y = 70, label = "bold('DAY286 yeast')", parse = TRUE)
+  annotate("text", x = 1.5, y = 70, label = "bold('DAY286 yeast')", parse = TRUE) + 
+  labs(fill = "GO domain")
 
 f4a2 <- plot_go_bar(f4a_b_go_table, c(1:4, 69,71:73, 96:97, 100:101), f4a_palette) + 
   annotate("text", x = 1.5, y = 65, label = "bold('DAY286 biofilm')", parse = TRUE)
@@ -917,8 +921,7 @@ f4b <- plot_mds(f4b_data, mat_labels = f4b_labels, shape_size = 3) +
                     values = unname(rev(st_pal)), 
                     labels = c("A10231", "A90028", "DAY B", "DAY Y"), 
                     guide = "legend") + 
-  scale_shape_manual(breaks = c("EV", "WCL"), 
-                     values = c(22,24)) + 
+  scale_shape_manual(values = c(22,24)) + 
   theme_bw() + 
   theme(legend.title = element_blank(),
         legend.position = "right", 
@@ -960,7 +963,7 @@ f4c_overlap <- plot_venn(vlist = f4c_comp, use_uniprot = FALSE, type = "list") %
 ```
 
 
-```{r figure4, fig.cap='Combined comparison', fig.width=7.1, fig.height=6}
+```{r figure4, fig.cap=f4_cap, fig.width=7.1, fig.height=6}
 
 ggarrange(ggarrange(f4a1, f4a2, 
                     f4a3, f4a4, 
@@ -979,6 +982,20 @@ ggarrange(ggarrange(f4a1, f4a2,
           ncol = 1, 
           nrow = 2, 
           heights = c(1.8,1))
+
+f4_cap = "\\textbf{Combined comparison of \\textit{C. albicans} EV proteomes.} \\textit{A}, 
+          Functional enrichment analyses of the significantly enriched and exclusive \\textit{C. albicans} 
+          EV proteins. The online tool FungiFun2 was used to identify enriched biological process (BP), 
+          cellular component (CC), and molecular function (MF) GO terms [@priebe2015]. A selection of the
+          most significantly enriched terms for each GO domain are shown. Full lists of enriched terms can be 
+          found in supplemental File x. \\textit{B}, Multidimensional scaling (MDS) plot of each LC-MS/MS
+          biological replicate sample shows the sources of variation in the data. Pairwise distance between 
+          samples approximately indicates the $\\log_2{FC}$ between samples. Multidimensional scaling 
+          was performed using \\texttt{plotMDS} from the R package \\textit{limma} [@ritchie2015]. 
+          \\textit{C}, Venn diagram comparing four \\textit{C. albicans} EV proteomes. Lists of proteins 
+          present in the centre and right partitions of each venn diagram in Figure \\@ref(fig:figure3)A were 
+          compared to identify proteins present in all four datasets. The data table underlying Figure 
+          \\@ref(fig:figure4)C is provided in supplemental File x."
 
 ```
 
