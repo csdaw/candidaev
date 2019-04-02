@@ -39,9 +39,8 @@ header-includes:
   - \usepackage{float}
   - \let\origfigure\figure
   - \let\endorigfigure\endfigure
-  - \renewenvironment{figure}[1][2] {
-    \expandafter\origfigure\expandafter[H]
-    } {\endorigfigure}
+  - \renewenvironment{figure}[1][2]{\expandafter\origfigure\expandafter[H]}{\endorigfigure}
+  - \usepackage{threeparttable}
 ---
 
 **Running title:** Running title goes here
@@ -296,7 +295,7 @@ EV - extracellular vesicle
 
 The abstract goes here. Here is a citation [@liao2012].
 
-Here is another citation [@gil-bona2018].
+Here is another citation [@gil-bona2015].
 
 And another [@lin2014].
 
@@ -352,16 +351,16 @@ marker_candidates <- marker_comp_tab %>%
   pull(..values..) %>% 
   unlist() %>% 
   as.data.frame(stringsAsFactors = FALSE) %>% 
-  rename(Gene = 1)
+  rename(Name = 1)
 
 marker_longlist <- marker_candidates %>% 
-  mutate(Protein = match_id(Gene, uniprot, "CGD_gene_name", "Protein_name"),
-         DAY.Y = match_id(Gene, yeast_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         DAY.B = match_id(Gene, biofilm_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         A1 = match_id(Gene, a1_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         A9 = match_id(Gene, a9_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         TM = match_id(Gene, uniprot, "CGD_gene_name", "Transmembrane"), 
-         SP = match_id(Gene, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
+  mutate(Function = match_id(Name, uniprot, "CGD_gene_name", "Protein_name"),
+         DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         A9 = match_id(Name, a9_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         TM = match_id(Name, uniprot, "CGD_gene_name", "Transmembrane"), 
+         SP = match_id(Name, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
             .funs = list(~ signif(as.numeric(.), digits = 3))) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
@@ -373,7 +372,7 @@ marker_longlist <- marker_candidates %>%
          TM = case_when(TM == 0 ~ "", 
                         TRUE ~ as.character(TM))) %>% 
   rename("DAY Y" = DAY.Y, "DAY B" = DAY.B) %>% 
-  arrange(Gene)
+  arrange(Name)
 
 protein_desc <- c("1,3-beta-glucanosyltransferase", 
                   "Rho family GTPase", 
@@ -419,8 +418,8 @@ protein_desc <- c("1,3-beta-glucanosyltransferase",
                   paste0("Rab family GTPase", footnote_marker_alphabet(1)),  
                   "Putative vacuolar cation channel")
 marker_longlist <- marker_longlist %>% 
-  mutate(Protein = protein_desc, 
-         VF = c("Y", rep("",3), rep("Y", 2), "", "Y", rep("", 9), rep("Y", 2), 
+  mutate(Function = protein_desc, 
+         VD = c("Y", rep("",3), rep("Y", 2), "", "Y", rep("", 9), rep("Y", 2), 
                 rep("", 4), rep("Y", 3), rep("", 2), rep("Y", 2), rep("", 5), "Y", rep("", 7)), 
          pack_row = c(5, rep(1,3), rep(5,2), 1, 2, rep(1,3), 5, rep(1,3), 4, 2, rep(5,2), 
                       1, rep(2,2), 4, 1, rep(5,2), 1, rep(5,3), 1, 4, rep(1,3), 5, 2, 1, 
@@ -441,9 +440,23 @@ marker_longlist[18, 8] <- ""
                      
 ```
 
+(ref:table1) [@gil-bona2015]
+
 ```{r markerTable}
+tab1_cap <- "\\textbf{43 protein marker candidates for positive identification of \\textit{C. albicans} 
+             EVs.} The names, functions, abundances, and certain properties of each of the proteins 
+             identified in Figure \\ref{fig:figure6} are given. Proteins with larger 
+             log\\textsubscript{2}(fold change) have a greater abundance compared to WCL for a particular strain, whilst
+             'ex' indicates a protein is only found in EVs. The 'TM' column records the number of 
+             transmembrane domains for each protein, 'SP' indicates whether a protein has a predicted
+             signal peptide, and 'VD' shows whether a protein has previously been detected in 
+             vesicle-depleted culture media (i.e. it may also be in the soluble secretome); see (ref:table1). 
+             Underlined proteins are those identified 
+             as ideal candidates for preliminary EV markers according to the criteria depicted in 
+             Figure \\ref{fig:figure1}."
+
 knitr::kable(marker_longlist[ ,-10],
-             caption = "Description of table", 
+             caption = tab1_cap, 
              format = "latex", 
              booktabs = TRUE, 
              longtable = TRUE, 
@@ -460,7 +473,8 @@ knitr::kable(marker_longlist[ ,-10],
   footnote(alphabet = c("Protein localisation was inferred from sequence similarity with \\\\textit{S. cerevisiae} ortholog (see CGD)", 
                         "Protein localisation was predicted using DeepLoc-1.0", 
                         "Presence of transmembrane domains and signal peptide predicted with TMHMM v2.0 and SignalP 5.0 respectively"), 
-           escape = FALSE)
+           escape = FALSE, 
+           threeparttable = TRUE)
 
 ```
 
@@ -759,7 +773,7 @@ f3d2 <- plot_volcano(data = a1_res,
 ```
 
 
-```{r figure3, fig.cap=f3_cap, fig.width=7.1, fig.height=6, cache=TRUE, out.extra='trim={0 2cm 0 0},clip'}
+```{r figure3, fig.cap=f3_cap, fig.width=7.1, fig.height=6, cache=TRUE}
 
 ggarrange(ggarrange(f3a1, f3b1, f3c1, f3d1, 
                     labels = c("A", "", "", ""), 
@@ -1141,24 +1155,23 @@ f5_go6 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust6.csv")
 ```
 
 
-```{r figure5, fig.cap='heatmap etc.', fig.height=6}
-# load f5c
+```{r figure5, fig.cap=f5_cap, fig.height=6}
+# load f5
 f5 <- png::readPNG("./vignettes/figures/figure5.png")
 
 ggplot() + 
   background_image(f5) + 
   theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, unit = "inches"))
 
-# plot figure5
-# ggarrange(ggarrange(f5a, f5b, 
-#                     labels = c("A", "B"), 
-#                     ncol = 2, 
-#                     nrow = 1), 
-#           f5c,
-#           labels = c("", "C"), 
-#           ncol = 1,
-#           nrow = 2, 
-#           heights = c(1,3))
+f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across different \\textit{C. albicans} strains
+           and morphologies.} Heatmap of proteins (n = 405) identified in all four EV samples. Each column 
+           represents a \\textit{C. albicans strain} and each row represents a protein group. The colours
+           indicate the $\\log_2{FC}$ of the protein for that particular strain; red is EV enriched, blue is 
+           EV depleted, and black is EV exclusive. Unsupervised clustering of rows and columns was performed 
+           using Gower's formula via the \\texttt{daisy} function from the R package \\textit{cluster} (ref).
+           Functional enrichment analyses were performed on the heatmap protein clusters using the online 
+           tool FungiFun2 [@priebe2015]. A selection of significantly enriched GO terms are presented in the 
+           table inset along with lists of the proteins identified in each cluster."
 
 ```
 
@@ -1212,12 +1225,18 @@ f6b <- as_ggplot(f6b_venn) +
 
 ```
 
-```{r figure6, fig.cap='Marker venns', fig.width=2.5, fig.height=4}
+```{r figure6, fig.cap=f6_cap, fig.width=2.5, fig.height=4}
 ggarrange(f6a, f6b, 
           labels = c("A", "B"), 
           ncol = 1,
           nrow = 2)
 
+f6_cap <- "\\textbf{Identification of common signficantly enriched or exclusive \\textit{C. albicans} 
+           EV and WCL proteins.} Proteins identified as significantly enriched or exclusive in Figure 
+           \\@ref(fig:figure3) were compared to select those which were common to all 4 datasets. 43 
+           proteins were identified as potential positive EV protein markers and 60 
+           proteins as potential negative EV protein markers. The data tables underlying Figure 
+          \\@ref(fig:figure6) are provided in supplemental File x."
 ```
 
 
