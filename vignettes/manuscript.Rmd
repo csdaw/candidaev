@@ -42,6 +42,7 @@ header-includes:
   - \renewenvironment{figure}[1][2]{\expandafter\origfigure\expandafter[H]}{\endorigfigure}
   - \usepackage{caption}
   - \captionsetup{font={normalsize,stretch=1.3},labelfont=bf}
+  - \usepackage{threeparttable}
 ---
 
 **Running title:** Running title goes here
@@ -447,20 +448,23 @@ marker_longlist[18, 8] <- ""
 
 (ref:footnote2) [@almagroarmenteros2017]
 
-(ref:footnote3) [@armenteros2019; @krogh2001]
+(ref:footnote3a) [@armenteros2019; @krogh2001]
 
 ```{r markerTable}
-tab1_cap <- "\\textbf{43 protein marker candidates for positive identification of \\textit{C. albicans} 
-             EVs.} The names, functions, abundances, and certain properties of each of the proteins 
-             identified in Figure \\ref{fig:figure6} are given. Proteins with larger 
-             log\\textsubscript{2}(fold change) have a greater abundance compared to WCL for a particular strain, whilst
-             'ex' indicates a protein is only found in EVs. The 'TM' column records the number of 
-             transmembrane domains for each protein, 'SP' indicates whether a protein has a predicted
-             signal peptide, and 'VD' shows whether a protein has previously been detected in 
-             vesicle-depleted culture media (i.e. it may also be in the soluble secretome); see (ref:table1). 
-             Underlined proteins are those identified 
-             as ideal candidates for preliminary EV markers according to the criteria depicted in 
-             Figure \\ref{fig:figure1}."
+tab1_cap <- "\\textbf{Candida protein biomarkers for \\textit{C. albicans} EVs.} 
+             This list of proteins consists of those that were found to be exclusive to EVs or 
+             significantly enriched in EVs across the four \\textit{C. albicans} strains examined in 
+             this study. Proteins are grouped according to their subcellular localisation as annotated 
+             in the Candida Genome Database (candidagenome.org) (ref:footnote1). The log\\textsubscript{2} ratio 
+             of the abundance (mean MaxQuant LFQ intensity) of each protein in EVs compared to 
+             whole cell lysate for each strain is listed. \`\`ex\" indicates where a protein was only 
+             identified in the EV fraction and not the whole cell lysate for that strain. The \`\`TM\" 
+             column indicates the number of transmembrane domains for each protein as annotated in 
+             UniProtKB. \`\`SP\" indicates whether a protein is annotated as having a signal peptide 
+             according to UniProtKB. \`\`VD\" shows whether a protein has previously been detected in 
+             vesicle-depleted culture media (i.e. it may also be present in the soluble secretome) 
+             (ref:table1). Underlined proteins are those identified as the best candidates for 
+             EV markers according to the criteria depicted in Figure \\ref{fig:figure1}."
 
 knitr::kable(marker_longlist[ ,-10],
              caption = tab1_cap, 
@@ -478,11 +482,15 @@ knitr::kable(marker_longlist[ ,-10],
   pack_rows("Mitochondria", 29, 31) %>% 
   pack_rows("Cell wall, cell surface", 32, 43) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence similarity with 
-                         \\\\textit{S. cerevisiae} ortholog (ref:footnote1)", 
+                         \\\\textit{S. cerevisiae} ortholog as annotated in the Candida 
+                         Genome Database (ref:footnote1)", 
                         "Protein localisation was predicted using DeepLoc-1.0 (ref:footnote2)", 
-                        "Presence of transmembrane domains and signal peptide predicted with TMHMM v2.0 
-                         and SignalP 5.0 respectively (ref:footnote3)"), 
-           escape = FALSE)
+                        "Presence of transmembrane domains and signal peptide was predicted 
+                         using TMHMM v2.0 and SignalP 5.0 respectively (ref:footnote3a).\n
+                         SUR7 is predicted to have 3 transmembrane domains and a signal peptide by 
+                         the tool Phobius (ref:footnote3b, which is used for its UniProtKB annotation."), 
+           escape = FALSE, 
+           threeparttable = TRUE)
 
 ```
 
