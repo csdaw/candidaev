@@ -41,7 +41,7 @@ header-includes:
   - \let\endorigfigure\endfigure
   - \renewenvironment{figure}[1][2]{\expandafter\origfigure\expandafter[H]}{\endorigfigure}
   - \usepackage{caption}
-  - \captionsetup{font={normalsize,stretch=1.3}}
+  - \captionsetup{font={normalsize,stretch=1.3},labelfont=bf}
 ---
 
 **Running title:** Running title goes here
@@ -482,8 +482,7 @@ knitr::kable(marker_longlist[ ,-10],
                         "Protein localisation was predicted using DeepLoc-1.0 (ref:footnote2)", 
                         "Presence of transmembrane domains and signal peptide predicted with TMHMM v2.0 
                          and SignalP 5.0 respectively (ref:footnote3)"), 
-           escape = FALSE, 
-           threeparttable = TRUE)
+           escape = FALSE)
 
 ```
 
@@ -957,8 +956,8 @@ f4b <- plot_mds(f4b_data, mat_labels = f4b_labels, shape_size = 3) +
 # figure 4c 4 way venn
 f4c_comp <- list("DAY Y" = rownames(y_ev), 
                  "DAY B" = rownames(b_ev),
-                 "ATCC90028" = rownames(atcc9_ev), 
-                 "ATCC10231" = rownames(atcc1_ev))
+                 "ATCC10231" = rownames(atcc1_ev), 
+                 "ATCC90028" = rownames(atcc9_ev))
 f4c_comp <- lapply(f4c_comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
 
 f4c_venn <- plot_venn(vlist = f4c_comp, use_uniprot = FALSE, type = "plot", 
@@ -966,7 +965,7 @@ f4c_venn <- plot_venn(vlist = f4c_comp, use_uniprot = FALSE, type = "plot",
                       cat.fontfamily = "sans", 
                       cex = 1, 
                       cat.cex = 0.8, 
-                      fill = unname(st_pal), 
+                      fill = unname(st_pal[c(1,2,4,3)]), 
                       alpha = c(0.3, 0.3, 0.3, 0.3))
 
 f4c <- as_ggplot(f4c_venn) + 
@@ -1209,12 +1208,12 @@ wcl_comp <- list("yeast" = yeast_res %>%
                    pull(CGD_gene_name), 
                  "biofilm" = biofilm_res %>% 
                    filter(group == "WCL up" | group == "WCL ex") %>% 
+                   pull(CGD_gene_name),
+                 "ATCC10231" = a1_res %>% 
+                   filter(group == "A1_W up" | group == "A1_W ex") %>% 
                    pull(CGD_gene_name), 
                  "ATCC90028" = a9_res %>% 
                    filter(group == "A9_W up" | group == "A9_W ex") %>% 
-                   pull(CGD_gene_name), 
-                 "ATCC10231" = a1_res %>% 
-                   filter(group == "A1_W up" | group == "A1_W ex") %>% 
                    pull(CGD_gene_name))
 
 f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot", 
@@ -1222,7 +1221,7 @@ f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot",
                       cat.fontfamily = "sans", 
                       cex = 0.9, 
                       cat.cex = 0.8, 
-                      fill = unname(st_pal), 
+                      fill = unname(st_pal[c(1,2,4,3)]), 
                       alpha = c(0.3, 0.3, 0.3, 0.3), 
                       sub = "WCL exclusive + sig. enriched", 
                       sub.fontfamily = "sans", 
