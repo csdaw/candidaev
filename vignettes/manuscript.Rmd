@@ -448,7 +448,7 @@ marker_longlist[18, 8] <- ""
 
 (ref:footnote2) [@almagroarmenteros2017]
 
-(ref:footnote3a) [@armenteros2019; @krogh2001]
+(ref:footnote3) [@tsirigos2015]
 
 ```{r markerTable}
 tab1_cap <- "\\textbf{Candida protein biomarkers for \\textit{C. albicans} EVs.} 
@@ -485,10 +485,8 @@ knitr::kable(marker_longlist[ ,-10],
                          \\\\textit{S. cerevisiae} ortholog as annotated in the Candida 
                          Genome Database (ref:footnote1)", 
                         "Protein localisation was predicted using DeepLoc-1.0 (ref:footnote2)", 
-                        "Presence of transmembrane domains and signal peptide was predicted 
-                         using TMHMM v2.0 and SignalP 5.0 respectively (ref:footnote3a).\n
-                         SUR7 is predicted to have 3 transmembrane domains and a signal peptide by 
-                         the tool Phobius (ref:footnote3b, which is used for its UniProtKB annotation."), 
+                        "Presence of transmembrane domains and absense of a signal peptide was predicted 
+                         using TOPCONS2 (ref:footnote3)"), 
            escape = FALSE, 
            threeparttable = TRUE)
 
@@ -1258,10 +1256,12 @@ f6_cap <- "\\textbf{Identification of common signficantly enriched or exclusive 
 
 \newpage
 
-```{r figure7, fig.cap='4tm domain'}
-fig7 <- multi_panel_figure(width = 7.1, height = 6, unit = "inches", columns = 2, rows = 4, 
-                           row_spacing = 0, column_spacing = 0)
-fig7
+```{r figure7, fig.cap='4tm domain', fig.width=7.2, fig.height=6}
+
+f7 <- png::readPNG("./vignettes/figures/figure7.png")
+
+ggplot() + 
+  background_image(f7)
 ```
 
 \newpage
