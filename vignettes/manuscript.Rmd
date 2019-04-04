@@ -425,7 +425,7 @@ marker_longlist <- marker_longlist %>%
                 rep("", 4), rep("Y", 3), rep("", 2), rep("Y", 2), rep("", 5), "Y", rep("", 7)), 
          pack_row = c(5, rep(1,3), rep(5,2), 1, 2, rep(1,3), 5, rep(1,3), 4, 2, rep(5,2), 
                       1, rep(2,2), 4, 1, rep(5,2), 1, rep(5,3), 1, 4, rep(1,3), 5, 2, 1, 
-                      3, 1, rep(2,2), 3)) %>% 
+                      3, 1, 3, 2, 3)) %>% 
   arrange(pack_row)
 
 # fix number of TM domains for CDR1;CDR2
@@ -477,8 +477,8 @@ knitr::kable(marker_longlist[ ,-10],
   add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs Cell" = 4, " " = 2), escape = FALSE) %>% 
   kable_styling(font_size = 8) %>% 
   pack_rows("Plasma membrane", 1, 19) %>% 
-  pack_rows("Golgi, ER, secretory pathway", 20, 26) %>% 
-  pack_rows("Vacuole", 27, 28) %>% 
+  pack_rows("Golgi, ER, secretory pathway", 20, 25) %>% 
+  pack_rows("Vacuole", 26, 28) %>% 
   pack_rows("Mitochondria", 29, 31) %>% 
   pack_rows("Cell wall, cell surface", 32, 43) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence similarity with 
@@ -1266,8 +1266,11 @@ ggplot() +
 
 \newpage
 
-```{r figure8, fig.cap='final candidates'}
-plot(mtcars[,1:2])
+```{r figure8, fig.cap='final candidates', fig.width=3.5, fig.height=2.8}
+f8 <- png::readPNG("./vignettes/figures/figure8.png")
+
+ggplot() + 
+  background_image(f8)
 ```
 
 
