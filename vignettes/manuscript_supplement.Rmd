@@ -281,17 +281,40 @@ a9_res <- atcc_ind[[2]]
 
 \beginsupplement
 
-```{r figureS1, fig.cap=test_cap, fig.height=4, fig.width=4}
+```{r figureS1, fig.cap=fS1_cap, fig.height=4, fig.width=4}
+
+fS1_cap <- c("This is a really, really, really, really, really, really, really, 
+              really, really, really, really, really, really, really, really, 
+              really, really, really, really, really, really, really, really, 
+              really, really, really, really, really, really, really, really, 
+              really long figure caption")
+
+figS1_labels <- c("ATCC10231", 
+                  "ATCC90028", 
+                  "DAY286 biofilm", 
+                  "DAY286 yeast")
+
+names(figS1_labels) <- c("ATCC10231", 
+                         "ATCC90028", 
+                         "Biofilm", 
+                         "DAY286")
 
 nta_techavg <- nta %>% 
   nanolyze(particle_size, Strain, Bio_rep, Dilution, 
            name = "Tech_rep", 
            param_var = True_count)
 
+nta_bioavg <- nta_techavg %>% 
+  nanolyze(particle_size, Strain,
+           name = "Bio_rep", 
+           param_var = Tech_rep_mean) %>% 
+  mutate(facet = case_when(Strain == "Biofilm" ~ "first", TRUE ~ "second"))
+
 nta_techavg %>% 
   ggplot(aes(x = particle_size, y = Tech_rep_mean, colour = Bio_rep)) + 
   geom_line(size = 0.5) + 
-  facet_wrap(~ Strain, scales = "free", ncol = 2, nrow = 2) + 
+  facet_wrap(~ Strain, scales = "free", ncol = 2, nrow = 2, 
+             labeller = labeller(Strain = figS1_labels)) + 
   theme_classic() + 
   theme(strip.background = element_blank(), 
         legend.position = "top", 
@@ -300,17 +323,116 @@ nta_techavg %>%
   ylab(label = "Particles / mL") + 
   labs(colour = "Biological replicate")
 
-test_cap <- c("This is a really, really, really, really, really, really, really, 
-              really, really, really, really, really, really, really, really, 
-              really, really, really, really, really, really, really, really, 
-              really, really, really, really, really, really, really, really, 
-              really long figure caption")
 
 ```
 
 \newpage
 
 ```{r tableS1Data}
+nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", 
+                                  "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
+                                  "Biofilm_1", "Biofilm_2", "Biofilm_3", "Biofilm_4", "Biofilm_5", 
+                                  "DAY286_1", "DAY286_2", "DAY286_3"), 
+                           strain = c(rep("ATCC10231", 3), 
+                                      rep("ATCC90028", 3), 
+                                      rep("Biofilm", 5), 
+                                      rep("DAY286", 3)), 
+                           replicate = c(seq(1, 3), seq(1, 3), seq(1, 5), seq(1, 3)), 
+                           OD600 = c(0.455*20, 0.557*20, 0.615*20, 
+                                     0.310*50, 0.337*50, 0.297*50, 
+                                     rep(NA, 5), 
+                                     36.2, 39.7, 34.0),
+                           culture_vol = c(rep(150, 3),
+                                           rep(150, 3), 
+                                           rep(1000, 5), 
+                                           rep(200, 3)), 
+                           protein_conc = c(0.192, 0.282, 0.287, 
+                                            0.424, 0.716, 0.584, 
+                                            0.204, 0.198, 0.297, 0.193, 0.416, 
+                                            0.437, 0.360, 0.447), 
+                           df = c(250, 750, 750, 
+                                  1500, 3000, 3000, 
+                                  3000, 2000, 2000, 3000, 6000, 
+                                  1500, 1500, 1500), 
+                           mean = c(248.5, 218.7, 217.9, 
+                                    197.1, 233.1, 191.0, 
+                                    119.4, 142.1, 143.3, 133.3, 120.9, 
+                                    182.8, 174.5, 164.5), 
+                           mode = c(171.9, 155.5, 140.2, 
+                                    135.4, 156.7, 138.0, 
+                                    100.5, 94.7, 103.1, 103.1, 97.5, 
+                                    106.4, 99.2, 100.2), 
+                           sd = c(120.1, 112.1, 110.0, 
+                                  87.1, 90.7, 68.4, 
+                                  47.4, 64.3, 70.2, 60.7, 47.4, 
+                                  93.4, 93.9, 83.1), 
+                           d10 = c(139.1, 110.2, 118.1, 
+                                   122.4, 141.9, 126.0, 
+                                   90.2, 88.8, 96.4, 93.2, 89.7, 
+                                   97.8, 93.8, 93.0), 
+                           d50 = c(211.9, 188.2, 180.3, 
+                                   169.4, 209.3, 170.7, 
+                                   105.6, 115.0, 110.9, 108.1, 105.9, 
+                                   152.8, 147.3, 136.2),
+                           d90 = c(393.0, 354, 354.4, 
+                                   301.4, 381.1, 285.8, 
+                                   151.5, 239.7, 240.8, 210.2, 171.2, 
+                                   320.4, 308.0, 290.9), 
+                           stringsAsFactors = FALSE)
+
+nta_total <- nta_techavg %>% 
+  nanocount(Strain, Bio_rep, Dilution, 
+            param_var = Tech_rep_mean) %>% 
+  tidyr::unite("id", Strain, Bio_rep) %>% 
+  inner_join(., nta_metadata, by = "id") %>% 
+  select(strain, replicate, OD600, culture_vol, protein_conc, 
+         Particle_count, mean, mode, sd, d10, d50, d90) %>% 
+  mutate(OD600 = case_when(is.na(OD600) == TRUE ~ "NA", 
+                           TRUE ~ as.character(OD600)), 
+         Particle_count = signif(Particle_count, digits = 3))
+
+
+
+```
+
+```{r tableS1}
+
+tabS1_labs <- c("Biological\nreplicate", 
+                "OD600", 
+                "Culture\nvol. (mL)", 
+                "Protein conc.\n($\\mu$g/mL)", 
+                "Particle conc.\n(Particles/mL)", 
+                "Mean", 
+                "Mode", 
+                "SD", 
+                "D10", 
+                "D50", 
+                "D90")
+
+tabS1_cap <- "This is the caption for tabS1"
+
+nta_total %>% 
+  select(-strain) %>% 
+  mutate_all(linebreak) %>% 
+  knitr::kable(caption = tabS1_cap, 
+               format = "latex", 
+               booktabs = TRUE, 
+               linesep = "", 
+               col.names = linebreak(tabS1_labs), 
+               escape = FALSE, 
+               align = "l") %>% 
+  kable_styling(latex_options = c("scale_down", 
+                                  "HOLD_position")) %>% 
+  add_header_above(c(" " = 5, "NTA particle size distribution (nm)" = 6)) %>% 
+  pack_rows("ATCC10231", 1, 3) %>% 
+  pack_rows("ATCC90028", 4, 6) %>% 
+  pack_rows("DAY286 biofilm", 7, 11) %>% 
+  pack_rows("DAY286 yeast", 12, 14)
+```
+
+\newpage
+
+```{r tableS2Data}
 wcl_comp <- list("yeast" = yeast_res %>% 
                    filter(group == "WCL up" | group == "WCL ex") %>% 
                    pull(CGD_gene_name), 
@@ -432,12 +554,18 @@ wcl_longlist[53, 1] <- "HSP12"
 
 ```
 
+(ref:footnote1) [@skrzypek2017]
 
-```{r tableS1}
-tabs1_cap <- "This is a table caption"
+(ref:footnote2) [@almagroarmenteros2017]
+
+(ref:footnote3) [@savojardo2018]
+
+
+```{r tableS2}
+tabs2_cap <- "This is a table caption"
 
 knitr::kable(wcl_longlist[, -10], 
-             caption = tabs1_cap, 
+             caption = tabs2_cap, 
              format = "latex", 
              booktabs = TRUE, 
              longtable = TRUE, 
@@ -445,7 +573,8 @@ knitr::kable(wcl_longlist[, -10],
              escape = FALSE) %>% 
   row_spec(row = c(28, 36, 41, 51, 53, 59), underline = TRUE) %>% 
   add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs Cell" = 4, " " = 2), escape = FALSE) %>% 
-  kable_styling(font_size = 8) %>% 
+  kable_styling(font_size = 8, 
+                latex_options = c("HOLD_position")) %>% 
   pack_rows("Cytoplasm", 1, 20) %>% 
   pack_rows("Mitochondria", 21, 36) %>% 
   pack_rows("Nucleus", 37, 39) %>% 
@@ -457,9 +586,9 @@ knitr::kable(wcl_longlist[, -10],
   pack_rows("Translation preinitiation complex", 60, 60) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence similarity with 
                          \\\\textit{S. cerevisiae} ortholog as annotated in the Candida 
-                         Genome Database", 
-                        "Protein localisation was predicted using DeepLoc-1.0", 
-                        "Protein localisation was predicted using BUSCA"), 
+                         Genome Database (ref:footnote1", 
+                        "Protein localisation was predicted using DeepLoc-1.0 (ref:footnote2)", 
+                        "Protein localisation was predicted using BUSCA (ref:footnote3"), 
            escape = FALSE, 
            threeparttable = TRUE)
 ```
