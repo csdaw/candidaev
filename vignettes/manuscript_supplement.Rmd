@@ -277,7 +277,7 @@ a9_res <- atcc_ind[[2]]
 ```
 
 
-# Supplementary data {-}
+# Supplementary data
 
 \beginsupplement
 
@@ -592,4 +592,10 @@ knitr::kable(wcl_longlist[, -10],
            escape = FALSE, 
            threeparttable = TRUE)
 ```
+
+\newpage
+
+# References
+
+<div id="refs"></div>
 
