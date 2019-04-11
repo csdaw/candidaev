@@ -59,12 +59,11 @@ knitr::opts_knit$set(progress = TRUE,
 ```
 
 ```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  warning = FALSE,
-  message = FALSE,
-  echo = FALSE,
-  comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      echo = FALSE,
+                      comment = "#>")
 
 library(candidaev)
 library(tidyNano)
@@ -87,7 +86,7 @@ ev_pal <- c("#999999", "#D55E00", "#0072B2")
 
 ```
 
-```{r yeast}
+```{r yeast, warning=FALSE}
 yeast <- yeast %>% 
   filter(Reverse != "+", Potential.contaminant != "+", 
          Only.identified.by.site != "+", Unique.peptides >= 2)
@@ -144,7 +143,7 @@ yeast_res <- get_results(efit = y_efit, mat = yeast_de, p_val = 0.01, lfc = 0, t
 
 ```
 
-```{r biofilm}
+```{r biofilm, warning=FALSE}
 biofilm <- biofilm %>% 
   filter(Reverse != "+", Potential.contaminant != "+", 
          Only.identified.by.site != "+", Unique.peptides >= 2)
@@ -204,7 +203,7 @@ biofilm_res <- get_results(efit = b_efit, mat = biofilm_de, p_val = 0.01, lfc = 
 
 ```
 
-```{r atcc}
+```{r atcc, warning=FALSE}
 atcc_lfq <- atcc %>% 
   filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2) %>% 
   convert_lfq(., atcc_exp)
@@ -332,7 +331,7 @@ Here is a citation [@marwick2017].
 
 # Tables
 
-```{r markerTableData}
+```{r table1Data}
 marker_comp <- list("yeast" = yeast_res %>% 
                       filter(group == "EV up" | group == "EV ex") %>% 
                       pull(CGD_gene_name), 
@@ -449,8 +448,8 @@ marker_longlist[18, 8] <- ""
 
 (ref:footnote3) [@tsirigos2015]
 
-```{r markerTable}
-tab1_cap <- "\\textbf{Candida protein biomarkers for \\textit{C. albicans} EVs.} 
+```{r table1}
+tab1_cap <- "\\textbf{Candidate positive protein markers for \\textit{C. albicans} EVs.} 
              This list of proteins consists of those that were found to be exclusive to EVs or 
              significantly enriched in EVs across the four \\textit{C. albicans} strains examined in 
              this study. Proteins are grouped according to their subcellular localisation as annotated 
@@ -461,8 +460,8 @@ tab1_cap <- "\\textbf{Candida protein biomarkers for \\textit{C. albicans} EVs.}
              column indicates the number of transmembrane domains for each protein as annotated in 
              UniProtKB. \`\`SP\" indicates whether a protein is annotated as having a signal peptide 
              according to UniProtKB. \`\`VDS\" shows whether a protein has previously been detected in 
-             vesicle-depleted culture media (i.e. it may also be present in the soluble secretome) 
-             (ref:table1). Underlined proteins are those identified as the best candidates for 
+             vesicle-depleted culture media (i.e. the proteins may also be in the soluble secretome) 
+             (ref:table1). Underlined proteins are those identified as the best candidates for positive
              EV markers according to the criteria depicted in Figure \\ref{fig:figure1}."
 
 knitr::kable(marker_longlist[ ,-10],
@@ -473,7 +472,7 @@ knitr::kable(marker_longlist[ ,-10],
              linesep = "", 
              escape = FALSE)  %>% 
   row_spec(row = c(1, 5, 6, 11, 12, 15:19, 21:27, 35, 40), underline = TRUE) %>% 
-  add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs Cell" = 4, " " = 2), escape = FALSE) %>% 
+  add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, " " = 2), escape = FALSE) %>% 
   kable_styling(font_size = 8) %>% 
   pack_rows("Plasma membrane", 1, 19) %>% 
   pack_rows("Golgi, ER, secretory pathway", 20, 25) %>% 
@@ -497,7 +496,14 @@ knitr::kable(marker_longlist[ ,-10],
 
 ```{r figure1, fig.cap=f1_cap, fig.width=5.45, fig.height=6}
 
-f1_cap <- "This is the caption for figure 1"
+f1_cap <- "\\textbf{Schematic of the workflow used for the isolation and proteomic analysis of 
+           \\textit{C. albicans} EVs and the selection of EV protein markers.} Steps 1 to 6 
+           were performed for each of the four strains examined in this study: DAY286 yeast, 
+           ATCC90028 yeast, ATCC10231 yeast, and DAY286 biofilm. 
+           The results from the four seperate analyses were combined (step 7) to identify 
+           proteins which commonly appeared as EV marker candidates. The MISEV2018 criteria 
+           for protein content-based EV characterisation and other considerations were 
+           used to select the best \\textit{C. albicans} EV marker proteins."
 
 f1 <- png::readPNG("./vignettes/figures/figure1.png")
 
@@ -620,15 +626,18 @@ ggarrange(f2a,
           ncol = 1, 
           heights = c(1,1))
 
-f2_cap <- "\\textbf{Characterisation of EVs from different \\textit{C. albicans} strains and morphologies.} 
-           \\textit{A}, Representative TEM images of EVs isolated from 4 different \\textit{C. albicans} cultures.
-           Scale bar indicates 500 nm. \\textit{B}, Size distribution of DAY286 biofilm (n = 5), DAY286 yeast (n = 3), 
+f2_cap <- "\\textbf{Characterisation and quantification of EVs from different \\textit{C. albicans} strains.} 
+           \\textit{(A)} Representative TEM images of EVs isolated from 4 different \\textit{C. albicans} cultures.
+           Scale bar indicates 0.5 $\\mu$m. \\textit{(B)} Size distribution of DAY286 biofilm (n = 5), DAY286 yeast (n = 3), 
            ATCC90028 yeast (n = 3), and ATCC10231 yeast (n = 3) EVs as measured by nanoparticle tracking analysis. 
-           Line plots shown are the average of the biological replicates and the dashed grey line indicates 100 nm.
-           \\textit{C}, Comparison of the ratio of particle concentration (particles/mL)/protein concentration 
-           ($\\mu$g/mL) across the four EV sources. Each dot represents 1 biological replicate. Sample means were 
-           compared using ANOVA followed by Tukey's HSD \\textit{post-hoc} test. P-values indicating significant 
-           differences are shown."
+           Line plots shown are the average of the biological replicates and the dashed grey line indicates 100 nm. 
+           Plots for the individual biological replicates are presented in supplemental Figure S1.
+           \\textit{(C)} Comparison of the ratio of particle concentration to protein concentration of the EV fraction, 
+           (particles/mL) $\\div$ ($\\mu$g protein/mL), across the four EV sources. 
+           Each dot represents one biological replicate. Sample means were compared using ANOVA followed by 
+           Tukey's HSD \\textit{post-hoc} test. P-values indicating significant 
+           differences are shown. The particle and protein concentrations for each biological replicate are 
+           provided in supplemental Table S1."
 
 ```
 
@@ -808,18 +817,19 @@ ggarrange(ggarrange(f3a1, f3b1, f3c1, f3d1,
           heights = c(1,2))
 
 f3_cap <- "\\textbf{Differential enrichment analysis of proteins identified in \\textit{C. albicans} 
-           EVs and whole cell lysates (WCL).} \\textit{A}, Venn diagrams comparing the EV and WCL 
-           proteomes from various \\textit{C. albicans} strains; DAY286 yeast (n = 3), DAY286 biofilm (n = 5), 
+           EVs and whole cell lysates (WCL).} \\textit{(A)} Venn diagrams comparing the EV and WCL 
+           proteomes from four \\textit{C. albicans} strains; DAY286 yeast (n = 3), DAY286 biofilm (n = 5), 
            ATCC90028 yeast (n = 3), and ATCC10231 yeast (n = 3). Whole cell lysates were prepared from the EV 
-           source cells. Proteins depicted were identified in minimum 2/3 (yeast) and 4/5 (biofilm) biological 
-           replicates of EV or WCL. \\textit{B}, Volcano plots depicting significantly enriched EV or WCL proteins. 
+           source cells. Proteins were quantified (MaxLFQ intensity) in minimum 2/3 (yeast) and 4/5 (biofilm) biological 
+           replicates of EV or WCL. \\textit{(B)} Volcano plots depicting significantly enriched EV or WCL proteins. 
            Differential enrichment was performed by comparing the mean normalised MaxLFQ intensities of proteins 
-           identified in both EV and WCL (i.e. proteins in venn overlap) using the R package 
+           identified in both EV and WCL (i.e. proteins in the venn overlap) using the Bioconductor package 
            \\textit{limma} [@cox2014; @ritchie2015]. Significantly enriched proteins were identified using a 
-           Benjamini-Hochberg adjusted p-value cutoff of 0.01. Counts of significant and 
-           non-significant proteins are indicated on each graph. Proteins with a $\\log_2{FC}$ greater than 
-           8 are labelled. Data tables underlying the venn diagrams and volcano plots are provided in 
-           supplemental Files x and y respectively."
+           Benjamini-Hochberg adjusted p-value cut off of 0.01. Counts of significant and 
+           non-significant proteins are indicated on each graph. Proteins with a 
+           log\\textsubscript{2}(FC) greater than 8 are labelled. 
+           Data tables underlying the venn diagrams and volcano plots are provided in 
+           supplemental Files Sx and Sy respectively."
 ```
 
 \newpage
@@ -1011,19 +1021,20 @@ ggarrange(ggarrange(f4a1, f4a2,
           nrow = 2, 
           heights = c(1.8,1))
 
-f4_cap = "\\textbf{Combined comparison of \\textit{C. albicans} EV proteomes.} \\textit{A}, 
+f4_cap = "\\textbf{Combined comparison of \\textit{C. albicans} EV proteomes.} \\textit{(A)} 
           Functional enrichment analyses of the significantly enriched and exclusive \\textit{C. albicans} 
-          EV proteins. The online tool FungiFun2 was used to identify enriched biological process (BP), 
+          EV proteins. The online tool FungiFun2 (elbe.hki-jena.de/fungifun) 
+          was used to identify enriched biological process (BP), 
           cellular component (CC), and molecular function (MF) GO terms [@priebe2015]. A selection of the
           most significantly enriched terms for each GO domain are shown. Full lists of enriched terms can be 
-          found in supplemental File x. \\textit{B}, Multidimensional scaling (MDS) plot of each LC-MS/MS
+          found in supplemental File Sx. \\textit{(B)} Multidimensional scaling (MDS) plot of each LC-MS/MS
           biological replicate sample shows the sources of variation in the data. Pairwise distance between 
-          samples approximately indicates the $\\log_2{FC}$ between samples. Multidimensional scaling 
-          was performed using \\texttt{plotMDS} from the R package \\textit{limma} [@ritchie2015]. 
-          \\textit{C}, Venn diagram comparing four \\textit{C. albicans} EV proteomes. Lists of proteins 
+          samples approximately indicates the log\\textsubscript{2}(FC) between samples. Multidimensional scaling 
+          was performed using \\texttt{plotMDS} from the Bioconductor package \\textit{limma} [@ritchie2015]. 
+          \\textit{(C)} Venn diagram comparing four \\textit{C. albicans} EV proteomes. Lists of proteins 
           present in the centre and right partitions of each venn diagram in Figure \\@ref(fig:figure3)A were 
           compared to identify proteins present in all four datasets. The data table underlying Figure 
-          \\@ref(fig:figure4)C is provided in supplemental File x."
+          \\@ref(fig:figure4)C is provided in supplemental File Sx."
 
 ```
 
@@ -1169,6 +1180,7 @@ f5_go6 <- process_fungifun(filename = "./vignettes/figures/f5_GO_clust6.csv")
 ```
 
 
+
 ```{r figure5, fig.cap=f5_cap, fig.height=6}
 # load f5
 f5 <- png::readPNG("./vignettes/figures/figure5.png")
@@ -1177,12 +1189,14 @@ ggplot() +
   background_image(f5) + 
   theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, unit = "inches"))
 
-f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across different \\textit{C. albicans} strains
-           and morphologies.} Heatmap of proteins (n = 405) identified in all four EV samples. Each column 
+f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across different \\textit{C. albicans} strains.} 
+           Heatmap of proteins (n = 405) identified in all four EV samples. Each column 
            represents a \\textit{C. albicans strain} and each row represents a protein group. The colours
-           indicate the $\\log_2{FC}$ of the protein for that particular strain; red is EV enriched, blue is 
+           indicate the log\\textsubscript{2}(FC) of the protein for that particular strain; red is EV enriched, blue is 
            EV depleted, and black is EV exclusive. Unsupervised clustering of rows and columns was performed 
-           using Gower's formula via the \\texttt{daisy} function from the R package \\textit{cluster} (ref).
+           using Gower's formula via the \\texttt{daisy} function from the R package \\textit{cluster} [@maechler2019].
+           Proteins which were exclusive to EVs from all four strains could not be clustered and were 
+           seperated prior to clustering, in the group designated \`\`cluster 6\".
            Functional enrichment analyses were performed on the heatmap protein clusters using the online 
            tool FungiFun2 [@priebe2015]. A selection of significantly enriched GO terms are presented in the 
            table inset along with lists of the proteins identified in each cluster."
@@ -1246,17 +1260,30 @@ ggarrange(f6a, f6b,
           nrow = 2)
 
 f6_cap <- "\\textbf{Identification of common signficantly enriched or exclusive \\textit{C. albicans} 
-           EV and WCL proteins.} Proteins identified as significantly enriched or exclusive in Figure 
-           \\@ref(fig:figure3) were compared to select those which were common to all 4 datasets. 43 
-           proteins were identified as potential positive EV protein markers and 60 
+           EV and WCL proteins.} Proteins identified as significantly enriched or exclusive to EVs
+           in Figure \\@ref(fig:figure3) were compared to select those which were common to all 
+           4 datasets. 43 proteins were identified as potential positive EV protein markers and 60 
            proteins as potential negative EV protein markers. The data tables underlying Figure 
-          \\@ref(fig:figure6) are provided in supplemental File x."
+           \\@ref(fig:figure6) are provided in supplemental File Sx. Details of the 47 positive EV
+           protein marker candidates and 60 negative candidates can be found in Table  and 
+           supplemental Table S2 respectively."
 ```
 
 
 \newpage
 
-```{r figure7, fig.cap='4tm domain', fig.width=7.2, fig.height=6}
+```{r figure7, fig.cap=f7_cap, fig.width=7.2, fig.height=6}
+
+f7_cap <- "\\textbf{Predicted topology and palmitoylation sites of \\textit{C. albicans} 
+           MCC/eisosome proteins SUR7 and orf19.6741 compared to the human tetraspanin CD81.} 
+           The presence of transmembrane (TM) domains and palmitoylation sites shown 
+           on the left side of the figure were predicted 
+           using the online tools TOPCONS2 (topcons.cbr.su.se) [@tsirigos2015] and 
+           CSS-PALM 4.0 (csspalm.biocuckoo.org) [@ren2008] respectively.
+           For CD81, palmitoylation sites experimentally determined in previous literature 
+           are shown [@delandre2009]. The right side of the figure shows a cartoon representation of the 
+           TOPCONS2 consensus topology prediction for the three proteins as well as 
+           the crystal structure of CD81 (PDB: 5TCX) [@zimmerman2016]."
 
 f7 <- png::readPNG("./vignettes/figures/figure7.png")
 
@@ -1266,7 +1293,16 @@ ggplot() +
 
 \newpage
 
-```{r figure8, fig.cap='final candidates', fig.width=3.5, fig.height=2.8}
+```{r figure8, fig.cap=f8_cap, fig.width=3.5, fig.height=2.8}
+
+f8_cap <- "\\textbf{Nineteen best potential \\textit{C. albicans} positive EV protein markers.} 
+           These proteins are those underlined in Table . They are 
+           are enriched or exclusive to EVs isolated from all of the 
+           \\textit{C. albicans} strains investigated in this study. The proteins
+           fit within the EV biomarker categories 1a, 2a, and 2b from MISEV2018 which 
+           includes transmembrane, GPI-anchored, and cytosolic proteins that are EV 
+           enriched [@thery2018]."
+
 f8 <- png::readPNG("./vignettes/figures/figure8.png")
 
 ggplot() + 

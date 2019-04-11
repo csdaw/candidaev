@@ -456,8 +456,8 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="57.588504"
-     inkscape:cy="401.04721"
+     inkscape:cx="441.86045"
+     inkscape:cy="237.21815"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -1375,7 +1375,7 @@
          id="tspan1070">EV exclusive</tspan></text>
     <g
        id="g1080"
-       transform="translate(6.858,-0.57561561)">
+       transform="translate(3.8293933,-0.57561561)">
       <rect
          y="210.41978"
          x="107.95"
@@ -1397,7 +1397,7 @@
          style="fill:none;stroke:#000000;stroke-width:0.13522466;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <g
-       transform="translate(6.8386067,-9.4318146)"
+       transform="translate(3.81,-9.4318146)"
        id="g1089">
       <rect
          style="opacity:1;fill:#e9a977;fill-opacity:1;stroke:none;stroke-width:0.28166434;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2.85732293;stroke-opacity:1"
@@ -1437,7 +1437,7 @@
     </g>
     <g
        id="g1105"
-       transform="translate(6.858,6.0959931)">
+       transform="translate(3.8293933,6.0959931)">
       <rect
          y="213.17996"
          x="107.95"
@@ -2640,6 +2640,39 @@
          x="76.252502"
          sodipodi:role="line"
          id="tspan1428">quantified in:</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0.02645833px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="115.93848"
+       y="203.57033"
+       id="text1415"><tspan
+         sodipodi:role="line"
+         id="tspan1413"
+         x="115.93848"
+         y="203.57033"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.26458332">p &lt; 0.01</tspan></text>
+    <text
+       id="text1419"
+       y="212.20633"
+       x="115.93848"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0.02645833px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.26458332"
+         y="212.20633"
+         x="115.93848"
+         id="tspan1417"
+         sodipodi:role="line">p &gt; 0.01</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0.02645833px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="115.93848"
+       y="218.81033"
+       id="text1423"><tspan
+         sodipodi:role="line"
+         id="tspan1421"
+         x="115.93848"
+         y="218.81033"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.26458332">p &lt; 0.01</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"

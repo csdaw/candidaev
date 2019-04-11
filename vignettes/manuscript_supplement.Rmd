@@ -281,13 +281,12 @@ a9_res <- atcc_ind[[2]]
 
 \beginsupplement
 
-```{r figureS1, fig.cap=fS1_cap, fig.height=4, fig.width=4}
+```{r figureS1, fig.cap=fS1_cap, fig.height=5, fig.width=5}
 
-fS1_cap <- c("This is a really, really, really, really, really, really, really, 
-              really, really, really, really, really, really, really, really, 
-              really, really, really, really, really, really, really, really, 
-              really, really, really, really, really, really, really, really, 
-              really long figure caption")
+fS1_cap <- c("\\textbf{Size distribution of \\textit{C. albicans} EVs as determined by 
+              nanoparticle tracking analysis (NTA).} A line plot for each EV biological 
+              replicate from each strain is shown. Each line plots represents the average 
+             of three technical replicates and the dashed grey lines indicate 100 nm.")
 
 figS1_labels <- c("ATCC10231", 
                   "ATCC90028", 
@@ -313,11 +312,12 @@ nta_bioavg <- nta_techavg %>%
 nta_techavg %>% 
   ggplot(aes(x = particle_size, y = Tech_rep_mean, colour = Bio_rep)) + 
   geom_line(size = 0.5) + 
+  geom_vline(xintercept = 100, colour = "#999999", linetype = "dashed") +
   facet_wrap(~ Strain, scales = "free", ncol = 2, nrow = 2, 
              labeller = labeller(Strain = figS1_labels)) + 
   theme_classic() + 
   theme(strip.background = element_blank(), 
-        legend.position = "top", 
+        legend.position = "bottom", 
         plot.margin = margin(t = 0, l = 0, r = 0, b = 0, unit = "inches")) + 
   xlab(label = "Particle size (nm)") + 
   ylab(label = "Particles / mL") + 
@@ -401,7 +401,7 @@ tabS1_labs <- c("Biological\nreplicate",
                 "OD600", 
                 "Culture\nvol. (mL)", 
                 "Protein conc.\n($\\mu$g/mL)", 
-                "Particle conc.\n(Particles/mL)", 
+                "Particle conc.\n(particles/mL)", 
                 "Mean", 
                 "Mode", 
                 "SD", 
@@ -409,7 +409,11 @@ tabS1_labs <- c("Biological\nreplicate",
                 "D50", 
                 "D90")
 
-tabS1_cap <- "This is the caption for tabS1"
+tabS1_cap <- "\\textbf{Metadata for each EV isolation analysed in this study.} 
+              The optical density (at 600 nm) and volume of each culture from which 
+              the EVs were isolated is given. The protein and particle concentration 
+              of the EVs along with the NTA size distribution results 
+              for each biological replicate are also shown."
 
 nta_total %>% 
   select(-strain) %>% 
@@ -554,6 +558,8 @@ wcl_longlist[53, 1] <- "HSP12"
 
 ```
 
+(ref:table1) [@gil-bona2015]
+
 (ref:footnote1) [@skrzypek2017]
 
 (ref:footnote2) [@almagroarmenteros2017]
@@ -562,7 +568,22 @@ wcl_longlist[53, 1] <- "HSP12"
 
 
 ```{r tableS2}
-tabs2_cap <- "This is a table caption"
+tabs2_cap <- "\\textbf{Candidate negative protein markers for \\textit{C. albicans} EVs.} 
+             This list of proteins consists of those that were found to be exclusive to 
+             whole cell lysate (WCL) or 
+             significantly enriched in WCL across the four \\textit{C. albicans} strains examined in 
+             this study. Proteins are grouped according to their subcellular localisation as annotated 
+             in the Candida Genome Database (candidagenome.org) (ref:footnote1). The log\\textsubscript{2} ratio 
+             of the abundance (mean MaxQuant LFQ intensity) of each protein in EVs compared to 
+             WCL for each strain is listed. A negative value indicates that a protein 
+             was enriched in WCL compared to EV. \`\`ex\" indicates where a protein was only 
+             identified in the WCL fraction and not in EVs for that strain. The \`\`TM\" 
+             column indicates the number of transmembrane domains for each protein as annotated in 
+             UniProtKB. \`\`SP\" indicates whether a protein is annotated as having a signal peptide 
+             according to UniProtKB. \`\`VDS\" shows whether a protein has previously been detected in 
+             vesicle-depleted culture media (i.e. the proteins may also be in the soluble secretome) 
+             (ref:table1). Underlined proteins are those identified as the best candidates for negative
+             EV markers according to the criteria depicted in Figure 1."
 
 knitr::kable(wcl_longlist[, -10], 
              caption = tabs2_cap, 
@@ -572,7 +593,7 @@ knitr::kable(wcl_longlist[, -10],
              linesep = "", 
              escape = FALSE) %>% 
   row_spec(row = c(28, 36, 41, 51, 53, 59), underline = TRUE) %>% 
-  add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs Cell" = 4, " " = 2), escape = FALSE) %>% 
+  add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, " " = 2), escape = FALSE) %>% 
   kable_styling(font_size = 8, 
                 latex_options = c("HOLD_position")) %>% 
   pack_rows("Cytoplasm", 1, 20) %>% 
@@ -586,9 +607,9 @@ knitr::kable(wcl_longlist[, -10],
   pack_rows("Translation preinitiation complex", 60, 60) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence similarity with 
                          \\\\textit{S. cerevisiae} ortholog as annotated in the Candida 
-                         Genome Database (ref:footnote1", 
+                         Genome Database (ref:footnote1)", 
                         "Protein localisation was predicted using DeepLoc-1.0 (ref:footnote2)", 
-                        "Protein localisation was predicted using BUSCA (ref:footnote3"), 
+                        "Protein localisation was predicted using BUSCA (ref:footnote3)"), 
            escape = FALSE, 
            threeparttable = TRUE)
 ```
