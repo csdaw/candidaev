@@ -86,7 +86,7 @@ ev_pal <- c("#999999", "#D55E00", "#0072B2")
 
 ```
 
-```{r yeast, warning=FALSE}
+```{r yeast}
 yeast <- yeast %>% 
   filter(Reverse != "+", Potential.contaminant != "+", 
          Only.identified.by.site != "+", Unique.peptides >= 2)
@@ -143,7 +143,7 @@ yeast_res <- get_results(efit = y_efit, mat = yeast_de, p_val = 0.01, lfc = 0, t
 
 ```
 
-```{r biofilm, warning=FALSE}
+```{r biofilm}
 biofilm <- biofilm %>% 
   filter(Reverse != "+", Potential.contaminant != "+", 
          Only.identified.by.site != "+", Unique.peptides >= 2)
@@ -203,7 +203,7 @@ biofilm_res <- get_results(efit = b_efit, mat = biofilm_de, p_val = 0.01, lfc = 
 
 ```
 
-```{r atcc, warning=FALSE}
+```{r atcc}
 atcc_lfq <- atcc %>% 
   filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2) %>% 
   convert_lfq(., atcc_exp)
