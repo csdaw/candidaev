@@ -659,16 +659,19 @@ f3a1 <- as_ggplot(f3a1) +
 
 f3a2 <- plot_volcano(data = yeast_res, 
                      p_val = adj.P.Val, 
-                     lfc = logFC,
-                     grp = group, 
-                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+                     log2fc = logFC,
+                     group = group, 
+                     label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
+                     point_size = 0.6, 
+                     label_size = 2, 
+                     x_lim = c(-10, 12), 
+                     y_lim = c(0, 8), 
+                     legend_params = c("left", 11, 8), 
+                     axis_params = c("black", 10)) + 
   scale_colour_manual(labels = c("EV enriched", "WCL enriched", "Not significant"), 
                       values = unname(ev_pal[c(2,1,3)]), 
                       breaks = c("EV up", "WCL up", "not sig"), 
                       name = element_blank()) + 
-  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
-  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
-  theme(legend.text = element_text(size = 8)) + 
   annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 Y')", parse = TRUE) + 
   annotate("text", x = 3.5, y = 7, label = "bold('80')", parse = TRUE, colour = unname(ev_pal[2])) + 
   annotate("text", x = -3.5, y = 7, label = "bold('109')", parse = TRUE, colour = unname(ev_pal[3])) + 
@@ -699,15 +702,18 @@ f3b1 <- as_ggplot(f3b1) +
 
 f3b2 <- plot_volcano(data = biofilm_res, 
                      p_val = adj.P.Val, 
-                     lfc = logFC,
-                     grp = group, 
-                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+                     log2fc = logFC,
+                     group = group, 
+                     label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
+                     point_size = 0.6, 
+                     label_size = 2, 
+                     x_lim = c(-10, 12), 
+                     y_lim = c(0, 8), 
+                     legend_params = c("left", 11, 8), 
+                     axis_params = c("black", 10)) + 
   scale_colour_manual(labels = c("EV enriched (95)", "WCL enriched (81)", "Not significant (482)"), 
                       values = unname(ev_pal[c(2,1,3)]), 
                       breaks = c("EV up", "WCL up", "not sig")) + 
-  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
-  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
-  theme(legend.text = element_text(size = 8)) + 
   annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 B')", parse = TRUE) + 
   annotate("text", x = 3.5, y = 7, label = "bold('95')", parse = TRUE, colour = unname(ev_pal[2])) + 
   annotate("text", x = -3.5, y = 7, label = "bold('81')", parse = TRUE, colour = unname(ev_pal[3])) + 
@@ -738,14 +744,17 @@ f3c1 <- as_ggplot(f3c1) +
 
 f3c2 <- plot_volcano(data = a9_res, 
                      p_val = adj.P.Val, 
-                     lfc = logFC,
-                     grp = group, 
-                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+                     log2fc = logFC,
+                     group = group, 
+                     label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
+                     point_size = 0.6, 
+                     label_size = 2, 
+                     x_lim = c(-10, 12), 
+                     y_lim = c(0, 8), 
+                     legend_params = c("left", 11, 8), 
+                     axis_params = c("black", 10)) + 
   scale_colour_manual(labels = c("EV enriched (105)", "WCL enriched (134)", "Not significant (734)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
-  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
-  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
-  theme(legend.text = element_text(size = 8)) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC90028')", parse = TRUE) + 
   annotate("text", x = 3.5, y = 7, label = "bold('105')", parse = TRUE, colour = unname(ev_pal[2])) + 
   annotate("text", x = -3.5, y = 7, label = "bold('134')", parse = TRUE, colour = unname(ev_pal[3])) + 
@@ -779,14 +788,17 @@ f3d1 <- as_ggplot(f3d1) +
 
 f3d2 <- plot_volcano(data = a1_res, 
                      p_val = adj.P.Val, 
-                     lfc = logFC,
-                     grp = group, 
-                     label = ifelse(logFC >= 8, CGD_gene_name, "")) + 
+                     log2fc = logFC,
+                     group = group, 
+                     label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
+                     point_size = 0.6, 
+                     label_size = 2, 
+                     x_lim = c(-10, 12), 
+                     y_lim = c(0, 8), 
+                     legend_params = c("left", 11, 8), 
+                     axis_params = c("black", 10)) + 
   scale_colour_manual(labels = c("EV enriched (106)", "WCL enriched (134)", "Not significant (445)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
-  scale_x_continuous(limits = c(-10,12), expand = c(0,0)) + 
-  scale_y_continuous(limits = c(0, 8), expand = c(0,0)) + 
-  theme(legend.text = element_text(size = 8)) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC10231')", parse = TRUE) + 
   annotate("text", x = 3.5, y = 7, label = "bold('106')", parse = TRUE, colour = unname(ev_pal[2])) + 
   annotate("text", x = -3.5, y = 7, label = "bold('134')", parse = TRUE, colour = unname(ev_pal[3])) + 

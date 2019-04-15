@@ -4,20 +4,32 @@
 \alias{plot_volcano}
 \title{Title}
 \usage{
-plot_volcano(data, p_val, lfc, grp, label)
+plot_volcano(data, p_val, log2fc, group, label_fun, point_size = 1,
+  label_size = 2, x_lim = c(-10, 10), y_lim = c(0, 10),
+  legend_params = c("left", 11, 10), axis_params = c("black", 10))
 }
 \arguments{
 \item{data}{Description.}
 
 \item{p_val}{Description.}
 
-\item{lfc}{Description.}
+\item{log2fc}{Description.}
 
-\item{grp}{Description.}
+\item{group}{Description.}
 
-\item{label}{Description.}
+\item{label_fun}{Description.}
 
-\item{colour}{Description.}
+\item{point_size}{Description.}
+
+\item{label_size}{Description.}
+
+\item{x_lim}{Description.}
+
+\item{y_lim}{Description.}
+
+\item{legend_params}{Description.}
+
+\item{axis_params}{Description.}
 }
 \value{
 Description.
@@ -26,6 +38,7 @@ Description.
 Description.
 }
 \examples{
-#example
+
+# example
 
 }
