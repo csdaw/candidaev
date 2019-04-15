@@ -4,19 +4,21 @@
 \alias{plot_heatmap}
 \title{Title}
 \usage{
-plot_heatmap(mt, plot = TRUE, data_type = c("log2fc", "log2intensity"),
-  clust_fun = c("gower", "euclidean", "maximum", "manhattan", "canberra",
-  "binary", "minkowski", "pearson", "spearman", "kendall"),
-  split_type = c("kmeans", "cutree"), k = 5, cluster_split = TRUE,
-  split_order = seq(1, k, 1), colour_lims = c(-8, 8),
-  use_cbrewer = FALSE, cbrewer_pal = NULL, colour_vals = c("blue",
-  "white", "red"), legend_pos = "top", row_font_size = 6,
-  col_font_size = 10, ...)
+plot_heatmap(mt, plot = TRUE, df = FALSE, data_type = c("log2fc",
+  "log2intensity"), clust_fun = c("gower", "euclidean", "maximum",
+  "manhattan", "canberra", "binary", "minkowski", "pearson", "spearman",
+  "kendall"), split_type = c("kmeans", "cutree"), k = 5,
+  cluster_split = TRUE, split_order = seq(1, k, 1),
+  colour_lims = c(-8, 8), use_cbrewer = FALSE, cbrewer_pal = NULL,
+  colour_vals = c("blue", "white", "red"), legend_pos = "top",
+  row_title_fontsize = 6, col_name_fontsize = 10, ...)
 }
 \arguments{
 \item{mt}{Description.}
 
 \item{plot}{Description.}
+
+\item{df}{Description.}
 
 \item{data_type}{Description.}
 
@@ -40,9 +42,9 @@ plot_heatmap(mt, plot = TRUE, data_type = c("log2fc", "log2intensity"),
 
 \item{legend_pos}{Description.}
 
-\item{row_font_size}{Description.}
+\item{row_title_fontsize}{Description.}
 
-\item{col_font_size}{Description.}
+\item{col_name_fontsize}{Description.}
 
 \item{...}{Description.}
 }

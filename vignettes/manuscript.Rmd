@@ -75,6 +75,7 @@ library(candidaev)
 library(ggpubr)
 library(UpSetR)
 library(kableExtra)
+
 set.seed(1)
 
 # define colour palette to distinguish between the 3 Candida strains and 
@@ -1075,44 +1076,32 @@ f5_table_excl <- f5_table %>%
   tibble::column_to_rownames(var = "CGD_gene_name") %>% 
   as.matrix()
 
-# cluster rows
-f5_hr <- hclust(clust_dist(f5_table_filt))
-
-# define row clusters
-f5_cutree <- cutree(f5_hr, h = max(f5_hr$height/1.5))
-
-# get cluster ID data for heatmap splitting
-f5_split <- f5_cutree %>% 
-  as.factor() %>% 
-  relevel("5")
-
-# ComplexHeatmap legend colours
-col_fun <- circlize::colorRamp2(c(-4,0,4), c("blue", "white", "red"))
-
-# heatmap
-f5_htmp <- ComplexHeatmap::Heatmap(f5_table_filt, 
-                                    cluster_rows = TRUE,
-                                    cluster_columns = TRUE,
-                                    clustering_distance_rows = clust_dist, 
-                                    clustering_distance_columns = clust_dist, 
-                                    na_col = "black", 
-                                    col = col_fun, 
-                                    show_row_names = FALSE, 
-                                    heatmap_legend_param = list(title = expression(bold(log[2]("FC"))), 
-                                                                direction = "horizontal", 
-                                                                legend_width = unit(2, "cm"), 
-                                                                title_position = "lefttop", 
-                                                                title_gp = grid::gpar(colour = "black", fontsize = 5), 
-                                                                labels_gp = grid::gpar(colour = "black", fontsize = 5), 
-                                                                at = c(-6, -4, -2, 0, 2, 4, 6)), 
-                                    column_labels = c("ATCC90028", "ATCC10231", "DAY286 Y", "DAY286 B"),
-                                    column_names_gp = grid::gpar(colour = "black", fontsize = 6), 
-                                    column_names_rot = 45, 
-                                    row_title = c("1", "2", "3", "4", "5"),
-                                    row_title_gp = grid::gpar(colour = "black", fontsize = 6), 
-                                    row_title_rot = 0,
-                                    cluster_row_slices = FALSE, 
-                                    row_split = f5_split)
+# plot heatmap
+f5_htmp <- plot_heatmap(mt = f5_table_filt, 
+                        plot = FALSE,
+                        df = FALSE, 
+                        data_type = "log2fc", 
+                        clust_fun = "gower", 
+                        split_type = "cutree", 
+                        k = 5, 
+                        cluster_split = FALSE, 
+                        split_order = c(5, 1, 2, 3, 4), 
+                        colour_lims = c(-4, 4),
+                        column_labels = c("ATCC90028", "ATCC10231", "DAY286 Y", "DAY286 B"), 
+                        col_name_fontsize = 6, 
+                        column_names_rot = 45, 
+                        row_title_fontsize = 6, 
+                        row_title_rot = 0, 
+                        row_title = c("1", "2", "3", "4", "5"), 
+                        heatmap_legend_param = list(title = expression(bold(log[2]("FC"))), 
+                                                    direction = "horizontal", 
+                                                    legend_width = unit(2, "cm"), 
+                                                    title_position = "lefttop", 
+                                                    title_gp = grid::gpar(colour = "black", 
+                                                                          fontsize = 5), 
+                                                    labels_gp = grid::gpar(colour = "black", 
+                                                                           fontsize = 5), 
+                                                    at = seq(-6, 6, 2)))
 
 # save heatmap as pdf file for editing in inkscape
 # not run in rmarkdown but manually in console
@@ -1190,7 +1179,8 @@ ggplot() +
   theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, unit = "inches"))
 
 f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across different \\textit{C. albicans} strains.} 
-           Heatmap of proteins (n = 405) identified in all four EV samples. Each column 
+           Heatmap of proteins (n = 405) identified in all four EV samples (venn overlap in Figure \\@ref(fig:figure4)C. 
+           Each column 
            represents a \\textit{C. albicans strain} and each row represents a protein group. The colours
            indicate the log\\textsubscript{2}(FC) of the protein for that particular strain; red is EV enriched, blue is 
            EV depleted, and black is EV exclusive. Unsupervised clustering of rows and columns was performed 

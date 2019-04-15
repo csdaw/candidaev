@@ -4,6 +4,7 @@
 #'
 #' @param mt Description.
 #' @param plot Description.
+#' @param df Description.
 #' @param data_type Description.
 #' @param clust_fun Description.
 #' @param split_type Description.
@@ -15,8 +16,8 @@
 #' @param cbrewer_pal Description.
 #' @param colour_vals Description.
 #' @param legend_pos Description.
-#' @param row_font_size Description.
-#' @param col_font_size Description.
+#' @param row_title_fontsize Description.
+#' @param col_name_fontsize Description.
 #' @param ... Description.
 #'
 #' @return Description.
@@ -28,6 +29,7 @@
 #' @export
 plot_heatmap <- function(mt,
                          plot = TRUE,
+                         df = FALSE,
                          data_type = c("log2fc", "log2intensity"),
                          clust_fun = c("gower", "euclidean", "maximum", "manhattan",
                                        "canberra", "binary", "minkowski", "pearson",
@@ -41,8 +43,8 @@ plot_heatmap <- function(mt,
                          cbrewer_pal = NULL,
                          colour_vals = c("blue", "white", "red"),
                          legend_pos = "top",
-                         row_font_size = 6,
-                         col_font_size = 10,
+                         row_title_fontsize = 6,
+                         col_name_fontsize = 10,
                          ...) {
 
   # centre values depending on data type
@@ -129,29 +131,34 @@ plot_heatmap <- function(mt,
                                   show_row_names = FALSE,
                                   split = htmp_split,
                                   cluster_row_slices = cluster_split,
-                                  row_names_gp = grid::gpar(fontsize = row_font_size),
-                                  column_names_gp = grid::gpar(fontsize = col_font_size),
+                                  row_title_gp = grid::gpar(fontsize = row_title_fontsize),
+                                  column_names_gp = grid::gpar(fontsize = col_name_fontsize),
                                   ...)
 
   if(plot) {
     # draw the heatmap
     ComplexHeatmap::draw(htmp, heatmap_legend_side = legend_pos)
   } else {
-    # return data table
-    result <- mt2[, unlist(ComplexHeatmap::column_order(htmp))]
+    if(df == TRUE) {
+      # return data table
+      result <- mt2[, unlist(ComplexHeatmap::column_order(htmp))]
 
-    if(split_type == "kmeans") {
-      result <- cbind(result, cluster = row_kmeans$cluster)
-    } else if(split_type == "cutree") {
-      result <- cbind(result, cluster = row_cutree)
+      if(split_type == "kmeans") {
+        result <- cbind(result, cluster = row_kmeans$cluster)
+      } else if(split_type == "cutree") {
+        result <- cbind(result, cluster = row_cutree)
+      }
+
+      result <- result[unlist(ComplexHeatmap::row_order(htmp)), ] %>%
+        as.data.frame() %>%
+        tibble::rownames_to_column(var = "id") %>%
+        mutate(order = row_number())
+
+      return(result)
+    } else if(df == FALSE) {
+      # return the heatmap but do not plot it
+      return(htmp)
     }
-
-    result <- result[unlist(ComplexHeatmap::row_order(htmp)), ] %>%
-      as.data.frame() %>%
-      tibble::rownames_to_column(var = "id") %>%
-      mutate(order = row_number())
-
-    return(result)
 
   }
 
