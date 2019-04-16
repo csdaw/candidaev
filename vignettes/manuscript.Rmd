@@ -364,9 +364,9 @@ marker_longlist <- marker_candidates %>%
          TM = match_id(Name, uniprot, "CGD_gene_name", "Transmembrane"), 
          SP = match_id(Name, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
-            .funs = list(~ signif(as.numeric(.), digits = 3))) %>% 
+            .funs = list(~ sprintf(as.numeric(.), fmt = "%#.2f"))) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
-            .funs = list(~ case_when(is.na(.) == TRUE ~ "ex", 
+            .funs = list(~ case_when(. == "NA" ~ "ex", 
                                      TRUE ~ as.character(.)))) %>% 
   mutate(TM = stringr::str_count(TM, "Helical"), 
          SP = case_when(grepl("SIGNAL", SP) ~ "Y", 
