@@ -60,7 +60,7 @@ plot_volcano <- function(data, p_val, log2fc, group, label_fun,
     scale_x_continuous(limits = x_lim, expand = c(0,0)) +
     xlab(expression(log[2]("FC"))) +
     scale_y_continuous(limits = y_lim, expand = c(0,0)) +
-    ylab(expression(-log[10]("Adj. p-value")))
+    ylab(expression(-log[10]("adj. p-val")))
 
   # return plot
   p
