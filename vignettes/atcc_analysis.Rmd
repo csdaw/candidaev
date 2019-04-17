@@ -48,8 +48,28 @@ knitr::opts_chunk$set(collapse = TRUE,
 ```
 
 
-```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+# Preface
 
+## Introduction
+
+Xxx.
+
+The raw proteinGroups.txt file on which these analyses are based can be accessed 
+[here](). 
+
+## Experimental design
+Strain used:
+
+
+
+# Data analysis
+    
+## Setup
+
+The packages required for knitting this document are loaded and a specific seed 
+is set for the steps requiring random number generation (imputation and clustering).
+
+```{r setup, echo=TRUE, warning=FALSE, message=FALSE}
 # load packages
 library(candidaev)
 library(dplyr)
@@ -58,44 +78,37 @@ library(ggpubr)
 library(limma)
 library(UpSetR)
 
-# set seed for imputation and kmeans
+# set seed for imputation, kmeans, MDS plot
 set.seed(1)
 ```
 
-# Preface
+The _C. albicans_ ATCC LC-MS/MS data set is provided as a data.frame in the 
+`candidaev` package. 
+It has `r nrow(atcc)` rows each of which corresponds to a single protein 
+group[^1], and `r ncol(atcc)` columns. 
+A key describing most of these columns can be found in the 
+[MaxQuant documentation](http://www.coxdocs.org/doku.php?id=maxquant:table:proteingrouptable). 
 
-## Introduction
+[^1]: Each protein group comprises the group of proteins that could be reconstructed 
+from a set of peptides by MaxQuant. In most cases this will be a single protein but 
+sometimes there will be two or more proteins that could not be distinguished by the 
+set of peptides.
 
-Aim is to determine whether identified potential biomarkers work in other 
-*C. albicans* strains.
+```{r atccColumns, echo=TRUE, collapse=FALSE}
+colnames(atcc)
+```
 
-## Experimental design
-Strain used:
-
-<div id="left">
-- ATCC10231
-- zzzzzz
-</div>
-
-<div id="right">
-- ATCC90028
-- zzzzzzz
-</div>
-
-# Data analysis
-    
-## Prepare data
-
-The untouched proteinGroups.txt file has `r nrow(atcc)` rows and `r ncol(atcc)`  columns.
-
-Each of the `r nrow(atcc)` rows corresponds to a single protein group. 
+## Data preparation
 
 ```{r atccInit}
+# filter out reverse, contaminant proteins, and proteins with <2 unique peptides
+# extract LFQ intensity columns and UniProt accessions 
+# log2 transform LFQ intensities
 atcc_lfq <- atcc %>% 
   filter(Reverse != "+", Potential.contaminant != "+", Unique.peptides >= 2) %>% 
   convert_lfq(., atcc_exp)
-
 ```
+
 
 First, filter any reverse and contaminant proteins. 
 Then select only proteins identified by at least 2 unique peptides.
@@ -131,7 +144,7 @@ knitr::kable(summarise_lfq(atcc_lfq),
              digits = 1)
 ```
 
-### Filter data
+## Protein filtering (replicate quantification)
 
 Filter for proteins identified in 2/3 reps of at least 1 condition.
 
@@ -168,6 +181,8 @@ ggarrange(ggarrange(a2a, a2b, labels = c("A", "B"), ncol = 1, nrow = 2,
 
 Reduces `r nrow(atcc_lfq)` proteins to `r nrow(atcc_filt)`.
 
+## LFQ intensity normalisation
+
 Text.
 
 ```{r atccNorm}
@@ -192,6 +207,8 @@ ggarrange(a3a,
           font.label = list(size = 24, color = "black"))
 
 ```
+
+## ATCC strain protein comparison
 
 Text.
 
@@ -265,6 +282,8 @@ knitr::kable(atcc9_top10,
   
 ```
 
+## Imputation of missing values
+
 TEXT. 
 
 ```{r atccSum}
@@ -331,6 +350,8 @@ plot_imputation2(atcc_exp, atcc_both, atcc_imp) #a6
 
 TEXT.
 
+## Differential enrichment analysis with _limma_
+
 ```{r atccDE}
 # recombine imputed proteins and non-imputed proteins in matrix
 atcc_de <- rbind(atcc_excl, atcc_imp)
@@ -371,6 +392,8 @@ aw_res <- atcc_ind[[4]]
 
 # Results
 
+## Volcano plot
+
 TEXT.
 
 ```{r atccVolcanoData}
@@ -385,6 +408,7 @@ TEXT.
 
 ```
 
+## Heatmap
 
 TEXT.
 
@@ -462,6 +486,7 @@ plot_heatmap(atcc_htmp2,
              )
 ```
 
+## Full results table
 
 TEXT.
 
@@ -495,6 +520,8 @@ knitr::kable(marker_comp_tab2,
 
 
 ```
+
+## Potential marker proteins
 
 TEXT.
 
