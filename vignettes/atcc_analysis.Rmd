@@ -1,44 +1,75 @@
 ---
-title: "Analysis"
-author: "Charlotte Dawson"
-date: "2018-01-20"
+title: "Vignette title"
+author: 
+- name: Charlotte Dawson
+  affiliation: Department of Biochemistry and Genetics, 
+               La Trobe Institute of Molecular Science, 
+               La Trobe University, Australia
+- name: Mark Bleackley
+  affiliation: Department of Biochemistry and Genetics, 
+               La Trobe Institute of Molecular Science, 
+               La Trobe University, Australia
+- name: Donovan Garcia Ceron
+  affiliation: Department of Biochemistry and Genetics, 
+               La Trobe Institute of Molecular Science, 
+               La Trobe University, Australia
+- name: Marilyn Anderson
+  affiliation: Department of Biochemistry and Genetics, 
+               La Trobe Institute of Molecular Science, 
+               La Trobe University, Australia
+date: '`r format(Sys.Date(), "%d %B %Y")`'
 output:
-  bookdown::html_document2:
+  BiocStyle::html_document:
     toc: true
-    toc_float: true
     df_print: kable
+package: candidaev
+abstract: | 
+  This is the abstract.
 vignette: > 
   %\VignetteIndexEntry{Vignette title}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-```{r setup, echo=FALSE, message=FALSE}
+
+```{r knit_options, include=FALSE}
+
+# knit options
+knitr::opts_knit$set(progress = TRUE, 
+                     verbose = TRUE)
+
+# chunk options
 knitr::opts_chunk$set(collapse = TRUE,
                       warning = FALSE,
                       message = FALSE,
                       echo = FALSE,
+                      error = TRUE, 
                       comment = "#>")
-# use fig.path="../vignettes/figures" to save generated figures
-library(limma)
+```
+
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+
+# load packages
+library(candidaev)
 library(dplyr)
 library(ggplot2)
-library(candidaev)
 library(ggpubr)
+library(limma)
 library(UpSetR)
 
+# set seed for imputation and kmeans
 set.seed(1)
 ```
 
-# Introduction
+# Preface
 
-# Different strains test
 ## Introduction
 
 Aim is to determine whether identified potential biomarkers work in other 
 *C. albicans* strains.
 
-## Experimental design info
+## Experimental design
 Strain used:
 
 <div id="left">
@@ -51,9 +82,9 @@ Strain used:
 - zzzzzzz
 </div>
 
-## Analysis
+# Data analysis
     
-### Prepare data
+## Prepare data
 
 The untouched proteinGroups.txt file has `r nrow(atcc)` rows and `r ncol(atcc)`  columns.
 
@@ -118,7 +149,12 @@ a2a <- plot_frequency2(atcc_filt)
 a2b <- plot_numbers2(atcc_filt, atcc_exp) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
-a2c <- plot_mds(atcc_filt)
+a2c_labels <- c(rep("EV", 3), 
+                rep("WCL", 3), 
+                rep("EV", 3), 
+                rep("WCL", 3))
+
+a2c <- plot_mds(atcc_filt, mat_labels = a2c_labels)
 
 ggarrange(ggarrange(a2a, a2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
                     font.label = list(size = 24, color = "black")), 
@@ -139,7 +175,12 @@ atcc_norm <- normalizeCyclicLoess(atcc_filt)
 
 a3a <- plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
 
-a3b <- plot_mds(atcc_norm)
+a3b_labels <- c(rep("EV", 3), 
+                rep("WCL", 3), 
+                rep("EV", 3), 
+                rep("WCL", 3))
+
+a3b <- plot_mds(atcc_norm, mat_labels = a3b_labels)
 
 a3c <- plot_dendro(atcc_norm)
 
@@ -328,59 +369,99 @@ aw_res <- atcc_ind[[4]]
 
 ```
 
+# Results
 
 TEXT.
 
-```{r atccVolcano}
+```{r atccVolcanoData}
 
-a7a <- plot_volcano(data = a1_res, 
-                    p_val = adj.P.Val, 
-                    lfc = logFC,
-                    grp = group, 
-                    colour = c("orange", "purple"), 
-                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
 
-a7b <- plot_volcano(data = a9_res, 
-                    p_val = adj.P.Val, 
-                    lfc = logFC,
-                    grp = group, 
-                    colour = c("red", "blue"), 
-                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
 
-a7c <- plot_volcano(data = aev_res, 
-                    p_val = adj.P.Val, 
-                    lfc = logFC,
-                    grp = group, 
-                    colour = c("orange", "red"), 
-                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
-
-a7d <- plot_volcano(data = aw_res, 
-                    p_val = adj.P.Val, 
-                    lfc = logFC,
-                    grp = group, 
-                    colour = c("purple", "blue"), 
-                    label = ifelse(logFC >= 6, CGD_gene_name, ""))
-
-ggarrange(a7a, a7c,
-          a7b, a7d,
-          labels = c("A", "C", "B", "D"), 
-          ncol = 2, 
-          nrow = 2)
 
 ```
+
+```{r atccVolcano}
+
+
+```
+
 
 TEXT.
 
 ```{r atccHeatmap}
-atcc_htmp <- atcc_overall %>% 
+
+# atcc_htmp <- atcc_overall %>% 
+#   select(1, 4:15, 24) %>% 
+#   filter(significant == TRUE) %>% 
+#   tibble::column_to_rownames(var = "UP_accession") %>% 
+#   as.matrix()
+# 
+# plot_heatmap2(atcc_htmp, atcc_exp, uniprot, kmeans = TRUE, k = 5, clustering_distance = "euclidean", show_row_names = FALSE)
+
+atcc_htmp3 <- atcc_overall %>% 
   select(1, 4:15, 24) %>% 
+  filter(significant == TRUE) %>% 
   tibble::column_to_rownames(var = "UP_accession") %>% 
+  select(-significant) %>% 
   as.matrix()
 
-plot_heatmap2(atcc_htmp, atcc_exp, uniprot, kmeans = TRUE, k = 5, clustering_distance = "euclidean", show_row_names = FALSE)
-
+plot_heatmap(atcc_htmp3, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "euclidean", 
+             split_type = "cutree", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = FALSE, 
+             split_order = c(1,2,5,4,3), 
+             heatmap_legend_param = list(title = "legend title", 
+                                         color_bar = "continuous", 
+                                         direction = "vertical", 
+                                         legend_width = unit(5, "cm"), 
+                                         title_position = "lefttop-rot", 
+                                         title_gp = grid::gpar(colour = "black", fontsize = 8), 
+                                         labels_gp = grid::gpar(colour = "black", fontsize = 8), 
+                                         at = seq(-10, 10, 2)))
 
 ```
+
+TEXT.
+
+```{r atccHeatmap2}
+
+# atcc_htmp2 <- atcc_overall %>% 
+#   select(1, matches("EV.vs.*W")) %>% 
+#   filter_at(.vars = vars(contains("vs")),
+#             all_vars(!is.na(.))) %>%
+#   tibble::column_to_rownames(var = "UP_accession") %>% 
+#   as.matrix()
+
+atcc_htmp2 <- atcc_overall %>% 
+  select(1, matches("EV.vs.*W"), 24) %>% 
+  filter(significant == TRUE) %>% 
+  tibble::column_to_rownames(var = "UP_accession") %>% 
+  select(-significant) %>% 
+  as.matrix()
+
+plot_heatmap(atcc_htmp2, 
+             plot = TRUE,
+             data_type = "log2fc", 
+             clust_fun = "euclidean", 
+             split_type = "kmeans", 
+             k = 5, 
+             legend_pos = "right", 
+             split_order = c(2, 5, 1, 4, 3), 
+             heatmap_legend_param = list(title = expression(bold(log[2]("FC"))), 
+                                         color_bar = "continuous", 
+                                         direction = "vertical", 
+                                         legend_width = unit(5, "cm"), 
+                                         title_position = "lefttop-rot", 
+                                         title_gp = grid::gpar(colour = "black", fontsize = 8), 
+                                         labels_gp = grid::gpar(colour = "black", fontsize = 8), 
+                                         at = seq(-10, 10, 2))
+             )
+```
+
 
 TEXT.
 
