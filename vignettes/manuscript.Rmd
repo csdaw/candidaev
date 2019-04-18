@@ -551,11 +551,6 @@ nta_total <- nta_techavg %>%
 
 nta_total_tukey <- aov(part_per_prot ~ Strain, data = nta_total) %>% 
   tukey_hsd()
-
-nta_total_dunns <- dunns_test(x = nta_total$Particle_count, 
-                              g = nta_total$Strain, 
-                              method = "bh")
-
 ```
 
 
@@ -584,29 +579,17 @@ f2b <- nta_bioavg %>%
   xlab(label = "Particle size (nm)") + 
   ylab(label = "Particles / mL")
 
-f2c1 <- nta_total %>% 
-  ggboxplot(x = "Strain", y = "Particle_count", 
-            color = "Strain", palette = "jco", add = "jitter")
-f2c1 <- ggpar(f2c1, 
-              yscale = "log10", 
-              format.scale = TRUE,
-              ylim = c(1e11, 1e13)) + 
-  stat_pvalue_manual(nta_total_dunns[c(1,2), ], 
-                     label = "p.adj", 
-                     y.position = c(12.4, 13), 
-                     tip.length = 4e-3)
-
-f2c2 <- nta_total %>% 
+f2c <- nta_total %>% 
   ggboxplot(x = "Strain", y = "part_per_prot", 
             color = "Strain", palette = rev(unname(st_pal)), add = "jitter", 
             shape = 15,
             ylab = expression("Particles /"~paste(mu,g)~"protein"))
-f2c2 <- ggpar(f2c2, 
-              yscale = "log10", 
-              format.scale = TRUE, 
-              ylim = c(8e8, 8e10),
-              font.y = 10, 
-              legend = "none") + 
+f2c <- ggpar(f2c, 
+             yscale = "log10", 
+             format.scale = TRUE, 
+             ylim = c(8e8, 8e10),
+             font.y = 10, 
+             legend = "none") + 
   stat_pvalue_manual(nta_total_tukey[c(2,4,6), ], label = "p.adj", 
                      y.position = c(10.7, 10.5, 10.85), 
                      tip.length = 1e-2, 
@@ -621,7 +604,7 @@ f2c2 <- ggpar(f2c2,
 ```{r figure2, fig.cap=f2_cap, fig.width=7.1, fig.height=4}
 
 ggarrange(f2a, 
-          ggarrange(f2b, f2c2, 
+          ggarrange(f2b, f2c, 
                     labels = c("B", "C"), 
                     ncol = 2,
                     nrow = 1, 
