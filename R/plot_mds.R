@@ -11,8 +11,12 @@
 #'
 #' @export
 #'
-plot_mds <- function(mat, mat_labels, shape_size = 2) {
-  mds <- limma::plotMDS(mat, top = 500, gene.selection = "common", plot = FALSE)
+plot_mds <- function(mat, mat_labels, shape_size = 2, ...) {
+  mds <- limma::plotMDS(mat,
+                        top = 500,
+                        gene.selection = "common",
+                        plot = FALSE,
+                        ...)
 
   coord <- data.frame(dim1 = mds[["x"]],
                       dim2 = mds[["y"]]) %>%
@@ -21,7 +25,5 @@ plot_mds <- function(mat, mat_labels, shape_size = 2) {
            label = mat_labels)
 
   ggplot(coord, aes(x = dim1, y = dim2)) +
-    geom_point(aes(fill = sample, shape = label), size = shape_size, colour = "black") +
-    xlab(label = "Dimension 1") +
-    ylab(label = "Dimension 2")
+    geom_point(aes(fill = sample, shape = label), size = shape_size, colour = "black")
 }

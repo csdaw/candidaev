@@ -25,7 +25,7 @@ plot_go_bar <- function(go_table, terms_list, col_pal) {
     theme(legend.justification = c(1,0),
           legend.position = "top",
           axis.text.x = element_text(size = 8),
-          axis.text.y = element_text(size = 6, colour = "black"),
+          axis.text.y = element_text(size = 7, colour = "black"),
           panel.grid.major.x = element_line(size = 0.2, colour = "black")) +
     scale_fill_manual(values = col_pal) +
     coord_flip()
