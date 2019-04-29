@@ -455,9 +455,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="247.15941"
-     inkscape:cy="411.27064"
+     inkscape:zoom="5.6"
+     inkscape:cx="48.539506"
+     inkscape:cy="471.05641"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -1034,7 +1034,7 @@
          id="tspan825"
          x="12.704651"
          y="173.38362"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.17499995px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.26458332">ATCC90028</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.17499995px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.26458332">ATCC10231</tspan></text>
     <text
        id="text831"
        y="169.82762"
@@ -1045,7 +1045,7 @@
          y="169.82762"
          x="12.704651"
          id="tspan829"
-         sodipodi:role="line">ATCC10231</tspan></text>
+         sodipodi:role="line">ATCC90028</tspan></text>
     <text
        id="text3125"
        y="173.38362"
@@ -1862,7 +1862,7 @@
          x="29.545687"
          y="265.31992"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:end;text-anchor:end;stroke-width:0.26458332"
-         id="tspan7303">ATCC10231</tspan></text>
+         id="tspan7303">ATCC90028</tspan></text>
     <text
        id="text7311"
        y="265.31992"
@@ -1873,7 +1873,7 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:end;text-anchor:end;stroke-width:0.26458332"
          y="265.31992"
          x="48.595688"
-         sodipodi:role="line">ATCC90028</tspan></text>
+         sodipodi:role="line">ATCC10231</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0.02645833px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
