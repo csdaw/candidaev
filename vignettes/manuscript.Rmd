@@ -172,7 +172,7 @@ biofilm_lfq <- biofilm %>%
          Unique.peptides >= 2) %>% 
   convert_lfq(., biofilm_exp)
 
-# filter for proteins identified in min 4/5 reps of EV or WCL
+# filter for proteins quantified in min 4/5 reps of EV or WCL
 biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=", 
                            pat1 = "EV", val1 = 1, 
                            pat2 = "W", val2 = 1)
@@ -242,7 +242,7 @@ atcc_lfq <- atcc %>%
          Unique.peptides >= 2) %>% 
   convert_lfq(., atcc_exp)
 
-# filter for proteins identified in min 2/3 reps of: 
+# filter for proteins quantified in min 2/3 reps of: 
 # A1 EV or A1 WCL or A9 EV or A9 WCL
 atcc_filt <- filter_na4(atcc_lfq, "or", "<=", 
                         pat1 = "A10231_EV", 1, 
