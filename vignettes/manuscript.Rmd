@@ -405,9 +405,9 @@ marker_candidates <- marker_comp_tab %>%
 marker_longlist <- marker_candidates %>% 
   mutate(Function = match_id(Name, uniprot, "CGD_gene_name", "Protein_name"),
          DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", str_split = FALSE), 
          A9 = match_id(Name, a9_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", str_split = FALSE), 
          TM = match_id(Name, uniprot, "CGD_gene_name", "Transmembrane"), 
          SP = match_id(Name, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 

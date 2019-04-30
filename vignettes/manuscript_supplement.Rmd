@@ -349,11 +349,10 @@ nta_techavg <- nta %>%
            name = "Tech_rep", 
            param_var = True_count)
 
-nta_bioavg <- nta_techavg %>% 
-  nanolyze(particle_size, Strain,
-           name = "Bio_rep", 
-           param_var = Tech_rep_mean) %>% 
-  mutate(facet = case_when(Strain == "Biofilm" ~ "first", TRUE ~ "second"))
+nta_techavg$Strain <- factor(nta_techavg$Strain, levels = c("DAY286",
+                                                            "ATCC90028", 
+                                                            "ATCC10231", 
+                                                            "Biofilm"))
 
 nta_techavg %>% 
   ggplot(aes(x = particle_size, y = Tech_rep_mean, colour = Bio_rep)) + 
@@ -368,8 +367,6 @@ nta_techavg %>%
   xlab(label = "Particle size (nm)") + 
   ylab(label = "Particles / mL") + 
   labs(colour = "Biological replicate")
-
-
 ```
 
 \newpage
@@ -427,7 +424,8 @@ nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3",
                            d90 = c(393.0, 354, 354.4, 
                                    301.4, 381.1, 285.8, 
                                    151.5, 239.7, 240.8, 210.2, 171.2, 
-                                   320.4, 308.0, 290.9), 
+                                   320.4, 308.0, 290.9),
+                           sort_order = c(rep(3, 3), rep(2, 3), rep(4, 5), rep(1, 3)), 
                            stringsAsFactors = FALSE)
 
 nta_total <- nta_techavg %>% 
@@ -435,6 +433,7 @@ nta_total <- nta_techavg %>%
             param_var = Tech_rep_mean) %>% 
   tidyr::unite("id", Strain, Bio_rep) %>% 
   inner_join(., nta_metadata, by = "id") %>% 
+  arrange(sort_order) %>% 
   select(strain, replicate, OD600, culture_vol, protein_yield, protein_conc, 
          Particle_count, mean, mode, sd) %>% 
   mutate(OD600 = case_when(is.na(OD600) == TRUE ~ "NA", 
@@ -476,10 +475,10 @@ nta_total %>%
   kable_styling(latex_options = c("scale_down", 
                                   "HOLD_position")) %>% 
   add_header_above(c(" " = 6, "Particle diameter (nm)" = 3)) %>% 
-  pack_rows("ATCC10231", 1, 3) %>% 
+  pack_rows("DAY286 yeast", 1, 3) %>% 
   pack_rows("ATCC90028", 4, 6) %>% 
-  pack_rows("DAY286 biofilm", 7, 11) %>% 
-  pack_rows("DAY286 yeast", 12, 14)
+  pack_rows("ATCC10231", 7, 9) %>% 
+  pack_rows("DAY286 biofilm", 10, 14)
 ```
 
 \newpage
@@ -510,9 +509,9 @@ wcl_candidates <- wcl_comp_tab %>%
 wcl_longlist <- wcl_candidates %>% 
   mutate(Function = match_id(Name, uniprot, "CGD_gene_name", "Protein_name", concat = TRUE, str_split = FALSE),
          DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
-         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
-         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
          A9 = match_id(Name, a9_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
+         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
+         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
          TM = match_id(Name, uniprot, "CGD_gene_name", "Transmembrane"), 
          SP = match_id(Name, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
