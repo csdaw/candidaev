@@ -238,7 +238,6 @@ biofilm_res <- get_results(efit = b_efit,
 atcc_lfq <- atcc %>% 
   filter(Reverse != "+", 
          Potential.contaminant != "+", 
-         Only.identified.by.site != "+",
          Unique.peptides >= 2) %>% 
   convert_lfq(., atcc_exp)
 
@@ -1390,7 +1389,7 @@ f7_cap <- "\\textbf{Identification of common signficantly enriched or exclusive 
 ```{r figure8, fig.cap=f8_cap, fig.width=3.5, fig.height=2.8}
 
 f8_cap <- "\\textbf{Eighteen best potential \\textit{C. albicans} positive EV protein markers.} 
-           These proteins are those underlined in Table . They are 
+           These proteins are those underlined in Table \\@ref(tab:table1). They are 
            are enriched or exclusive to EVs isolated from all of the 
            \\textit{C. albicans} strains investigated in this study. The proteins
            fit within the EV biomarker categories 1a, 2a, and 2b from MISEV2018 which 

@@ -42,7 +42,7 @@
 #'
 #' @importFrom grDevices dev.off png tiff
 #' @export
-plot_venn <- function(vlist, use_uniprot = FALSE, type = c("list", "plot", "output"),
+plot_venn <- function(vlist, use_uniprot = FALSE, type = c("list", "plot", "save"),
                       output = c("tiff", "png"), output_file = NULL, output_dim = c(1000, 1000),
                       output_res = 300, output_units = "px",
                       output_pts = 14, ...) {

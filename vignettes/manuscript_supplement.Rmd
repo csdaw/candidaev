@@ -364,7 +364,7 @@ nta_techavg %>%
   theme_classic() + 
   theme(strip.background = element_blank(), 
         legend.position = "bottom", 
-        plot.margin = margin(t = 0, l = 0, r = 0, b = 0, unit = "inches")) + 
+        plot.margin = margin(t = 0, l = 0, r = 0.1, b = 0, unit = "inches")) + 
   xlab(label = "Particle size (nm)") + 
   ylab(label = "Particles / mL") + 
   labs(colour = "Biological replicate")
@@ -392,6 +392,10 @@ nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3",
                                            rep(150, 3), 
                                            rep(1000, 5), 
                                            rep(300, 3)), 
+                           protein_yield = c(19.2, 28.2, 28.7, 
+                                             42.4, 71.6, 58.4, 
+                                             20.4, 19.8, 29.7, 19.3, 41.6, 
+                                             21.9, 18.0, 22.4), 
                            protein_conc = c(0.192, 0.282, 0.287, 
                                             0.424, 0.716, 0.584, 
                                             0.204, 0.198, 0.297, 0.193, 0.416, 
@@ -431,8 +435,8 @@ nta_total <- nta_techavg %>%
             param_var = Tech_rep_mean) %>% 
   tidyr::unite("id", Strain, Bio_rep) %>% 
   inner_join(., nta_metadata, by = "id") %>% 
-  select(strain, replicate, OD600, culture_vol, protein_conc, 
-         Particle_count, mean, mode, sd, d10, d50, d90) %>% 
+  select(strain, replicate, OD600, culture_vol, protein_yield, protein_conc, 
+         Particle_count, mean, mode, sd) %>% 
   mutate(OD600 = case_when(is.na(OD600) == TRUE ~ "NA", 
                            TRUE ~ as.character(OD600)), 
          Particle_count = signif(Particle_count, digits = 3))
@@ -445,15 +449,13 @@ nta_total <- nta_techavg %>%
 
 tabS1_labs <- c("Biological\nreplicate", 
                 "OD600", 
-                "Culture\nvol. (mL)", 
+                "Culture vol.\n(mL)", 
+                "Protein yield\n($\\mu$g)", 
                 "Protein conc.\n($\\mu$g/mL)", 
                 "Particle conc.\n(particles/mL)", 
                 "Mean", 
                 "Mode", 
-                "SD", 
-                "D10", 
-                "D50", 
-                "D90")
+                "SD")
 
 tabS1_cap <- "\\textbf{Metadata for each EV isolation analysed in this study.} 
               The optical density (at 600 nm) and volume of each culture from which 
@@ -473,7 +475,7 @@ nta_total %>%
                align = "l") %>% 
   kable_styling(latex_options = c("scale_down", 
                                   "HOLD_position")) %>% 
-  add_header_above(c(" " = 5, "NTA particle size distribution (nm)" = 6)) %>% 
+  add_header_above(c(" " = 6, "Particle diameter (nm)" = 3)) %>% 
   pack_rows("ATCC10231", 1, 3) %>% 
   pack_rows("ATCC90028", 4, 6) %>% 
   pack_rows("DAY286 biofilm", 7, 11) %>% 
@@ -581,7 +583,7 @@ function_desc <- c(paste0("\\textit{S. cerevisiae} ortholog is ABP1, actin bindi
 
 wcl_longlist <- wcl_longlist %>% 
   mutate(Function = function_desc, 
-         VDS = c(rep("", 52)), 
+         VDM = c(rep("", 52)), 
          pack_row = c(8, rep(4, 2), 3, rep(2, 2), 7, rep(1, 2), rep(7, 3), 1, 
                       rep(2, 3), 7, 2, 4, rep(2, 2), 7, 3, 2, 5, rep(1, 2), 6, 
                       2, 7, 6, 2, 1, 7, rep(1, 3), 2, 1, 5, 2, 1, 6, 
@@ -613,7 +615,7 @@ tabs2_cap <- "\\textbf{Candidate negative protein markers for \\textit{C. albica
              identified in the WCL fraction and not in EVs for that strain. The \`\`TM\" 
              column indicates the number of transmembrane domains for each protein as annotated in 
              UniProtKB. \`\`SP\" indicates whether a protein is annotated as having a signal peptide 
-             according to UniProtKB. \`\`VDS\" shows whether a protein has previously been detected in 
+             according to UniProtKB. \`\`VDM\" shows whether a protein has previously been detected in 
              vesicle-depleted culture media (i.e. the proteins may also be in the soluble secretome) 
              (ref:table1). Underlined proteins are those identified as the best candidates for negative
              EV markers according to the criteria depicted in Figure 1."
