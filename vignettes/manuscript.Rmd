@@ -95,7 +95,6 @@ ev_pal <- c("#999999", "#D55E00", "#0072B2")
 yeast_lfq <- yeast %>% 
   filter(Reverse != "+", 
          Potential.contaminant != "+", 
-         Only.identified.by.site != "+", 
          Unique.peptides >= 2) %>% 
   convert_lfq(., yeast_exp)
 
@@ -168,7 +167,6 @@ yeast_res <- get_results(efit = y_efit,
 biofilm_lfq <- biofilm %>% 
   filter(Reverse != "+", 
          Potential.contaminant != "+", 
-         Only.identified.by.site != "+", 
          Unique.peptides >= 2) %>% 
   convert_lfq(., biofilm_exp)
 
@@ -886,7 +884,7 @@ f3_cap <- "\\textbf{Differential enrichment analysis of proteins identified in \
            non-significant proteins are indicated on each graph. Proteins with a 
            log\\textsubscript{2}(FC) greater than 8 are labelled. 
            Data tables underlying the venn diagrams and volcano plots are provided in 
-           supplemental Files Sx and Sy respectively."
+           supplemental File S2."
 ```
 
 \newpage
@@ -1016,7 +1014,7 @@ f4_cap <- "\\textbf{Functional enrichment analyses of the significantly enriched
           The online tool FungiFun2 (elbe.hki-jena.de/fungifun) was used to identify enriched biological process (BP), 
           cellular component (CC), and molecular function (MF) GO terms [@priebe2015]. A selection of the
           most significantly enriched terms for each GO domain are shown. Full lists of enriched terms can be 
-          found in supplemental File Sx."
+          found in supplemental File S3."
 
 ```
 
@@ -1149,7 +1147,7 @@ f5_cap <- "\\textbf{Combined comparison of \\textit{C. albicans} proteomes.} \\t
           present in the centre and left partitions of each venn diagram in Figure \\@ref(fig:figure3)A were 
           compared to identify proteins present in all four datasets.
           The data tables underlying Figures \\@ref(fig:figure5)A and \\@ref(fig:figure5)B are provided in 
-          supplemental File Sx. \\textit{(C)} Multidimensional scaling (MDS) plot of each LC-MS/MS
+          supplemental File S4. \\textit{(C)} Multidimensional scaling (MDS) plot of each LC-MS/MS
           biological replicate sample with the first 2 dimensions shown. Pairwise distance between 
           samples approximately indicates the log\\textsubscript{2}(FC) between samples. \\textit{limma} was 
           used to generate the MDS plots [@ritchie2015]. 
@@ -1306,9 +1304,9 @@ ggplot() +
   theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, unit = "inches"))
 
 f6_cap <- "\\textbf{Identification of commonly enriched EV proteins across different \\textit{C. albicans} strains.} 
-           Heatmap of proteins (n = 403) identified in all four EV samples (venn overlap in Figure \\@ref(fig:figure5)A. 
+           Heatmap of proteins (n = 403) identified in all four EV samples (venn overlap in Figure \\@ref(fig:figure5)A). 
            Each column 
-           represents a \\textit{C. albicans strain} and each row represents a protein group. The colours
+           represents a \\textit{C. albicans} strain and each row represents a protein. The colours
            indicate the log\\textsubscript{2}(FC) of the protein for that particular strain; red is EV enriched, blue is 
            EV depleted, and black is EV exclusive. Unsupervised clustering of rows and columns was performed 
            using Gower's formula via the \\texttt{daisy} function from the R package \\textit{cluster} [@maechler2019].
@@ -1316,7 +1314,8 @@ f6_cap <- "\\textbf{Identification of commonly enriched EV proteins across diffe
            seperated prior to clustering, in the group designated \`\`cluster 6\".
            Functional enrichment analyses were performed on the heatmap protein clusters using the online 
            tool FungiFun2 [@priebe2015]. A selection of significantly enriched GO terms are presented in the 
-           table inset along with lists of the proteins identified in each cluster."
+           table inset. Lists of the proteins identified in each cluster are shown and are also available in 
+           supplemental File S5. "
 ```
 
 \newpage
@@ -1379,7 +1378,7 @@ f7_cap <- "\\textbf{Identification of common signficantly enriched or exclusive 
            in Figure \\@ref(fig:figure3) were compared to select those which were common to all 
            4 datasets. 43 proteins were identified as potential positive EV protein markers and 52 
            proteins as potential negative EV protein markers. The data tables underlying Figure 
-           \\@ref(fig:figure7) are provided in supplemental File Sx. Details of the 47 positive EV
+           \\@ref(fig:figure7) are provided in supplemental File S4. Details of the 43 positive EV
            protein marker candidates and 52 negative candidates can be found in Table \\@ref(tab:table1) and 
            supplemental Table S2 respectively."
 ```
