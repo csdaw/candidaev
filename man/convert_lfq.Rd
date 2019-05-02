@@ -4,7 +4,7 @@
 \alias{convert_lfq}
 \title{Title}
 \usage{
-convert_lfq(df, exd)
+convert_lfq(df, exd, log_2 = TRUE)
 }
 \arguments{
 \item{df}{Description}

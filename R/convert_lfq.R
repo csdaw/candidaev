@@ -14,7 +14,7 @@
 #'
 #' @export
 #'
-convert_lfq <- function(df, exd) {
+convert_lfq <- function(df, exd, log_2 = TRUE) {
   # define vector of labels from experimental design
   lfq_cols <- exd[["label"]]
 
@@ -36,6 +36,9 @@ convert_lfq <- function(df, exd) {
   # give columns shorter names and log2 transform LFQ intensities
   colnames(mat) <- exd[["ID"]]
   mat[mat == 0] <- NA
-  mat <- log2(mat)
-  return(mat)
+
+  if(log_2 == TRUE) {
+    mat <- log2(mat)
+    return(mat)
+  } else {return(mat)}
 }
