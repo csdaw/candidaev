@@ -13,8 +13,13 @@
 #'
 #' @export
 plot_go_bar <- function(go_table, terms_list, col_pal) {
-  ggplot(data = go_table[terms_list, ],
-         aes(x = reorder(GO.term, Cat.ratio),
+  df <- go_table[terms_list, ]
+
+  df <- df %>%
+    arrange(adj.p.val)
+
+  ggplot(data = df,
+         aes(x = reorder(GO.term, rev(adj.p.val)),
              y = Cat.ratio*100)) +
     geom_bar(stat = "identity", aes(fill = GO.type)) +
     theme_classic(base_size = 8) +
