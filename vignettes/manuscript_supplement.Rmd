@@ -1,5 +1,5 @@
 ---
-title: "**Defining protein biomarkers for *Candida albicans* extracellular vesicles**"
+title: "**Defining protein markers for *Candida albicans* extracellular vesicles**"
 author: "*Charlotte Dawson^a^, Mark Bleackley^a^, Donovan Garcia Ceron^a^, Marilyn Anderson^a^*"
 date: | 
    *^a^Department of Biochemistry and Genetics, La Trobe Institute for Molecular Science, 

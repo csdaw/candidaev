@@ -31,14 +31,23 @@ make_s1 <- function(df) {
            CGDID = match_id(Majority.protein.IDs,
                             uniprot,
                             "UP_accession",
-                            "CGDID")) %>%
+                            "CGDID"),
+           First.protein = stringr::str_extract(Majority.protein.IDs, "[^;]+"),
+           "Mass.(kDa)" = as.numeric(gsub(",", "",
+                                         match_id(First.protein,
+                                                  uniprot,
+                                                  "UP_accession",
+                                                  "Mass_(Da)",
+                                                  concat = FALSE)))/1000) %>%
     select(Majority.protein.IDs,
            CGDID,
            Protein.name,
            Function,
+           "Mass.(kDa)",
            Q.value,
            Score,
-           everything()) %>%
+           everything(),
+           -First.protein) %>%
     rename_all(list(~ stringr::str_replace_all(., "\\.", " ")))
 }
 
