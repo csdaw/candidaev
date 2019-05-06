@@ -2,25 +2,26 @@
 % Please edit documentation in R/fill_na.R
 \name{fill_na}
 \alias{fill_na}
-\title{Fill NA in character column}
+\title{Fill \code{NA} in character column}
 \usage{
 fill_na(df, na_col, fill_col)
 }
 \arguments{
-\item{df}{Data frame}
+\item{df}{data.frame}
 
-\item{na_col}{Data frame character column containing \code{NA}}
+\item{na_col}{character column in \code{df}: contains \code{NA} values}
 
-\item{fill_col}{Data frame column containing strings to replace \code{NA}}
+\item{fill_col}{character column in \code{df}: ccontains strings to
+replace \code{NA} values}
 }
 \value{
-\code{df} with \code{NA} in a specific character column filled
-with strings from another column
+Returns a \code{data.frame} with \code{NA} in a specific character column filled
+with strings from another column.
 }
 \description{
-\code{fill_na} fills in any \code{NA} rows in a data frame character
+\code{fill_na} fills in any \code{NA} rows in a data.frame character
 column with the corresponding strings from another character column in
-the same data frame.
+the same data.frame.
 }
 \details{
 Essentially \code{fill_na} converts all \code{NA} in a character column to ""

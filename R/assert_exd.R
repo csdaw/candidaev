@@ -3,7 +3,7 @@
 #' @description Certain plot functions in this package which are adapted from the
 #' \href{http://doi.org/10.18129/B9.bioc.DEP}{DEP}
 #' package require an experimental design to define data groups and labels.
-#' This internal function ensures that only the exact, correct columns are
+#' This function ensures that only the exact, correct columns are
 #' present in the experimental design data frame.
 #'
 #' Extraneous columns are named so they can be removed and missing
@@ -16,8 +16,9 @@
 #' \href{https://cran.r-project.org/web/packages/assertthat/index.html}{assertthat}
 #' package.
 #'
-#' @param df data frame: the experimental design for proteomics experiment. See
-#' examples section for an example of a correct experimental design.
+#' @param df data.frame: the experimental design for proteomics experiment. See
+#' examples section in this page or \link{atcc_exp} for examples of
+#' correct experimental designs.
 #'
 #' @return Return \code{TRUE} if experimental design has correct columns.
 #'
@@ -29,7 +30,6 @@
 #' \itemize{
 #' \item \code{\link{convert_lfq}}
 #' \item \code{\link{get_annotation2}}
-#' \item \code{\link{plot_heatmap2}}
 #' \item \code{\link{plot_imputation2}}
 #' \item \code{\link{plot_normalization2}}
 #' \item \code{\link{plot_numbers2}}
@@ -49,14 +49,19 @@
 #'                   replicate = c(1, 2, 1))
 #'
 #' # use assert_exd within a function definition
-#' my_fun <- function(x) {
-#'   assertthat::assert_that(assert_exd(x))
+#' my_fun <- function(exp_design) {
+#'   assertthat::assert_that(assert_exd(exp_design))
 #'
 #'   # rest of function goes here
 #' }
 #'
-#' # function will stop if exp is not correct
-#' my_fun(exp)
+#' # if you use the 'my_fun' function
+#' # it will stop if the experimental design is
+#' # not correct. In this case it is correct and
+#' # so 'my_fun' will return TRUE.
+#' my_fun(exp_design = exp)
+#'
+#' @export
 #'
 assert_exd <- function(df) {
   # assert that input is data frame

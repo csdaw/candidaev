@@ -1,14 +1,39 @@
-#' Title
+#' Convert proteinGroups table into LFQ intensity matrix
 #'
-#' @param df Description
+#' @description This function extracts the \code{LFQ.intensity} columns defined in
+#' an experimental design from a MaxQuant proteinGroups data.frame, and converts
+#' these into a numeric matrix.
 #'
-#' @param exd Description
+#' It also changes the row names of the numeric matrix to the UniProt
+#' accession(s) found in the \code{Majority.protein.IDs} column of the
+#' proteinGroups data.frame.
 #'
-#' @return Returns x
+#' A numeric matrix generally makes it easier to perform
+#' normalisation, imputation, and statistical analyses in later steps.
+#'
+#' @param df data.frame: this should at a minimum contain a \code{Majority.protein.IDs}
+#' column as well as the \code{LFQ.intensity} columns defined in the experimental design.
+#'
+#' @param exd data.frame: see the examples section of \code{\link{assert_exd}} or
+#' \code{\link{atcc_exp}} for examples of appropriately structured experimental designs.
+#'
+#' @return Returns a numeric \code{matrix} with the same number of rows as \code{df}
+#' and the \code{LFQ.intensity} columns defined in \code{exd}. The row names are the
+#' \code{Majority.protein.IDs} column in \code{df}.
 #'
 #'
 #' @examples
-#' # example
+#' # load a proteinGroups data.frame supplied with this package
+#' my_proteinGroups <- atcc
+#'
+#' # load its corresponding experimental design
+#' my_expDesign <- atcc_exp
+#'
+#' # filter for proteins identified with minimum 3 unique peptides
+#' # and convert to numerical matrix
+#' my_proteinGroups_filt <- my_proteinGroups %>%
+#'   filter(Unique.peptides >= 3) %>%
+#'   convert_lfq(., my_expDesign)
 #'
 #' @import dplyr
 #'
@@ -18,25 +43,28 @@ convert_lfq <- function(df, exd, log_2 = TRUE) {
   # define vector of labels from experimental design
   lfq_cols <- exd[["label"]]
 
-  # show error if inputs are not correct class or structure
+  # show error if inputs are not correct data structure
+  # or don't have correct columns
   assertthat::assert_that(is.data.frame(df),
                           is.data.frame(exd),
                           assert_exd(exd))
-  # show error if LFQ columns in experimental design don't exactly match LFQ
-  # columns in proteinGroups data frame
+  # show error if LFQ columns in experimental design don't exactly match
+  # LFQ intensity columns in proteinGroups data.frame
   assertthat::assert_that(identical(lfq_cols, colnames(select(df, one_of(lfq_cols)))))
 
-  # select LFQ data and convert to matrix with UniProt accessions as rownames
+  # select LFQ intensity data and convert to numeric matrix with
+  # UniProt accessions as rownames
   mat <- df %>%
     select(Majority.protein.IDs, dplyr::one_of(lfq_cols)) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames(var = "Majority.protein.IDs") %>%
     as.matrix()
 
-  # give columns shorter names and log2 transform LFQ intensities
+  # give columns shorter names
   colnames(mat) <- exd[["ID"]]
   mat[mat == 0] <- NA
 
+  # log2 transform LFQ intensities if required
   if(log_2 == TRUE) {
     mat <- log2(mat)
     return(mat)

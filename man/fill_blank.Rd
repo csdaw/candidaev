@@ -7,24 +7,24 @@
 fill_blank(df, blank_col, fill_col)
 }
 \arguments{
-\item{df}{Data frame}
+\item{df}{data.frame}
 
-\item{blank_col}{Data frame character column containing empty strings}
+\item{blank_col}{character column in \code{df}: contains empty strings}
 
-\item{fill_col}{Data frame column containing strings to replace empty strings}
+\item{fill_col}{character column in \code{df}: ccontains strings to replace empty strings}
 }
 \value{
 \code{df} with empty strings in a specific character column filled
-with strings from another column
+with strings from another column.
 }
 \description{
-\code{fill_blank} fills any empty "" strings in a data frame character
+\code{fill_blank} fills any empty "" strings in a data.frame character
 column with the corresponding strings from another character column in
-the same data frame.
+the same data.frame.
 }
 \examples{
-# make data frame with blanks
-# columns must be class character
+# make data.frame with blanks
+# columns must be data type = character
 df <- data.frame(name1 = c("Bob", "Jane", "Henry", "Sue"),
                  name2 = c("Mary", "", "Tim", ""),
                  stringsAsFactors = FALSE)
