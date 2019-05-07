@@ -40,8 +40,8 @@
 #'   \item{\strong{Gene_name_res_date}}{Gene name reservation date (if any).}
 #'   \item{\strong{Res_name_also_standard}}{Has the reserved gene name become the standard name (yes or no).}
 #'   \item{\strong{Scerevisiae_orthologs}}{\emph{Saccharomyces cerevisiae orthologous genes.}}
-#'   \item{\strong{Feature_name}{Unique identifier for each chromosomal feature used for Assembly 20
-#'   and 21. Still persist in literaure.}}
+#'   \item{\strong{Feature_name}}{Unique identifier for each chromosomal feature used for Assembly 20
+#'   and 21. Still persist in literaure.}
 #'   \item{\strong{BP_CGD}}{Biological process GO terms from CGD}
 #'   \item{\strong{CC_CGD}}{Cellular component GO terms from CGD}
 #'   \item{\strong{MF_CGD}}{Molecular function GO terms from CGD}

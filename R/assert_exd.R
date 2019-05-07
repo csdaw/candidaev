@@ -29,11 +29,9 @@
 #' \pkg{candidaev} package functions:
 #' \itemize{
 #' \item \code{\link{convert_lfq}}
-#' \item \code{\link{get_annotation2}}
 #' \item \code{\link{plot_imputation2}}
 #' \item \code{\link{plot_normalization2}}
 #' \item \code{\link{plot_numbers2}}
-#' \item \code{\link{plot_volcano2}}
 #' }
 #'
 #' @examples

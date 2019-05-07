@@ -18,7 +18,7 @@ plot_heatmap(mt, plot = TRUE, df = FALSE, data_type = c("log2fc",
 If \code{NA} values are present, use \code{clust_fun = "gower"}.}
 
 \item{plot}{logical: if \code{TRUE} the heatmap will be plotted using
-\code{\link[ComplexHeatmap]{draw}}. If \code{FALSE}, either a
+\code{draw()} from \pkg{ComplexHeatmap}. If \code{FALSE}, either a
 \code{\link[ComplexHeatmap]{Heatmap-class}} object or a \code{data.frame} will be
 generated, depending on the value of \code{df}.}
 
@@ -50,8 +50,8 @@ same length as \code{k}. Use to manually specify the order of row slices.}
 \item{colour_lims}{numeric vector (length = 2): specify the limits of the divergent
 legend colours.}
 
-\item{use_cbrewer}{logical: if \code{TRUE} then \code{\link[RColorBrewer]{brewer.pal}} is
-used to define the legend colours.}
+\item{use_cbrewer}{logical: if \code{TRUE} then \code{brewer.pal()} from
+\pkg{RColorBrewer} is used to define the legend colours.}
 
 \item{cbrewer_pal}{character: name of a divergent \pkg{RColorBrewer} palette. One of
 c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral").}
@@ -70,7 +70,7 @@ c("left", "right", "top", "bottom").}
 will include \code{heatmap_legend_param} for further customisation of the heatmap appearance.}
 }
 \value{
-If \code{plot = TRUE}, plots a heatmap using \code{\link[ComplexHeatmap]{draw}}.
+If \code{plot = TRUE}, plots a heatmap using \code{draw()} from \pkg{ComplexHeatmap}.
 If \code{plot = FALSE} and \code{df = FALSE}, returns a
 \code{\link[ComplexHeatmap]{Heatmap-class}} object. If \code{plot = FALSE} and \code{df = TRUE},
 returns a \code{data.frame} with the proteins listed in order of appearance in the heatmap.

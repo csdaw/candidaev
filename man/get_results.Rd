@@ -42,16 +42,14 @@ This results table contains the following:
 \item Protein names, identifiers, and functions
 \item \code{log2} LFQ intensity data for each protein in each sample
 \item Mean \code{log2} LFQ intensities for each protein in each sample group
-\item \code{log2} fold change (\code{log2FC}) values for each protein for the sample group
-comparison (contrast) of interest
+\item \code{log2} fold change (\code{log2FC}) values for each protein
+for the sample group comparison (contrast) of interest
 \item \pkg{limma} moderated t- and B-statistics
 \item p-values and Benjamini-Hochberg (BH) adjusted p-values (q-values)
-\item An indication of whether the protein is significantly different between the
-sample groups contrasted according to the adjusted p-value threshold selected.
-\item An indication of what group the protein fits into (if \code{type = "individual}:
-either exclusively found in one
-sample group or another, significantly enriched (up) in one sample group or another, or not
-significantly different between the sample groups.
+\item An indication of whether the protein is significantly different between the sample
+groups contrasted according to the adjusted p-value threshold selected.
+\item An indication of if the protein is exclusive or enriched in one group or
+another (only if \code{type = "individual"}
 }
 
 See the \strong{Examples} section for an example of how to use this function.
