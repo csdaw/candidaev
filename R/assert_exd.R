@@ -62,7 +62,6 @@
 #' my_fun(exp_design = exp)
 #'
 #' @export
-#'
 assert_exd <- function(df) {
   # assert that input is data frame
   assertthat::assert_that(is.data.frame(df))

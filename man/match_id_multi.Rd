@@ -2,58 +2,85 @@
 % Please edit documentation in R/match_id_multi.R
 \name{match_id_multi}
 \alias{match_id_multi}
-\title{Title}
+\title{Create data.frame or list based on matching values with a reference table}
 \usage{
-match_id_multi(df, id, ref, match, new, as_list = FALSE)
+match_id_multi(df, id, ref, match, new, as_list = FALSE, ...)
 }
 \arguments{
-\item{df}{Description}
+\item{df}{data.frame: contains the \code{id} column}
 
-\item{id}{Description}
+\item{id}{string: name of a character column with values to be matched}
 
-\item{ref}{Description}
+\item{ref}{data.frame: reference table with values to be matched against}
 
-\item{match}{Description}
+\item{match}{string: name of character column in reference table with
+values to be matched against}
 
-\item{new}{Description}
+\item{new}{vector: name(s) of character column(s) in reference table with
+corresponding information/values of interest to append to \code{df}}
 
-\item{as_list}{Description}
+\item{as_list}{logical: if \code{TRUE} output is a list of vectors and if
+\code{FALSE} output is a data.frame}
+
+\item{...}{Other arguments passed to \code{\link{match_id}}. Used for specifying
+\code{concat = FALSE} or \code{str_split = FALSE} where required. See
+\code{\link{match_id}} for examples.}
 }
 \value{
-Description
+If \code{as_list = TRUE}, returns a list of vectors with the values
+from the columns specified by \code{new}. If \code{as_list = FALSE} returns
+a \code{data.frame}
+with the column specified by \code{new} added to the end.
+
+If there is a value in \code{id} which is not present in \code{match},
+the output for that particular value will be the value \code{NA} or
+the string \code{"NA"}.
 }
 \description{
-Description.
+\code{match_id_multi} matches a character column in a \code{data.frame}
+with values (which may or may not be
+separated by semicolons) to a reference table with a character column containing matching
+values (which may or may not be separated by semicolons) and then produces a list of
+vectors with corresponding information from other selected columns in the reference
+table.
+
+\code{match_id_multi} is  useful for adding multiple columns to a \code{data.frame}
+based on matching with a single reference table.
+
+If you want to add multiple columns to a \code{data.frame} based on matching to multiple
+reference tables, see \code{\link{match_id}}.
 }
 \examples{
 # make a reference table
-ref_df <- data.frame(id = c("a1", "a2", "a3"),
-                     last_name = c("Smith", "Brown", "Doe"),
-                     atr1 = c("Blue", "Brown", "Yellow"),
-                     atr2 = c("Big", "Medium", "Small"),
-                     stringsAsFactors = FALSE)
+my_ref <- data.frame(accession = c("A12345", "B45678", "C09876", "D20398"),
+                     gene_name = c("AAA1", "BBB56", "CCC9", "DDD-110"),
+                     protein_name = c("Alcohol dehydrogenase",
+                                      "Butylase",
+                                      "Chitinase",
+                                      "Uncharacterized protein"))
+# make a data.frame with an id column with some
+# identifiers we want to match
+my_data <- data.frame(id = c("A12345", "C09876", "E55566", "D20398;B45678"),
+                      sample_A1 = c(NA, NA, 30, NA),
+                      sample_A2 = c(NA, 15, 31, 23),
+                      sample_A3 = c(NA, NA, 32, 24),
+                      sample_B1 = c(23, NA, 29, 22),
+                      sample_B2 = c(24, NA, 30, NA),
+                      sample_B3 = c(21, 14, 31, 24))
 
-# make a dataset to which you want to append columns
-# note that row 3 has an id which is NOT in the reference table
-my_names <- data.frame(employee_id = c("a1;a3", "a2", "a5"),
-                       first_name = c("Jane", "Mary", "John"),
-                       stringsAsFactors = FALSE)
+# add the gene name and protein name columns to the data table
+my_data2 <- match_id_multi(df = my_data,
+                           id = "id",
+                           ref = my_ref,
+                           match = "accession",
+                           new = c("protein_name", "gene_name"))
 
-# append selected columns to my_names based on matching ids
-# note that row 3 has NA in all appended columns because
-# the employee_id = a5 is not in the reference table
-my_names <- match_id_multi(df = my_names,
-                           id = "employee_id",
-                           ref = ref_df,
-                           match = "id",
-                           new = c("last_name", "atr2", "atr1"))
-
-# alternatively, return a list of character vectors for the
-columns selected in by the 'new' argument
-my_list <- match_id_multi(df = my_names,
-                          id = "employee_id",
-                          ref = ref_df,
-                          match = "id",
-                          new = c("atr1", "atr2"))
+# or get a list of gene names and protein names
+my_list <- match_id_multi(df = my_data,
+                          id = "id",
+                          ref = my_ref,
+                          match = "accession",
+                          new = c("protein_name", "gene_name",
+                          as_list = TRUE))
 
 }

@@ -1,6 +1,6 @@
 #' Fill \code{NA} in character column
 #'
-#' \code{fill_na} fills in any \code{NA} rows in a data.frame character
+#' @description \code{fill_na} fills in any \code{NA} rows in a data.frame character
 #' column with the corresponding strings from another character column in
 #' the same data.frame.
 #'
@@ -27,7 +27,6 @@
 #' df <- fill_na(df, "name2", "name1")
 #'
 #' @export
-#'
 fill_na <- function(df, na_col, fill_col) {
   df[[na_col]][is.na(df[[na_col]])] <- ""
   df[[na_col]] <- as.character(ifelse(df[[na_col]] == "",

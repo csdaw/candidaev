@@ -30,15 +30,14 @@
 #' my_expDesign <- atcc_exp
 #'
 #' # filter for proteins identified with minimum 3 unique peptides
-#' # and convert to numerical matrix
-#' my_proteinGroups_filt <- my_proteinGroups %>%
+#' # and convert to numeric matrix
+#' my_lfq <- my_proteinGroups %>%
 #'   filter(Unique.peptides >= 3) %>%
 #'   convert_lfq(., my_expDesign)
 #'
 #' @import dplyr
 #'
 #' @export
-#'
 convert_lfq <- function(df, exd, log_2 = TRUE) {
   # define vector of labels from experimental design
   lfq_cols <- exd[["label"]]

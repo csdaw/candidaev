@@ -22,8 +22,7 @@ with strings from another column.
 \code{fill_na} fills in any \code{NA} rows in a data.frame character
 column with the corresponding strings from another character column in
 the same data.frame.
-}
-\details{
+
 Essentially \code{fill_na} converts all \code{NA} in a character column to ""
 then uses \code{\link{fill_blank}} to fill in with values from
 another character column in the same data frame.

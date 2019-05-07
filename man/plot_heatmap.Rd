@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_heatmap.R
 \name{plot_heatmap}
 \alias{plot_heatmap}
-\title{Title}
+\title{Plot a protein heatmap}
 \usage{
 plot_heatmap(mt, plot = TRUE, df = FALSE, data_type = c("log2fc",
   "log2intensity"), clust_fun = c("gower", "euclidean", "maximum",
@@ -14,48 +14,181 @@ plot_heatmap(mt, plot = TRUE, df = FALSE, data_type = c("log2fc",
   row_title_fontsize = 6, col_name_fontsize = 10, ...)
 }
 \arguments{
-\item{mt}{Description.}
+\item{mt}{numeric matrix: contains either log2 intensities or log2 fold change data.
+If \code{NA} values are present, use \code{clust_fun = "gower"}.}
 
-\item{plot}{Description.}
+\item{plot}{logical: if \code{TRUE} the heatmap will be plotted using
+\code{\link[ComplexHeatmap]{draw}}. If \code{FALSE}, either a
+\code{\link[ComplexHeatmap]{Heatmap-class}} object or a \code{data.frame} will be
+generated, depending on the value of \code{df}.}
 
-\item{df}{Description.}
+\item{df}{logical: if \code{TRUE} a \code{data.frame} with the data underlying the
+heatmap (include the cluster id) is generated, with the proteins in order of
+appearance in the heatmap. If \code{FALSE}, a
+\code{\link[ComplexHeatmap]{Heatmap-class}} object is generated.}
 
-\item{data_type}{Description.}
+\item{data_type}{character: can be either \code{"log2intensity"} or
+\code{"log2fc"} depending on the data in the numeric matrix.}
 
-\item{clust_fun}{Description.}
+\item{clust_fun}{character: one of c("gower", "euclidean", "maximum",
+"manhattan", "canberra", "binary", "minkowski", "pearson", "spearman",
+"kendall").}
 
-\item{split_type}{Description.}
+\item{split_type}{character: method for splitting rows into slices, one of c("kmeans", "cutree").
+Use \code{"kmeans"} if \code{mt} does not contain \code{NA} values, or \code{"cutree"}
+if \code{mt} does contain \code{NA} values.}
 
-\item{k}{Description.}
+\item{k}{integer: number of slices to split heatmap into.}
 
-\item{cluster_split}{Description.}
+\item{cluster_split}{logical: if rows are split, \code{TRUE} indicates that clustering
+should be performed on the slice means. If \code{mt} contains \code{NA} values, use
+\code{cluster_split = FALSE}.}
 
-\item{split_order}{Description.}
+\item{split_order}{integer vector: must be sequencial integers in a vector with the
+same length as \code{k}. Use to manually specify the order of row slices.}
 
-\item{colour_lims}{Description.}
+\item{colour_lims}{numeric vector (length = 2): specify the limits of the divergent
+legend colours.}
 
-\item{use_cbrewer}{Description.}
+\item{use_cbrewer}{logical: if \code{TRUE} then \code{\link[RColorBrewer]{brewer.pal}} is
+used to define the legend colours.}
 
-\item{cbrewer_pal}{Description.}
+\item{cbrewer_pal}{character: name of a divergent \pkg{RColorBrewer} palette. One of
+c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral").}
 
-\item{colour_vals}{Description.}
+\item{colour_vals}{character vector (length = 3): use with \code{use_cbrewer = FALSE} if
+the legend colours should be defined manually.}
 
-\item{legend_pos}{Description.}
+\item{legend_pos}{character: position of the legend, one of
+c("left", "right", "top", "bottom").}
 
-\item{row_title_fontsize}{Description.}
+\item{row_title_fontsize}{numeric: text size of the cluster titles.}
 
-\item{col_name_fontsize}{Description.}
+\item{col_name_fontsize}{numeric: text size of the column titles.}
 
-\item{...}{Description.}
+\item{...}{Other arguments passed to \code{\link[ComplexHeatmap]{Heatmap}}. Most often this
+will include \code{heatmap_legend_param} for further customisation of the heatmap appearance.}
 }
 \value{
-Description.
+If \code{plot = TRUE}, plots a heatmap using \code{\link[ComplexHeatmap]{draw}}.
+If \code{plot = FALSE} and \code{df = FALSE}, returns a
+\code{\link[ComplexHeatmap]{Heatmap-class}} object. If \code{plot = FALSE} and \code{df = TRUE},
+returns a \code{data.frame} with the proteins listed in order of appearance in the heatmap.
 }
 \description{
-Description.
+\code{plot_heatmap} generates a heatmap of proteins
+based on either their log2 LFQ intensities across in each sample or
+their log2FC between sample groups.
+
+This function uses the \code{\link[ComplexHeatmap]{Heatmap}} function from
+\pkg{ComplexHeatmap} to generate the heatmap.
+If the numeric matrix input does not have missing values, then the clustering
+methods built into \code{\link[ComplexHeatmap]{Heatmap}} should be used for
+row and column clustering. If there are \code{NA} values in the numeric matrix
+input, then \code{clust_fun = "gower"} should be specified, which uses
+Gower's formula via the \code{\link[cluster]{daisy}} function from the
+package \pkg{cluster} for row and column clustering.
 }
 \examples{
+## log2 LFQ intensity type heatmap
+# load a proteinGroups data.frame supplied with this package
+my_proteinGroups <- atcc
 
-# example
+# load its corresponding experimental design
+my_expDesign <- atcc_exp
+
+# filter for proteins identified with minimum 3 unique peptides
+# and convert to numeric matrix
+my_lfq <- my_proteinGroups \%>\%
+  filter(Unique.peptides >= 3) \%>\%
+  convert_lfq(., my_expDesign)
+
+# filter for proteins quantified in min 2/3 reps of
+# at least 1 sample group
+my_filt <- my_lfq \%>\%
+  filter_na4(my_lfq, logic = "or", op = "<=",
+             pat1 = "A10231_EV", val1 = 1,
+             pat2 = "A10231_W", val2 = 1,
+             pat3 = "A90028_EV", val3 = 1,
+             pat4 = "A90028_W", val4 = 1)
+
+# normalise LFQ intensities
+my_norm <- normalizeCyclicLoess(my_filt)
+
+# impute missing values
+my_imp <- impute_QRILC(my_norm)
+
+# rename columns
+colnames(my_imp) <- stringi::stri_replace_all_regex(colnames(my_imp),
+                                                    c("A10231_", "A90028_"),
+                                                    c("A1_", "A9_"),
+                                                    vectorize_all = FALSE)
+
+# see limmma user guide section 9.2 for more info about DE
+# create design matrix
+my_samples <- data.frame(T = rep(c("A1_EV", "A1_W", "A9_EV", "A9_W"), each = 3))
+
+my_design <- stats::model.matrix(~ 0 + T, data = my_samples)
+colnames(my_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+
+# define sample contrasts of interest
+my_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W")
+
+# make linear model fit and perform limma::eBayes()
+my_efit <- limma_eBayes(mat = my_imp, design = my_design, contrasts = my_contrasts)
+
+# extract overall results table
+result_overall <- get_results(efit = my_efit, mat = my_imp, p_val = 0.001, lfc = 0, type = "overall")
+
+# plot a log2 LFQ intensity heatmap
+htmp_data <- result_overall \%>\%
+  select(1, 4:15, 24) \%>\%
+  filter(significant == TRUE) \%>\%
+  tibble::column_to_rownames(var = "UP_accession") \%>\%
+  select(-significant) \%>\%
+  as.matrix()
+
+plot_heatmap(htmp_data,
+             plot = TRUE,
+             df = FALSE,
+             data_type = "log2intensity",
+             clust_fun = "euclidean",
+             split_type = "kmeans",
+             k = 5,
+             legend_pos = "right",
+             heatmap_legend_param = list(title = "legend title",
+                                         color_bar = "continuous",
+                                         direction = "vertical",
+                                         legend_width = ggplot2::unit(5, "cm"),
+                                         title_position = "lefttop-rot",
+                                         at = seq(-10, 10, 2)))
+
+
+## log2FC type heatmap
+# plot a log2FC heatmap
+htmp_data2 <- result_overall \%>\%
+  select(1, matches("EV.vs.*W"), 24) \%>\%
+  filter(significant == TRUE) \%>\%
+  tibble::column_to_rownames(var = "UP_accession") \%>\%
+  select(-significant) \%>\%
+  as.matrix()
+
+plot_heatmap(htmp_data2,
+             plot = TRUE,
+             df = FALSE,
+             data_type = "log2fc",
+             clust_fun = "canberra",
+             split_type = "kmeans",
+             k = 5,
+             legend_pos = "right",
+             split_order = c(2, 5, 1, 4, 3),
+             heatmap_legend_param = list(title = expression(bold(log[2]("FC"))),
+             color_bar = "continuous",
+             direction = "vertical",
+             legend_width = unit(5, "cm"),
+             title_position = "lefttop-rot",
+             title_gp = grid::gpar(colour = "black", fontsize = 8),
+             labels_gp = grid::gpar(colour = "black", fontsize = 8),
+             at = seq(-10, 10, 2)))
 
 }

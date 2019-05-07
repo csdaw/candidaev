@@ -2,50 +2,118 @@
 % Please edit documentation in R/match_id.R
 \name{match_id}
 \alias{match_id}
-\title{Replace values based on match}
+\title{Create a vector based on matching values with a reference table}
 \usage{
 match_id(id, ref, match, new, concat = TRUE, str_split = TRUE)
 }
 \arguments{
 \item{id}{character vector: the values to be matched}
 
-\item{ref}{data frame: reference table with values to be matched against}
+\item{ref}{data.frame: reference table with values to be matched against}
 
-\item{match}{string: column name of character column in reference table with
+\item{match}{string: name of character column in reference table with
 values to be matched against}
 
-\item{new}{string: column name of character column in reference table with new
-information to replace matches}
+\item{new}{string: name of character column in reference table with
+corresponding information/values of interest}
 
-\item{concat}{Description.}
+\item{concat}{logical: if \code{TRUE} then if a value in \code{id} has multiple
+matches in the \code{ref$match} column, the corresponding values in \code{new}
+\strong{will} be concatenated with \code{;}. The default value is \code{TRUE}
+because it ensures the output of this function is the same length as \code{id}
+which is essential if you want to add the output as a \code{data.frame} column.}
 
-\item{str_split}{Description.}
+\item{str_split}{logical: if \code{TRUE} then values in \code{id} with concatenation,
+e.g. \code{A12345;B67890}, \strong{will} be separated and matched separately to the \code{ref}.
+If \code{FALSE} the entire string as a whole will be matched to \code{ref}.}
 }
 \value{
-A vector with the same length as \code{id} but with the values replaced
-with corresponding information from the reference table.
+If \code{concat = TRUE}, returns a vector with the same length as \code{id}
+but with the values replaced
+with corresponding information from a column in \code{ref}. If \code{concat = FALSE}, returns
+a vector which may or may not be the same length as \code{id} but with the values
+replaced with corresponding information from a column in \code{ref}.
 
-If there is a value to be matched which is not present in the reference table,
-the value will be replaced with the string "NA"
+If there is a value in \code{id} which is not present in \code{match},
+the output for that particular value will be the value \code{NA} or
+the string \code{"NA"}.
 }
 \description{
 \code{match_id} matches a character vector with values (which may or may not be
 separated by semicolons) to a reference table with a character column containing
-values (which must not be separated by semicolons) and then replaces those
-values with corresponding information from another character column in the
+matching values (which may or may not be separated by semicolons) and then produces a
+vector with corresponding information from another character column in the
 reference table.
+
+\code{match_id} is  useful for adding single or multiple columns to a \code{data.frame} with
+\code{\link[dplyr]{mutate}} based on matching with several different
+reference tables.
+
+If you want to add multiple columns to a \code{data.frame} based on matching to a
+single reference table, use \code{\link{match_id_multi}}.
 }
 \examples{
 # load dplyr
 library(dplyr)
 
 # make a reference table
-ref_df <- data.frame(id = c("a1", "a2", "a3"), last_name = c("Smith", "Brown", "Doe"))
+my_ref <- data.frame(accession = c("A12345", "B45678", "C09876", "D20398"),
+                     gene_name = c("AAA1", "BBB56", "CCC9", "DDD-110"),
+                     protein_name = c("Alcohol dehydrogenase",
+                                      "Butylase",
+                                      "Chitinase",
+                                      "Uncharacterized protein"))
+# make a data.frame with an id column with some
+# identifiers we want to match
+my_data <- data.frame(id = c("A12345", "C09876", "E55566", "D20398;B45678"),
+                      sample_A1 = c(NA, NA, 30, NA),
+                      sample_A2 = c(NA, 15, 31, 23),
+                      sample_A3 = c(NA, NA, 32, 24),
+                      sample_B1 = c(23, NA, 29, 22),
+                      sample_B2 = c(24, NA, 30, NA),
+                      sample_B3 = c(21, 14, 31, 24))
 
-# make a data frame
-my_names <- data.frame(id = c("a1;a3", "a10", "a2"), first = c("Jane", "Mary", "John"))
+# match the accession column in the reference table and...
+# output a vector of gene_names
+my_gn <- match_id(id = my_data$id,
+                  ref_df = my_ref,
+                  match = "accession",
+                  new = "gene_name")
 
-# use match_id to make new column in my_names
-my_names$last <- match_id(my_names$id, ref_df, "id", "last_name")
+# create a new column in my_data with corresponding
+# protein names
+my_data$pn <- match_id(id = my_data$id,
+                       ref_df = my_ref,
+                       match = "accesssion",
+                       new = "protein_name")
+
+# create several new columns in my_data using dplyr
+my_data <- my_data \%>\%
+  mutate(gn = match_id(id, my_df, "accession", "gene_name"),
+         pn = match_id(id, my_df, "accession", "protein_name"))
+
+# output a vector of gene_names that are not concatenated
+my_gn <- match_id(id = my_data$id,
+                  ref_df = my_ref,
+                  match = "accession",
+                  new = "gene_name",
+                  concat = FALSE)
+
+# make a new reference table with a concatenated accession
+my_ref2 <- my_ref \%>\%
+  mutate(accession = gsub("D20398", "D20398;E55566", accession))
+
+# make a new data table with a different concatenated accession
+my_data2 <- my_data \%>\%
+  mutate(id = gsub("E55566", "D20398;E55566", id),
+         id = gsub("D20398;B45678", "B45678", id))
+
+# match the accession column in the reference table by not
+# splitting the strings in the id column in the data table
+my_data2$gn <- match_id(id = my_data2$id,
+                        ref_df = my_ref2,
+                        match = "accession",
+                        new = "gene_name",
+                        str_split = FALSE)
 
 }

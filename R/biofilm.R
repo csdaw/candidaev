@@ -63,5 +63,4 @@
 #'
 #' @source Dawson, C. S., Bleackley, M. R., Garcia-Ceron, D., & Anderson, M. A. (2019).
 #' Title. \emph{Journal vol}(issue), 000-000. doi:
-#'
 "biofilm"

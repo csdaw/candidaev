@@ -22,8 +22,7 @@ cgd
 \description{
 This \code{data.frame} contains information about chromosomal features for
 \emph{Candida albicans} SC5314 (Assembly 22) including:
-}
-\details{
+
 \itemize{
 \item Various identifiers and aliases (see the \href{http://www.candidagenome.org/Nomenclature.shtml}{CGD website}
 for nomenclature explanantions)
@@ -38,7 +37,8 @@ and combines the \emph{C. albicans}
 SC3514 Assembly 22 chromosomal feature file available \href{http://www.candidagenome.org/download/chromosomal_feature_files/}{here}
 (downloaded 2018-12-09),
 and the orf6 plus GO term file available \href{http://www.candidagenome.org/download/misc/}{here} (downloaded 2019-04-18).
-
+}
+\details{
 Each row represents 1 chromosomal feature. The columns are as follows:
 
 \describe{

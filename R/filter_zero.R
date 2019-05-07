@@ -100,7 +100,6 @@
 #'
 #'
 #' @export
-#'
 filter_zero <- function(data, op = c("==", "<=", ">="), pat, val) {
   # refer to operator by name
   op <- as.name(op)

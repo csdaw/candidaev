@@ -133,7 +133,6 @@
 #'   pull(colour)
 #'
 #' @export
-#'
 filter_na4 <- function(data, logic = c("and", "or"), op = c("==", ">=", "<="),
                        pat1, val1, pat2, val2, pat3, val3, pat4, val4) {
   # refer to operator by name

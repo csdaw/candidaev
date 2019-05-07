@@ -1,6 +1,6 @@
 #' Candida Genome Database reference table
 #'
-#' This \code{data.frame} contains information about chromosomal features for
+#' @description This \code{data.frame} contains information about chromosomal features for
 #' \emph{Candida albicans} SC5314 (Assembly 22) including:
 #'
 #' \itemize{
@@ -55,5 +55,4 @@
 #' The Candida Genome Database (CGD): incorporation of Assembly 22, systematic identifiers and visualization of
 #' high throughput sequencing data. \emph{Nucleic Acids Research, 45}(D1), D592-D596.
 #' \href{https://doi.org/10.1093/nar/gkw924}{doi:10.1093/nar/gkw924}
-#'
 "cgd"

@@ -140,7 +140,7 @@ yeast_de <- rbind(yeast_excl, yeast_imp)
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-y_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+y_samp <- data.frame(T = rep(c("EV", "WCL"), each = 3))
 
 y_design <- stats::model.matrix(~ 0 + T, data = y_samp)
 colnames(y_design) <- c("EV", "WCL")
@@ -209,7 +209,7 @@ biofilm_de <- rbind(biofilm_excl, biofilm_imp)
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+b_samp <- data.frame(T = rep(c("EV", "WCL"), each = 5))
 
 b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
 colnames(b_design) <- c("EV", "WCL")
@@ -299,7 +299,7 @@ colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de),
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3)))
+atcc_samp <- data.frame(T = rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3))
 
 atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
 colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
