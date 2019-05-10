@@ -16,8 +16,8 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="figure7.svg"
-   inkscape:export-filename="C:\Users\Charlotte\Documents\candidaev\vignettes\figures\figure7.png"
+   sodipodi:docname="figure9.svg"
+   inkscape:export-filename="C:\Users\Charlotte\Documents\candidaev\vignettes\figures\figure9.png"
    inkscape:export-xdpi="500"
    inkscape:export-ydpi="500">
   <defs
@@ -291,8 +291,8 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="2"
-     inkscape:cx="437.4608"
-     inkscape:cy="314.26172"
+     inkscape:cx="202.79466"
+     inkscape:cy="719.66658"
      inkscape:document-units="mm"
      inkscape:current-layer="layer6"
      showgrid="true"
@@ -9802,13 +9802,13 @@
          style="font-size:2.11666656px;stroke-width:0.26458332;-inkscape-font-specification:Arial;font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;">Signal peptide</tspan></text>
     <path
        style="fill:#000000;stroke:none;stroke-width:0.1322923px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 100.81918,9.7512131 v 0.5079999 l 1.01601,-0.254 z"
+       d="m 98.93299,9.7512131 v 0.5079999 l 1.01601,-0.254 z"
        id="path2437"
        inkscape:connector-curvature="0" />
     <path
        inkscape:connector-curvature="0"
        id="path2439"
-       d="m 102.85316,12.699994 v 0.508 l 1.01601,-0.254 z"
+       d="m 101.219,12.699994 v 0.508 l 1.01601,-0.254 z"
        style="fill:#000000;stroke:none;stroke-width:0.1322923px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <text
        id="text14762"
