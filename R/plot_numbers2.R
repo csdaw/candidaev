@@ -55,7 +55,7 @@ plot_numbers2 <- function(mat, exd, plot = TRUE) {
     geom_hline(yintercept = unique(stat$n)) +
     labs(title = "Proteins per sample", x = "",
          y = "Number of proteins") +
-    theme_bw()
+    theme_bw(base_size = 12)
   if(plot) {
     return(p)
   } else {

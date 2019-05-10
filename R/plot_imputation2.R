@@ -67,5 +67,5 @@ plot_imputation2 <- function(exd, mat, ...) {
     geom_density(na.rm = TRUE) +
     facet_wrap(~var, ncol = 1) +
     labs(x = expression(log[2]~"Intensity"), y = "Density") +
-    theme_bw()
+    theme_bw(base_size = 12)
 }

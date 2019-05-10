@@ -75,7 +75,7 @@ plot_frequency2 <- function(mat, plot = TRUE) {
     labs(title = "Protein quantification frequency",
          x = "Identified in number of samples",
          y = "Number of proteins") +
-    theme_bw() +
+    theme_bw(base_size = 12) +
     theme(legend.position="none")
   if(plot) {
     return(p)

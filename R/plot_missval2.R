@@ -48,7 +48,7 @@ plot_missval2 <- function(mat) {
                                 show_row_names = FALSE,
                                 show_column_names = TRUE,
                                 name = "Missing values pattern",
-                                column_names_gp = gpar(fontsize = 16),
+                                column_names_gp = grid::gpar(fontsize = 16),
                                 heatmap_legend_param = list(at = c(0, 1),
                                                             labels = c("Missing value", "Valid value")))
   ComplexHeatmap::draw(ht2, heatmap_legend_side = "top")

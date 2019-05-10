@@ -69,5 +69,5 @@ plot_normalization2 <- function(exd, mat, ...) {
     coord_flip() +
     facet_wrap(~var, ncol = 1) +
     labs(x = "", y = expression(log[2]~"Intensity")) +
-    theme_bw()
+    theme_bw(base_size = 12)
 }

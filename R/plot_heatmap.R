@@ -190,7 +190,7 @@ plot_heatmap <- function(mt,
                          colour_lims = c(-8, 8),
                          use_cbrewer = FALSE,
                          cbrewer_pal = NULL,
-                         colour_vals = c("blue", "white", "red"),
+                         colour_vals = c("#0000FF", "#B38BFF", "#FFFFFF", "#FF9E81", "#FF0000"),
                          legend_pos = "top",
                          row_title_fontsize = 6,
                          col_name_fontsize = 10,
@@ -252,7 +252,7 @@ plot_heatmap <- function(mt,
 
   # use colorbrewer colour palette or specific colours
   if(use_cbrewer == TRUE) {
-    legend_cols <- RColorBrewer::brewer.pal(11, cbrewer_pal)
+    legend_cols <- rev(RColorBrewer::brewer.pal(11, cbrewer_pal))
 
     colour_fun <- circlize::colorRamp2(legend_breaks, legend_cols)
   } else {
@@ -265,7 +265,7 @@ plot_heatmap <- function(mt,
   if(data_type == "log2fc") {
     legend_title <- expression(bold(log[2]("FC")))
   } else if(data_type == "log2intensity") {
-      legend_title <- expression("centred"~log[2]("intensity"))}
+      legend_title <- expression("centered"~log[2]("intensity"))}
 
 
 
