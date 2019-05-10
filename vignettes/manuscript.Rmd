@@ -637,6 +637,7 @@ nta_total$Strain <- factor(nta_total$Strain,
 f2c <- nta_total %>% 
   ggboxplot(x = "Strain", y = "part_per_prot", 
             color = "Strain", palette = st_pal, add = "jitter", 
+            add.params = list(color = "black"), 
             shape = 15,
             ylab = expression("Particles /"~paste(mu,g)~"protein"))
 f2c <- ggpar(f2c, 
