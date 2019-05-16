@@ -9,7 +9,7 @@
 Arnaud, M.B., Costanzo, M. C., Skrzypek, M. S., Binkley, G., Lane, C., Miyasato, S. R., & Sherlock, G.
 (2005). The Candida Genome Database (CGD), a community resource for \emph{Candida albicans} gene and
 protein information. \emph{Nucleic Acids Research, 33}(suppl_1), D358-D363.
-\href{https://doi.org/10.1093/nar/gki003}{doi:10.1093/nar/gki003}.
+\href{https://doi.org/10.1093/nar/gki003}{doi:10.1093/nar/gki003}
 
 Skrzypek, M. S., Binkley, J., Binkley, G., Miyasato, S. R., Simison, M., & Sherlock, G. (2017).
 The Candida Genome Database (CGD): incorporation of Assembly 22, systematic identifiers and visualization of
@@ -42,7 +42,8 @@ and the orf6 plus GO term file available \href{http://www.candidagenome.org/down
 Each row represents 1 chromosomal feature. The columns are as follows:
 
 \describe{
-  \item{\strong{Systematic_name}}{Unique identifier for each chromosomal feature introduced with Assembly 22.}
+  \item{\strong{Systematic_name}}{Unique identifier for each chromosomal feature,
+   introduced with Assembly 22.}
   \item{\strong{Gene_name}}{Standard gene name. Not all genes have standard gene names.}
   \item{\strong{Aliases}}{Non-standard gene names and alternative or old identifiers.}
   \item{\strong{Feature_type}}{Type of chromosomal feature e.g. open reading frame, tRNA, etc.}

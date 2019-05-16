@@ -4,15 +4,42 @@
 \alias{remove_dotdot}
 \title{Remove duplicate . in column names}
 \usage{
-remove_dotdot(df)
+remove_dotdot(data)
 }
 \arguments{
-\item{df}{data frame: column names contain duplicate .. or ... etc.}
+\item{data}{data.frame or matrix: has column names contain duplicate periods
+like .. or ... or .... etc.}
 }
 \value{
-data frame: column names contain only single .
+Returns a data.frame or matrix with column names that only
+contain single periods.
 }
 \description{
-Internal function to remove duplicated periods in column names with a
-single period.
+\code{remove_dotdot} is a function that removes
+duplicated periods in column names and replaces them with a single period.
+}
+\examples{
+# make a data.frame
+my_df <- data.frame(name..1 = c("Bob", "Jane", "Henry", "Sue"),
+                    name..2 = c("Mary", "", "Tim", ""),
+                    stringsAsFactors = FALSE)
+
+# remove duplicate periods from column names
+new_df <- remove_dotdot(my_df)
+
+# make a matrix
+my_mat <- matrix(c(2, 7, NA, NA,
+                   3, 6, NA, NA,
+                   1, NA, 8, NA,
+                   432, 564, 789, 555),
+                   nrow = 4,
+                   ncol = 4)
+colnames(my_mat) <- c("sample....1",
+                      "sample..2",
+                      "sample...3",
+                      "total")
+
+# remove duplicate periods from column names
+new_mat <- remove_dotdot(my_mat)
+
 }
