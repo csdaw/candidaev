@@ -86,6 +86,6 @@ plot_mds <- function(mat, mat_labels, shape_size = 2, ...) {
                size = shape_size,
                colour = "black") +
     scale_shape_manual(values = shapes[1:n_sample]) +
-    theme_bw() +
+    theme_bw(base_size = 12) +
     guides(fill = guide_legend(override.aes = list(shape = 21)))
 }
