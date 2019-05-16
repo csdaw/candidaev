@@ -61,7 +61,9 @@ uniprot <- uniprot %>%
   mutate(CGD_gene_name = match_id(CGDID, cgd, "CGDID", "Gene_name"),
          CGD_feature_name = match_id(CGDID, cgd, "CGDID", "Feature_name"),
          CGD_systematic_name = match_id(CGDID, cgd, "CGDID", "Systematic_name"),
-         CGD_description = match_id(CGDID, cgd, "CGDID", "Description")) %>%
+         CGD_description = match_id(CGDID, cgd, "CGDID", "Description"),
+         `Mass_(Da)` = as.numeric(sub(",", "", `Mass_(Da)`))/1000) %>%
+  rename("Mass_(kDa)" = `Mass_(Da)`) %>%
   select(UP_accession, CGDID, UP_gene_name, CGD_gene_name, CGD_feature_name,
          CGD_systematic_name, Protein_name, CGD_description, everything(),
          -CGDID2, -CGDID3, -Gene_name_ol, -Gene_name_orf)
