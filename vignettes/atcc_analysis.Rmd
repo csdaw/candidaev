@@ -81,6 +81,12 @@ library(UpSetR)
 
 # set seed for imputation, kmeans, MDS plot
 set.seed(1)
+
+# define ggplot2 default colour palette function
+gg_colour <- function(n) {
+  hues <- seq(15, 375, length = n + 1)
+  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
+}
 ```
 
 ```{r randomDraws, include=FALSE}
@@ -352,8 +358,7 @@ atccNorm2_cap <- "This is a figure caption. This is the second sentence."
 
 Text.
 
-```{r atccVenn}
-
+```{r atccVenn, fig.cap=atccVenn_cap, fig.small=TRUE}
 # filter for proteins identified in min 1/3 reps of 10231 EV
 atcc1_ev <- filter_na(atcc_norm, op = "<=", 
                       pat = "A10231_EV", val = 2)
@@ -370,15 +375,27 @@ atcc9_ev <- filter_na(atcc_norm, op = "<=",
 atcc9_w <- filter_na(atcc_norm, op = "<=", 
                       pat = "A90028_W", val = 2)
 
-a4 <- plot_venn(list("ATCC10231 EV" = atcc1_ev, "ATCC10231 WCL" = atcc1_w, 
-                     "ATCC90028 EV" = atcc9_ev, "ATCC90028 WCL" = atcc9_w), 
-                use_uniprot = TRUE, type = "plot")
+# define comparison list for Venn diagram
+venn1_comp <- list("A10231_EV" = atcc1_ev, 
+                   "A10231_WCL" = atcc1_w, 
+                   "A90028_EV" = atcc9_ev, 
+                   "A90028_WCL" = atcc9_w)
 
-a4 <- as_ggplot(a4) + 
-  theme(plot.margin = unit(c(0,2,0,2), "lines"))
+# plot Venn diagram
+venn1 <- plot_venn(venn1_comp, 
+                   use_uniprot = TRUE, 
+                   type = "plot", 
+                   fontfamily = "sans", 
+                   cat.fontfamily = "sans", 
+                   cex = 1.9, 
+                   cat.cex = 1.2, 
+                   fill = gg_colour(4), 
+                   alpha = c(rep(0.4, 4)))
 
-plot(a4)
+# draw Venn diagram
+grid::grid.draw(venn1)
 
+atccVenn_cap <- "This is a figure caption. This is the second sentence."
 ```
 
 Text. 
