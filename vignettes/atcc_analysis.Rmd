@@ -40,7 +40,7 @@ knitr::opts_knit$set(progress = TRUE,
 
 # chunk options
 knitr::opts_chunk$set(collapse = FALSE,
-                      warning = FALSE,
+                      warning = TRUE,
                       message = FALSE,
                       echo = FALSE,
                       error = TRUE, 
@@ -210,8 +210,7 @@ are not quantified in every biological replicate of every strain.
 ```{r atccInit2, fig.cap=atccInit2_cap, fig.wide=TRUE}
 freq1 <- plot_frequency2(atcc_lfq) + 
   scale_y_continuous(limits = c(0,600), 
-                     expand = expand_scale(mult = c(0, 0))) + 
-  labs(title = "Protein quantification frequency")
+                     expand = expand_scale(mult = c(0, 0)))
 
 numb1 <- plot_numbers2(atcc_lfq, atcc_exp) + 
   theme(axis.text.x = element_text(angle = 0), 
@@ -240,8 +239,7 @@ Table goes here.
 More text goes here.
 
 ```{r atccInit3}
-
-knitr::kable(summarise_lfq(atcc_lfq), 
+knitr::kable(sum_table(atcc_lfq), 
              caption = "A table caption", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
@@ -257,64 +255,98 @@ Filter for proteins identified in 2/3 reps of at least 1 condition.
 
 
 
-```{r atccFilt}
+```{r atccFilt, fig.cap=atccFilt_cap, fig.wide=TRUE}
 atcc_filt <- filter_na4(atcc_lfq, "or", "<=", 
                         pat1 = "A10231_EV", 1, 
                         pat2 = "A10231_W", 1, 
                         pat3 = "A90028_EV", 1, 
                         pat4 = "A90028_W", 1)
 
-a2a <- plot_frequency2(atcc_filt)
+freq2 <- plot_frequency2(atcc_filt) + 
+  scale_y_continuous(limits = c(0,400), 
+                     expand = expand_scale(mult = c(0, 0)))
 
-a2b <- plot_numbers2(atcc_filt, atcc_exp) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+numb2 <- plot_numbers2(atcc_filt, atcc_exp) + 
+  theme(axis.text.x = element_text(angle = 0), 
+        legend.position = "right") + 
+  scale_y_continuous(limits = c(0, 1750), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_discrete(labels = c(rep(1:3, 4))) + 
+  labs(title = "Proteins per biological replicate") + 
+  xlab("Biological replicate") + 
+  guides(fill = guide_legend(nrow = 4, byrow = TRUE))
 
-a2c_labels <- c(rep("EV", 3), 
+ggpubr::ggarrange(freq2, numb2,
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  font.label = list(size = 24, color = "black"), 
+                  widths = c(1, 1.32), 
+                  vjust = 1)
+
+atccFilt_cap <- "This is a figure caption. This is the second sentence."
+```
+
+Reduces `r nrow(atcc_lfq)` proteins to `r nrow(atcc_filt)`.
+
+```{r atccFilt2, fig.cap=atccFilt2_cap, fig.small=TRUE}
+mds1_labels <- c(rep("EV", 3), 
                 rep("WCL", 3), 
                 rep("EV", 3), 
                 rep("WCL", 3))
 
-a2c <- plot_mds(atcc_filt, mat_labels = a2c_labels)
+plot_mds(atcc_filt, mat_labels = mds1_labels, 
+         shape_size = 4) + 
+  labs(title = "Title") + 
+  scale_y_continuous(limits = c(-1.5, 0.75), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_continuous(limits = c(-4, 2), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(legend.position = "bottom") + 
+  scale_fill_manual(values = c("orange", "red"))
 
-ggarrange(ggarrange(a2a, a2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
-                    font.label = list(size = 24, color = "black")), 
-          a2c, 
-          labels = c("", "C"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
+atccFilt2_cap <- "This is a figure caption. This is the second sentence."
 ```
 
-Reduces `r nrow(atcc_lfq)` proteins to `r nrow(atcc_filt)`.
 
 ## LFQ intensity normalisation
 
 Text.
 
-```{r atccNorm}
+```{r atccNorm, fig.cap=atccNorm_cap, fig.height=7}
 atcc_norm <- normalizeCyclicLoess(atcc_filt)
 
-a3a <- plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
+plot_normalization2(atcc_exp, atcc_filt, atcc_norm) + 
+  scale_x_discrete(labels = c(rep(1:3, 4))) + 
+  labs(title = "Title") + 
+  xlab("Biological replicate") + 
+  theme(plot.margin = margin(t = 0, l = 1.5, r = 1.5, b = 0, unit = "inches"))
+  
 
-a3b_labels <- c(rep("EV", 3), 
+atccNorm_cap <- "This is a figure caption. This is the second sentence."
+```
+
+Text.
+
+```{r atccNorm2, fig.cap=atccNorm2_cap, fig.small=TRUE}
+mds2_labels <- c(rep("EV", 3), 
                 rep("WCL", 3), 
                 rep("EV", 3), 
                 rep("WCL", 3))
 
-a3b <- plot_mds(atcc_norm, mat_labels = a3b_labels)
+plot_mds(atcc_norm, mat_labels = mds2_labels, 
+         shape_size = 4) + 
+  labs(title = "Title") + 
+  scale_y_continuous(limits = c(-0.8, 0.8), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_continuous(limits = c(-1, 1), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(legend.position = "bottom") + 
+  scale_fill_manual(values = c("orange", "red"))
 
-a3c <- plot_dendro(atcc_norm)
-
-ggarrange(a3a, 
-          ggarrange(a3b, a3c, labels = c("B", "C"), ncol = 1, nrow = 2, 
-                    font.label = list(size = 24, color = "black")), 
-          labels = c("A", ""), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
+atccNorm2_cap <- "This is a figure caption. This is the second sentence."
 ```
+
 
 ## ATCC strain protein comparison
 
