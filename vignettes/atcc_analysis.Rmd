@@ -400,7 +400,7 @@ atccVenn_cap <- "This is a figure caption. This is the second sentence."
 
 Text. 
 
-```{r atcc1Top10, results='hide'}
+```{r atcc1Top10}
 # get top 10 most abundant protein exclusive to 10231 EVs
 # in descending order of abundance
 atcc1_top10 <- atcc1_ev %>% 
@@ -410,19 +410,21 @@ atcc1_top10 <- atcc1_ev %>%
   mutate(mean = rowMeans(select(., contains("A10231_EV")), na.rm = TRUE)) %>% 
   top_n(n = 10, wt = mean) %>% 
   arrange(desc(mean)) %>% 
-  mutate(protein_name = match_id(id, uniprot, "UP_accession", "CGD_gene_name"), 
-         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+  match_id_multi(., "id", uniprot, "UP_accession", 
+                 new = c("CGD_gene_name", 
+                         "CGD_description")) %>% 
+  select(CGD_gene_name, CGD_description, everything(), -id)
 
 knitr::kable(atcc1_top10, 
              caption = "This is a table caption", 
+             col.names = c("Name", "Function", "EV1 LFQ", 
+                           "EV2 LFQ", "EV3 LFQ", "Mean LFQ"), 
              digits = 1)
-  
-
 ```
 
 TEXT.
 
-```{r atcc9Top10, results='hide'}
+```{r atcc9Top10}
 atcc9_top10 <- atcc9_ev %>% 
   tibble::as_tibble(rownames = "id") %>% 
   filter_na(., op = "==", pat = "A90028_W", val = 3) %>% 
@@ -430,22 +432,25 @@ atcc9_top10 <- atcc9_ev %>%
   mutate(mean = rowMeans(select(., contains("A90028_EV")), na.rm = TRUE)) %>% 
   top_n(n = 10, wt = mean) %>% 
   arrange(desc(mean)) %>% 
-  mutate(protein_name = match_id(id, uniprot, "UP_accession", "CGD_gene_name"), 
-         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+  match_id_multi(., "id", uniprot, "UP_accession", 
+                 new = c("CGD_gene_name", 
+                         "CGD_description")) %>% 
+  select(CGD_gene_name, CGD_description, everything(), -id)
 
 knitr::kable(atcc9_top10, 
              caption = "This is a table caption", 
+             col.names = c("Name", "Function", "EV1 LFQ", 
+                           "EV2 LFQ", "EV3 LFQ", "Mean LFQ"), 
              digits = 1)
-  
 ```
 
 ## Imputation of missing values
 
 TEXT. 
 
-```{r atccSum, results='hide'}
+```{r atccSum}
 # explore percentage missing values in each sample
-knitr::kable(summarise_lfq(atcc_norm), 
+knitr::kable(sum_table(atcc_norm), 
              caption = "A table caption", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
@@ -453,7 +458,6 @@ knitr::kable(summarise_lfq(atcc_norm),
                            "Range", "Number of proteins", "Number of NA", 
                            "Percent NA"), 
              digits = 1)
-
 ```
 
 TEXT
@@ -476,7 +480,7 @@ atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=",
 
 
 
-knitr::kable(summarise_lfq(atcc_both), 
+knitr::kable(sum_table(atcc_both), 
              caption = "A table caption", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
@@ -484,7 +488,11 @@ knitr::kable(summarise_lfq(atcc_both),
                            "Range", "Number of proteins", "Number of NA", 
                            "Percent NA"), 
              digits = 1)
+```
 
+TEXT.
+
+```{r atccSum3}
 a5a <- grid::grid.grabExpr(plot_missval2(atcc_both))
 
 a5b <- grid::grid.grabExpr(plot_detect2(atcc_both))
@@ -496,6 +504,7 @@ ggarrange(a5a, a5b,
           font.label = list(size = 24, colour = "black"))
 ```
 
+
 TEXT.
 
 ```{r atccImpute}
@@ -505,8 +514,7 @@ TEXT.
 # use left censored imputation method
 atcc_imp <- impute_QRILC(atcc_both)
 
-plot_imputation2(atcc_exp, atcc_both, atcc_imp) #a6
-
+plot_imputation2(atcc_exp, atcc_both, atcc_imp)
 ```
 
 TEXT.
@@ -530,6 +538,14 @@ atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL",
 atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
 colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
 
+knitr::kable(atcc_design, 
+             caption = "A table caption.")
+```
+
+TEXT.
+
+```{r atccDE2, include=FALSE}
+# specify comparisons of interest
 atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
 
 # make all pair-wise comparisons for specified contrasts
@@ -547,6 +563,7 @@ atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de,
 a1_res <- atcc_ind[[1]]
 a9_res <- atcc_ind[[2]]
 ```
+
 
 # Results
 
@@ -601,8 +618,50 @@ DT::datatable(a9_res_short,
 
 ## ATCC10231 results table
 
-```{r a1ResData}
+```{r a1ResData, include=FALSE}
+a1_res_short <- a1_res %>% 
+  select(CGD_gene_name, Protein_name, logFC, 
+         contains("_mean"), adj.P.Val, group) %>% 
+  mutate_at(.vars = vars(logFC, contains("_mean")), 
+            .funs = list(~round(., digits = 2))) %>% 
+  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
+         group = as.factor(group))
+```
 
+```{r a1Res}
+js1 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 40 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 40) + 
+              '...</span>' : data;",
+              "}")
+
+js2 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 12 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 12) + 
+              '...</span>' : data;",
+              "}")
+
+DT::datatable(a1_res_short, 
+              caption = "This is a table caption. Note that adjusted p-values 
+              have been shortened to three significant figures for ease of 
+              display.", 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name", 
+                           "Protein" = "Protein_name", 
+                           "p.adj" = "adj.P.Val"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(width = "40%", targets = 1), 
+                                  list(width = "10%", targets = c(0, 2:6)), 
+                                  list(targets = 1, 
+                                       render = js1), 
+                                  list(targets = 0, 
+                                       render = js2)
+                )
+              )
+)
 ```
 
 
@@ -611,9 +670,6 @@ DT::datatable(a9_res_short,
 TEXT.
 
 ```{r atccVolcanoData}
-
-
-
 
 ```
 
