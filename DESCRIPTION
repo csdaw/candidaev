@@ -7,6 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "first.last@example.com")
 Description: What the package does (one paragraph).
+Depends: R (>= 2.10)
 License: MIT + file LICENSE
 ByteCompile: true
 Encoding: UTF-8
@@ -32,8 +33,17 @@ Imports:
     tidyr,
     VennDiagram,
     stats,
-    magrittr
-Suggests: knitr,
-    rmarkdown
+    magrittr,
+    rlang,
+    limma,
+    broom
+Suggests: 
+    knitr,
+    rmarkdown,
+    BiocStyle,
+    kableExtra,
+    ggpubr,
+    stringi,
+    DT
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1

@@ -83,4 +83,15 @@ my_list <- match_id_multi(df = my_data,
                           new = c("protein_name", "gene_name",
                           as_list = TRUE))
 
+# use with dplyr
+library(dplyr)
+
+my_data3 <- my_data \%>\%
+  select(-sample_B3) \%>\%
+  match_id_multi(.,
+                 id = "id",
+                 ref = my_ref,
+                 match = "accession",
+                 new = c("protien_name", "gene_name"))
+
 }

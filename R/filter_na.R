@@ -56,8 +56,7 @@
 #'                       "sample_3",
 #'                       "total")
 #'
-#' # keep rows with maximum 1/3 NA values
-#' # in the 3 sample columns
+#' # keep rows with maximum 1/3 NA values in sample columns
 #' my_mat2 <- filter_na(my_mat,
 #'                      op = "<=",
 #'                      pat = "sample_",
@@ -83,6 +82,8 @@
 #' ## note you can also use this function with
 #' ## dplyr functions and magrittr pipes
 #' ## (and other tidyverse functions perhaps)
+#' # load dplyr
+#' library(dplyr)
 #'
 #' # drop the 'total' column
 #' # keep rows with at least 2/3 NA values

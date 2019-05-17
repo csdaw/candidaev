@@ -75,9 +75,6 @@ and clustering).
 library(candidaev)
 library(dplyr)
 library(ggplot2)
-library(ggpubr)
-library(limma)
-library(UpSetR)
 
 # set seed for imputation, kmeans, MDS plot
 set.seed(1)
@@ -105,7 +102,8 @@ yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_1")]
 yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
                           pat1 = "EV", val1 = 1, 
                           pat2 = "W", val2 = 1)
-yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
+
+yeast_norm2 <- limma::normalizeCyclicLoess(yeast_filt2)
 
 yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
                          pat1 = "EV", val1 = 3, 
@@ -129,7 +127,7 @@ biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=",
                            pat1 = "EV", val1 = 1, 
                            pat2 = "W", val2 = 1)
 
-biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
+biofilm_norm <- limma::normalizeCyclicLoess(biofilm_filt)
 
 biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=", 
                          pat1 = "EV", val1 = 4, 
@@ -320,7 +318,7 @@ atccFilt2_cap <- "This is a figure caption. This is the second sentence."
 Text.
 
 ```{r atccNorm, fig.cap=atccNorm_cap, fig.height=7}
-atcc_norm <- normalizeCyclicLoess(atcc_filt)
+atcc_norm <- limma::normalizeCyclicLoess(atcc_filt)
 
 plot_normalization2(atcc_exp, atcc_filt, atcc_norm) + 
   scale_x_discrete(labels = c(rep(1:3, 4))) + 

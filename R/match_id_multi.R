@@ -74,6 +74,17 @@
 #'                           new = c("protein_name", "gene_name",
 #'                           as_list = TRUE))
 #'
+#' # use with dplyr
+#' library(dplyr)
+#'
+#' my_data3 <- my_data %>%
+#'   select(-sample_B3) %>%
+#'   match_id_multi(.,
+#'                  id = "id",
+#'                  ref = my_ref,
+#'                  match = "accession",
+#'                  new = c("protien_name", "gene_name"))
+#'
 #' @export
 match_id_multi <- function(df, id, ref, match, new, as_list = FALSE, ...) {
   new_columns <- lapply(new, function(x) match_id(id = df[[id]],
@@ -85,7 +96,7 @@ match_id_multi <- function(df, id, ref, match, new, as_list = FALSE, ...) {
   names(new_columns) <- new
 
   if(as_list == FALSE) {
-    new_df <- dplyr::bind_cols(df, new_columns)
+    new_df <- bind_cols(df, new_columns)
 
     new_df
   } else {new_columns}

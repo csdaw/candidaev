@@ -74,6 +74,9 @@
 #' returns a \code{data.frame} with the proteins listed in order of appearance in the heatmap.
 #'
 #' @examples
+#' # load dplyr
+#' library(dplyr)
+#'
 #' ## log2 LFQ intensity type heatmap
 #' # load a proteinGroups data.frame supplied with this package
 #' my_proteinGroups <- atcc
@@ -90,14 +93,14 @@
 #' # filter for proteins quantified in min 2/3 reps of
 #' # at least 1 sample group
 #' my_filt <- my_lfq %>%
-#'   filter_na4(my_lfq, logic = "or", op = "<=",
+#'   filter_na4(., logic = "or", op = "<=",
 #'              pat1 = "A10231_EV", val1 = 1,
 #'              pat2 = "A10231_W", val2 = 1,
 #'              pat3 = "A90028_EV", val3 = 1,
 #'              pat4 = "A90028_W", val4 = 1)
 #'
 #' # normalise LFQ intensities
-#' my_norm <- normalizeCyclicLoess(my_filt)
+#' my_norm <- limma::normalizeCyclicLoess(my_filt)
 #'
 #' # impute missing values
 #' my_imp <- impute_QRILC(my_norm)
@@ -122,7 +125,8 @@
 #' my_efit <- limma_eBayes(mat = my_imp, design = my_design, contrasts = my_contrasts)
 #'
 #' # extract overall results table
-#' result_overall <- get_results(efit = my_efit, mat = my_imp, p_val = 0.001, lfc = 0, type = "overall")
+#' result_overall <- get_results(efit = my_efit, mat = my_imp,
+#'                               p_val = 0.001, lfc = 0, type = "overall")
 #'
 #' # plot a log2 LFQ intensity heatmap
 #' htmp_data <- result_overall %>%
@@ -143,7 +147,7 @@
 #'              heatmap_legend_param = list(title = "legend title",
 #'                                          color_bar = "continuous",
 #'                                          direction = "vertical",
-#'                                          legend_width = ggplot2::unit(5, "cm"),
+#'                                          legend_width = grid::unit(5, "cm"),
 #'                                          title_position = "lefttop-rot",
 #'                                          at = seq(-10, 10, 2)))
 #'
@@ -169,7 +173,7 @@
 #'              heatmap_legend_param = list(title = expression(bold(log[2]("FC"))),
 #'              color_bar = "continuous",
 #'              direction = "vertical",
-#'              legend_width = unit(5, "cm"),
+#'              legend_width = grid::unit(5, "cm"),
 #'              title_position = "lefttop-rot",
 #'              title_gp = grid::gpar(colour = "black", fontsize = 8),
 #'              labels_gp = grid::gpar(colour = "black", fontsize = 8),
@@ -226,7 +230,7 @@ plot_heatmap <- function(mt,
     clust_dist <- clust_fun
 
     # cluster rows
-    row_clust <- stats::hclust(dist(mt2, method = clust_fun))
+    row_clust <- stats::hclust(stats::dist(mt2, method = clust_fun))
 
   }
 
@@ -240,7 +244,7 @@ plot_heatmap <- function(mt,
       factor(levels = split_order)
   } else if(split_type == "kmeans") {
     set.seed(1)
-    row_kmeans <- kmeans(mt2, k)
+    row_kmeans <- stats::kmeans(mt2, k)
 
     htmp_split <- row_kmeans$cluster %>%
       factor(levels = split_order)
@@ -256,7 +260,7 @@ plot_heatmap <- function(mt,
 
     colour_fun <- circlize::colorRamp2(legend_breaks, legend_cols)
   } else {
-    legend_cols <- colorRampPalette(colour_vals)
+    legend_cols <- grDevices::colorRampPalette(colour_vals)
 
     colour_fun <- circlize::colorRamp2(legend_breaks, legend_cols(11))
   }

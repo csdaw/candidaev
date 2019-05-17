@@ -84,6 +84,8 @@
 #' ## note you can also use this function with
 #' ## dplyr functions and magrittr pipes
 #' ## (and other tidyverse functions perhaps)
+#' # load dplyr
+#' library(dplyr)
 #'
 #' # drop the 'total' column
 #' # keep rows with at least 2/3 zero values

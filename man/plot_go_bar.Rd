@@ -28,7 +28,7 @@ bars indicates the specific GO domain a GO term is under: biological process
 (BP), cellular component (CC), molecular function (MF).
 }
 \examples{
-\dontrun{
+\donttest{
 # import a FungiFun2 output .csv file
 go_table <- process_fungifun("./vignettes/figures/f4_GO_DAY_Y.csv")
 

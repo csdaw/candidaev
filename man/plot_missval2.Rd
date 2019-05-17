@@ -36,6 +36,9 @@ removed. Instead the input has been changed to a numeric matrix.
 }
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 
@@ -51,7 +54,7 @@ my_lfq <- my_proteinGroups \%>\%
 # filter for proteins quantified in min 2/3 reps of
 # at least 1 sample group
 my_filt <- my_lfq \%>\%
-  filter_na4(my_lfq, logic = "or", op = "<=",
+  filter_na4(., logic = "or", op = "<=",
              pat1 = "A10231_EV", val1 = 1,
              pat2 = "A10231_W", val2 = 1,
              pat3 = "A90028_EV", val3 = 1,

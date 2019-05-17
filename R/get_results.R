@@ -45,6 +45,9 @@
 #' \code{result_1 <- get_results(my_efit, my_mat, type = "individual")[[1]]}
 #'
 #' @examples
+#' # load dplyr
+#' library(dplyr)
+#'
 #' # load a proteinGroups data.frame supplied with this package
 #' my_proteinGroups <- atcc
 #'
@@ -60,14 +63,14 @@
 #' # filter for proteins quantified in min 2/3 reps of
 #' # at least 1 sample group
 #' my_filt <- my_lfq %>%
-#'   filter_na4(my_lfq, logic = "or", op = "<=",
+#'   filter_na4(., logic = "or", op = "<=",
 #'              pat1 = "A10231_EV", val1 = 1,
 #'              pat2 = "A10231_W", val2 = 1,
 #'              pat3 = "A90028_EV", val3 = 1,
 #'              pat4 = "A90028_W", val4 = 1)
 #'
 #' # normalise LFQ intensities
-#' my_norm <- normalizeCyclicLoess(my_filt)
+#' my_norm <- limma::normalizeCyclicLoess(my_filt)
 #'
 #' # impute missing values
 #' my_imp <- impute_QRILC(my_norm)
@@ -92,10 +95,12 @@
 #' my_efit <- limma_eBayes(mat = my_imp, design = my_design, contrasts = my_contrasts)
 #'
 #' # extract overall results table
-#' result_overall <- get_results(efit = my_efit, mat = my_imp, p_val = 0.001, lfc = 0, type = "overall")
+#' result_overall <- get_results(my_efit, my_imp,
+#'                               p_val = 0.001, lfc = 0, type = "overall")
 #'
 #' # extract list of results tables for each individual contrast
-#' result_list <- get_results(efit = my_efit, mat = my_imp, p_val = 0.001, lfc = 0, type = "individual")
+#' result_list <- get_results(my_efit, my_imp,
+#'                            p_val = 0.001, lfc = 0, type = "individual")
 #'
 #' # see results table for A9_EV versus A9_W contrast
 #' result_a9 <- result_list[[2]]
@@ -106,7 +111,7 @@ get_results <- function(efit, mat, p_val = 0.01, lfc = 0, type = c("individual",
     df <- as.data.frame(mat) %>%
       tibble::rownames_to_column(var = "UP_accession")
 
-    tt <- topTable(efit, number = Inf, sort.by = "none") %>%
+    tt <- limma::topTable(efit, number = Inf, sort.by = "none") %>%
       tibble::rownames_to_column(var = "UP_accession")
 
     result <- left_join(df, tt, by = "UP_accession") %>%
@@ -122,13 +127,13 @@ get_results <- function(efit, mat, p_val = 0.01, lfc = 0, type = c("individual",
   if(type == "individual") {
     result <- list()
 
-    contrasts <- colnames(coef(efit))
+    contrasts <- colnames(stats::coef(efit))
 
     df <- as.data.frame(mat) %>%
       tibble::rownames_to_column(var = "UP_accession")
 
     for(i in 1:length(contrasts)) {
-      tt <- topTable(efit, number = Inf, coef = i) %>%
+      tt <- limma::topTable(efit, number = Inf, coef = i) %>%
         tibble::rownames_to_column(var = "UP_accession")
 
       c1 <- unlist(strsplit(contrasts[i], " - "))[1]

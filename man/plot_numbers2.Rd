@@ -44,6 +44,9 @@ removed. Instead the input has been changed to a numeric matrix.
 }
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 
@@ -58,6 +61,6 @@ my_lfq <- my_proteinGroups \%>\%
 
 # generate bar plot of number of proteins
 # quantified per sample
-plot_numbers2(my_lfq)
+plot_numbers2(my_lfq, my_expDesign)
 
 }

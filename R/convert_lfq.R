@@ -17,12 +17,19 @@
 #' @param exd data.frame: see the examples section of \code{\link{assert_exd}} or
 #' \code{\link{atcc_exp}} for examples of appropriately structured experimental designs.
 #'
+#' @param log_2 logical: if \code{TRUE} then the numeric matrix will be log2
+#' transformed before being returned. If \code{FALSE} the output numeric
+#' matrix will not be log2 transformed before being returned.
+#'
 #' @return Returns a numeric \code{matrix} with the same number of rows as \code{df}
 #' and the \code{LFQ.intensity} columns defined in \code{exd}. The row names are the
 #' \code{Majority.protein.IDs} column in \code{df}.
 #'
 #'
 #' @examples
+#' # load dplyr
+#' library(dplyr)
+#'
 #' # load a proteinGroups data.frame supplied with this package
 #' my_proteinGroups <- atcc
 #'
@@ -36,7 +43,6 @@
 #'   convert_lfq(., my_expDesign)
 #'
 #' @import dplyr
-#'
 #' @export
 convert_lfq <- function(df, exd, log_2 = TRUE) {
   # define vector of labels from experimental design

@@ -67,25 +67,25 @@
 #' # match the accession column in the reference table and...
 #' # output a vector of gene_names
 #' my_gn <- match_id(id = my_data$id,
-#'                   ref_df = my_ref,
+#'                   ref = my_ref,
 #'                   match = "accession",
 #'                   new = "gene_name")
 #'
 #' # create a new column in my_data with corresponding
 #' # protein names
 #' my_data$pn <- match_id(id = my_data$id,
-#'                        ref_df = my_ref,
+#'                        ref = my_ref,
 #'                        match = "accesssion",
 #'                        new = "protein_name")
 #'
 #' # create several new columns in my_data using dplyr
 #' my_data <- my_data %>%
-#'   mutate(gn = match_id(id, my_df, "accession", "gene_name"),
-#'          pn = match_id(id, my_df, "accession", "protein_name"))
+#'   mutate(gn = match_id(id, my_ref, "accession", "gene_name"),
+#'          pn = match_id(id, my_ref, "accession", "protein_name"))
 #'
 #' # output a vector of gene_names that are not concatenated
 #' my_gn <- match_id(id = my_data$id,
-#'                   ref_df = my_ref,
+#'                   ref = my_ref,
 #'                   match = "accession",
 #'                   new = "gene_name",
 #'                   concat = FALSE)
@@ -102,7 +102,7 @@
 #' # match the accession column in the reference table by not
 #' # splitting the strings in the id column in the data table
 #' my_data2$gn <- match_id(id = my_data2$id,
-#'                         ref_df = my_ref2,
+#'                         ref = my_ref2,
 #'                         match = "accession",
 #'                         new = "gene_name",
 #'                         str_split = FALSE)

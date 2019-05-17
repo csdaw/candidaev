@@ -33,6 +33,9 @@
 #' returns a \code{data.frame} with the data underlying the bar plot.
 #'
 #' @examples
+#' # load dplyr
+#' library(dplyr)
+#'
 #' # load a proteinGroups data.frame supplied with this package
 #' my_proteinGroups <- atcc
 #'

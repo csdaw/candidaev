@@ -12,6 +12,10 @@ column as well as the \code{LFQ.intensity} columns defined in the experimental d
 
 \item{exd}{data.frame: see the examples section of \code{\link{assert_exd}} or
 \code{\link{atcc_exp}} for examples of appropriately structured experimental designs.}
+
+\item{log_2}{logical: if \code{TRUE} then the numeric matrix will be log2
+transformed before being returned. If \code{FALSE} the output numeric
+matrix will not be log2 transformed before being returned.}
 }
 \value{
 Returns a numeric \code{matrix} with the same number of rows as \code{df}
@@ -31,6 +35,9 @@ A numeric matrix generally makes it easier to perform
 normalisation, imputation, and statistical analyses in later steps.
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 

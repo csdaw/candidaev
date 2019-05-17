@@ -86,18 +86,19 @@ grid::grid.draw(my_venn)
 # get the data underlying the Venn
 my_venn_data <- plot_venn(vlist = comp,
                           type = "df")
-
+\donttest{
 # plot Venn diagram and save as png
 plot_venn(vlist = comp,
           type = "save",
           output = "png",
-          output_file = "path/to/save/to/my_venn.png")
+          output_file = "./venn/my_venn.png")
 
 # plot Venn diagram and save as svg
 plot_venn(vlist = comp,
           type = "save",
           output = "svg",
-          output_file = "path/to/save/to/my_venn.svg",
+          output_file = "./venn/my_venn.svg",
           output_dim = c(6, 6))
+}
 
 }

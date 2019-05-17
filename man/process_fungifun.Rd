@@ -28,6 +28,7 @@ analysis are:
 }
 }
 \examples{
+\donttest{
 # write some gene names to the clipboard
 # only works with Windows
 my_genes <- c("GSC1", "XOG1", "BGL2", "HYR1", "ALS3",
@@ -38,6 +39,7 @@ writeClipboard(my_genes)
 # paste into FungiFun2 input
 # perform GO analysis and save output as CSV
 # import GO enrichment analysis results
-GO_result <- process_fungifun("./path/to/file")
+GO_result <- process_fungifun("./vignettes/figures/f4_GO_DAY_Y.csv")
+}
 
 }

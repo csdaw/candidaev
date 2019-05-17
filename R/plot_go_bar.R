@@ -19,7 +19,7 @@
 #' \code{\link[ggplot2]{ggplot}}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # import a FungiFun2 output .csv file
 #' go_table <- process_fungifun("./vignettes/figures/f4_GO_DAY_Y.csv")
 #'
@@ -44,7 +44,7 @@ plot_go_bar <- function(go_table, terms_list, col_pal) {
     arrange(adj.p.val)
 
   ggplot(data = df,
-         aes(x = reorder(GO.term, rev(adj.p.val)),
+         aes(x = stats::reorder(GO.term, rev(adj.p.val)),
              y = Cat.ratio*100)) +
     geom_bar(stat = "identity", aes(fill = GO.type)) +
     theme_classic(base_size = 8) +

@@ -59,6 +59,7 @@
 #' # so 'my_fun' will return TRUE.
 #' my_fun(exp_design = exp)
 #'
+#' @importFrom assertthat assert_that
 #' @export
 assert_exd <- function(df) {
   # assert that input is data frame

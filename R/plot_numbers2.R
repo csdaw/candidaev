@@ -35,6 +35,9 @@
 #' returns a \code{data.frame} with the data underlying the bar plot.
 #'
 #' @examples
+#' # load dplyr
+#' library(dplyr)
+#'
 #' # load a proteinGroups data.frame supplied with this package
 #' my_proteinGroups <- atcc
 #'
@@ -49,7 +52,7 @@
 #'
 #' # generate bar plot of number of proteins
 #' # quantified per sample
-#' plot_numbers2(my_lfq)
+#' plot_numbers2(my_lfq, my_expDesign)
 #'
 #' @export
 plot_numbers2 <- function(mat, exd, plot = TRUE) {

@@ -16,6 +16,8 @@ in \code{mat}. Used for grouping LFQ intensity data so different groups
 have different point shapes e.g. EV vs WCL.}
 
 \item{shape_size}{integer: size of scatterplot points}
+
+\item{...}{Other arguments to be passed to \code{\link[limma]{plotMDS}}.}
 }
 \value{
 Returns an MDS plot on the current graphics device
@@ -34,6 +36,9 @@ largest standard deviation between the samples).
 \code{\link[ggplot2]{ggplot}} is used to draw the plot.
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 
@@ -49,14 +54,14 @@ my_lfq <- my_proteinGroups \%>\%
 # filter for proteins quantified in min 2/3 reps of
 # at least 1 sample group
 my_filt <- my_lfq \%>\%
-  filter_na4(my_lfq, logic = "or", op = "<=",
+  filter_na4(., logic = "or", op = "<=",
              pat1 = "A10231_EV", val1 = 1,
              pat2 = "A10231_W", val2 = 1,
              pat3 = "A90028_EV", val3 = 1,
              pat4 = "A90028_W", val4 = 1)
 
 # normalise LFQ intensities
-my_norm <- normalizeCyclicLoess(my_filt)
+my_norm <- limma::normalizeCyclicLoess(my_filt)
 
 
 # vector for sample groups

@@ -42,6 +42,9 @@ removed. Instead the input has been changed to a numeric matrix.
 }
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 
@@ -57,23 +60,23 @@ my_lfq <- my_proteinGroups \%>\%
 # filter for proteins quantified in min 2/3 reps of
 # at least 1 sample group
 my_filt <- my_lfq \%>\%
-  filter_na4(my_lfq, logic = "or", op = "<=",
+  filter_na4(., logic = "or", op = "<=",
              pat1 = "A10231_EV", val1 = 1,
              pat2 = "A10231_W", val2 = 1,
              pat3 = "A90028_EV", val3 = 1,
              pat4 = "A90028_W", val4 = 1)
 
 # normalise LFQ intensities using limma
-my_norm <- normalizeCyclicLoess(my_filt)
+my_norm <- limma::normalizeCyclicLoess(my_filt)
 
 # normalise LFQ intensities
 # using some other function from limma
-my_norm2 <- normalizeQuantiles(my_filt)
+my_norm2 <- limma::normalizeQuantiles(my_filt)
 
 # box plots before and after normalisations
-plot_normalization(exd = atcc_exp,
-                   my_filt,
-                   my_norm,
-                   my_norm2)
+plot_normalization2(exd = atcc_exp,
+                    my_filt,
+                    my_norm,
+                    my_norm2)
 
 }

@@ -42,6 +42,9 @@ Instead the input has been changed to a numeric matrix.
 }
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 

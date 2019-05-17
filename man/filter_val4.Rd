@@ -97,6 +97,8 @@ my_mat2 <- filter_val4(my_mat,
                        pat4 = "sample.*d", val4 = 20)
 
 ## example for a data.frame input
+# load dplyr
+library(dplyr)
 
 # define a 6x14 data.frame
 my_df <- my_mat \%>\%

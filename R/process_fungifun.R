@@ -19,6 +19,7 @@
 #' enrichment analysis.
 #'
 #' @examples
+#' \donttest{
 #' # write some gene names to the clipboard
 #' # only works with Windows
 #' my_genes <- c("GSC1", "XOG1", "BGL2", "HYR1", "ALS3",
@@ -29,11 +30,13 @@
 #' # paste into FungiFun2 input
 #' # perform GO analysis and save output as CSV
 #' # import GO enrichment analysis results
-#' GO_result <- process_fungifun("./path/to/file")
+#' GO_result <- process_fungifun("./vignettes/figures/f4_GO_DAY_Y.csv")
+#' }
 #'
 #' @export
 process_fungifun <- function(filename) {
-  df <- read.csv(filename, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+  df <- utils::read.csv(filename, header = TRUE,
+                        sep = "\t", stringsAsFactors = FALSE)
   df$N.prot.found <- as.numeric(gsub(" /.*", "", df$X..genes...category))
   df$N.prot.cat <- as.numeric(gsub(".* / ", "", df$X..genes...category))
   df$N.prot.input <- as.numeric(gsub(".* / ", "", df$X..genes...input))

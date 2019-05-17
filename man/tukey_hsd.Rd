@@ -20,6 +20,10 @@ adjusted p-values for the comparison of sample means.
 \code{\link[stats]{TukeyHSD}} from the \pkg{stats} package.
 }
 \examples{
+\donttest{
+# load dplyr
+library(dplyr)
+
 # construct data.frame with nta experiment info
 nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2",
                                   "ATCC10231_3", "ATCC90028_1",
@@ -71,5 +75,6 @@ nta_total <- nta_techavg \%>\%
 # ratio across the strains
 nta_total_tukey <- aov(part_per_prot ~ Strain, data = nta_total) \%>\%
   tukey_hsd()
+}
 
 }

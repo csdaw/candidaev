@@ -72,6 +72,9 @@ colour.
 }
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 
@@ -87,14 +90,14 @@ my_lfq <- my_proteinGroups \%>\%
 # filter for proteins quantified in min 2/3 reps of
 # at least 1 sample group
 my_filt <- my_lfq \%>\%
-  filter_na4(my_lfq, logic = "or", op = "<=",
+  filter_na4(., logic = "or", op = "<=",
              pat1 = "A10231_EV", val1 = 1,
              pat2 = "A10231_W", val2 = 1,
              pat3 = "A90028_EV", val3 = 1,
              pat4 = "A90028_W", val4 = 1)
 
 # normalise LFQ intensities
-my_norm <- normalizeCyclicLoess(my_filt)
+my_norm <- limma::normalizeCyclicLoess(my_filt)
 
 # impute missing values
 my_imp <- impute_QRILC(my_norm)
@@ -159,5 +162,4 @@ my_plot <- plot_volcano(data = result_a9,
                       values = c("red",
                                  "blue",
                                  "grey")
-
 }

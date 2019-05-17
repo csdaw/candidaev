@@ -112,6 +112,8 @@
 #' ## note you can also use this function with
 #' ## dplyr functions and magrittr pipes
 #' ## (and other tidyverse functions probably)
+#' # load dplyr
+#' library(dplyr)
 #'
 #' # drop the 'total' column
 #' # keep rows where the sample a columns add up

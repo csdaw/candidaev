@@ -55,6 +55,9 @@ another (only if \code{type = "individual"}
 See the \strong{Examples} section for an example of how to use this function.
 }
 \examples{
+# load dplyr
+library(dplyr)
+
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
 
@@ -70,14 +73,14 @@ my_lfq <- my_proteinGroups \%>\%
 # filter for proteins quantified in min 2/3 reps of
 # at least 1 sample group
 my_filt <- my_lfq \%>\%
-  filter_na4(my_lfq, logic = "or", op = "<=",
+  filter_na4(., logic = "or", op = "<=",
              pat1 = "A10231_EV", val1 = 1,
              pat2 = "A10231_W", val2 = 1,
              pat3 = "A90028_EV", val3 = 1,
              pat4 = "A90028_W", val4 = 1)
 
 # normalise LFQ intensities
-my_norm <- normalizeCyclicLoess(my_filt)
+my_norm <- limma::normalizeCyclicLoess(my_filt)
 
 # impute missing values
 my_imp <- impute_QRILC(my_norm)
@@ -102,10 +105,12 @@ my_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W"
 my_efit <- limma_eBayes(mat = my_imp, design = my_design, contrasts = my_contrasts)
 
 # extract overall results table
-result_overall <- get_results(efit = my_efit, mat = my_imp, p_val = 0.001, lfc = 0, type = "overall")
+result_overall <- get_results(my_efit, my_imp,
+                              p_val = 0.001, lfc = 0, type = "overall")
 
 # extract list of results tables for each individual contrast
-result_list <- get_results(efit = my_efit, mat = my_imp, p_val = 0.001, lfc = 0, type = "individual")
+result_list <- get_results(my_efit, my_imp,
+                           p_val = 0.001, lfc = 0, type = "individual")
 
 # see results table for A9_EV versus A9_W contrast
 result_a9 <- result_list[[2]]

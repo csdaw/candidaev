@@ -70,8 +70,8 @@ colnames(my_mat) <- c("sample_1a",
                       "total")
 
 # keep rows with maximum 1/3 NA values
-in the sample a columns and 1/3 NA values
-in the sample b columns
+# in the sample a columns and 1/3 NA values
+# in the sample b columns
 my_mat2 <- filter_na2(my_mat,
                       logic = "or",
                       op = "<=",
@@ -107,6 +107,8 @@ my_df2 <- filter_na2(my_df,
 ## note you can also use this function with
 ## dplyr functions and magrittr pipes
 ## (and other tidyverse functions probably)
+# load dplyr
+library(dplyr)
 
 # drop the 'total' column
 # keep rows with at least 2/3 NA values in the
