@@ -167,7 +167,7 @@ It has the following structure. Notice that each row in the `label`
 column of `atcc_exp` is exactly the same as the names of the 
 `LFQ.intensity` columns of `atcc`.
 
-```{r atccexpTable, include=FALSE}
+```{r atccexpTable}
 knitr::kable(atcc_exp, 
              caption = "A table caption. A table caption.")
 ```
@@ -199,28 +199,38 @@ function which performs the following:
    
 3. Log<sub>2</sub> transforms the LFQ intensities.
 
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 The resulting matrix `atcc_lfq` still has `r nrow(atcc_lfq)` rows but only 
 `r ncol(atcc_lfq)` columns, one for each LC-MS/MS sample. As it typical for 
 shotgun proteomics data, the proteins in this data set 
 are not quantified in every biological replicate of every strain.
 
-```{r atccInit2, fig.cap="This is a figure caption. This is the second sentence.", fig.wide=TRUE}
-a1a <- plot_frequency2(atcc_lfq) + 
-  scale_y_continuous(limits = c(0,600), expand = expand_scale(mult = c(0, 0)))
+```{r atccInit2, fig.cap=atccInit2_cap, fig.wide=TRUE}
+freq1 <- plot_frequency2(atcc_lfq) + 
+  scale_y_continuous(limits = c(0,600), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  labs(title = "Protein quantification frequency")
 
-plot_numbers2(atcc_lfq, atcc_exp) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
-  scale_y_continuous(limits = c(0, 2250), expand = expand_scale(mult = c(0, 0))) + 
-  labs(fill = "Sample\ntype")
+numb1 <- plot_numbers2(atcc_lfq, atcc_exp) + 
+  theme(axis.text.x = element_text(angle = 0), 
+        legend.position = "right") + 
+  scale_y_continuous(limits = c(0, 2250), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_discrete(labels = c(rep(1:3, 4))) + 
+  labs(title = "Proteins per biological replicate") + 
+  xlab("Biological replicate") + 
+  guides(fill = guide_legend(nrow = 4, byrow = TRUE))
 
-ggpubr::ggarrange(a1a, a1b,
+ggpubr::ggarrange(freq1, numb1,
                   labels = c("A", "B"), 
                   ncol = 2, 
                   nrow = 1, 
-                  font.label = list(size = 24, color = "black"))
+                  font.label = list(size = 24, color = "black"), 
+                  widths = c(1, 1.32), 
+                  vjust = 1)
 
+atccInit2_cap <- "This is a figure caption. This is the second sentence."
 ```
 
 
