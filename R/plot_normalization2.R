@@ -101,6 +101,6 @@ plot_normalization2 <- function(exd, mat, ...) {
     geom_boxplot(notch = TRUE, na.rm = TRUE) +
     coord_flip() +
     facet_wrap(~var, ncol = 1) +
-    labs(x = "", y = expression(log[2]~"Intensity")) +
+    labs(x = "", y = expression(log[2]~"LFQ intensity")) +
     theme_bw(base_size = 12)
 }

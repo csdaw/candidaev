@@ -31,7 +31,7 @@ For example: \code{"./figures/my_venn.tiff"}.}
 \item{output_dim}{integer vector (length = 2): width and height of image to
 be saved. Units of the dimensions for tiff and png files can be specified
 using the \code{output_units} argument. For svg files the dimensions must
-be in inches (e.g. \code(c(7, 7))).}
+be in inches (e.g. \code{c(7, 7))}.}
 
 \item{output_units}{character: one of \code{"px"}, \code{"in"},
 \code{"cm"}, or \code{"mm"}. Indicates the units of the dimensions for

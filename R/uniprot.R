@@ -72,7 +72,7 @@
 #'
 #' @source The UniProt Consortium (2019). UniProt: a worldwide hub of protein
 #' knowledge. \emph{Nucleic Acids Research, 47}(D1), D506-D515.
-#' \href{https://doi.org/10.1093/nar/gky1049}
+#' \href{https://doi.org/10.1093/nar/gky1049}{doi:10.1093/nar/gky1049}
 #'
 #' Arnaud, M.B., Costanzo, M. C., Skrzypek, M. S., Binkley, G., Lane, C.,
 #' Miyasato, S. R., & Sherlock, G. (2005). The Candida Genome Database (CGD),

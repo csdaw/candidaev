@@ -951,25 +951,6 @@ f4_a1_go <- marker_comp[4] %>%
 ```
 
 ```{r figure4Plots, include=FALSE}
-# define function to process the .csv files output by FungiFun2
-process_fungifun <- function(filename) {
-  df <- read.csv(filename, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
-  df$N.prot.found <- as.numeric(gsub(" /.*", "", df$X..genes...category))
-  df$N.prot.cat <- as.numeric(gsub(".* / ", "", df$X..genes...category))
-  df$N.prot.input <- as.numeric(gsub(".* / ", "", df$X..genes...input))
-  df$Cat.ratio <- df$N.prot.found / df$N.prot.cat
-  df$Input.ratio <- df$N.prot.found / df$N.prot.input
-  
-  df <- df[, -c(7:8)]
-  
-  colnames(df)[1:6] <- c("GO.ID", "GO.term", "GO.type", "Prot.found", "p.val", "adj.p.val")
-  
-  df$Prot.found <- as.character(df$Prot.found)
-  df$Prot.found <- gsub(" | ", ";", df$Prot.found, fixed = TRUE)
-  
-  return(df)
-}
-
 # import FungiFun2 GO enrichment results
 f4_y_go_table <- process_fungifun("./vignettes/figures/f4_GO_DAY_Y.csv")
 f4_b_go_table <- process_fungifun("./vignettes/figures/f4_GO_DAY_B.csv")
