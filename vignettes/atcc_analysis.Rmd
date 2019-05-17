@@ -41,7 +41,7 @@ knitr::opts_knit$set(progress = TRUE,
 # chunk options
 knitr::opts_chunk$set(collapse = FALSE,
                       warning = TRUE,
-                      message = FALSE,
+                      message = TRUE,
                       echo = FALSE,
                       error = TRUE, 
                       comment = "#>")
@@ -682,18 +682,8 @@ TEXT.
 
 TEXT.
 
-```{r atccHeatmap}
-
-# atcc_htmp <- atcc_overall %>% 
-#   select(1, 4:15, 24) %>% 
-#   filter(significant == TRUE) %>% 
-#   tibble::column_to_rownames(var = "UP_accession") %>% 
-#   as.matrix()
-# 
-# plot_heatmap2(atcc_htmp, atcc_exp, uniprot, kmeans = TRUE, k = 5, 
-#               clustering_distance = "euclidean", show_row_names = FALSE)
-
-atcc_htmp3 <- atcc_overall %>% 
+```{r atccHeatmap, fig.cap=htmp_cap, fig.heigh=7}
+atcc_htmp <- atcc_overall %>% 
   select(UP_accession, 
          matches("A9_EV[0-9]"), matches("A1_EV[0-9]"), 
          matches("A9_W[0-9]"), matches("A1_W[0-9]"),  
@@ -703,16 +693,16 @@ atcc_htmp3 <- atcc_overall %>%
   select(-significant) %>% 
   as.matrix()
 
-htmp3_params <- list(title = "legend title", 
-                     color_bar = "continuous", 
-                     direction = "vertical", 
-                     legend_width = unit(8, "cm"), 
-                     title_position = "lefttop-rot", 
-                     title_gp = grid::gpar(colour = "black", fontsize = 8), 
-                     labels_gp = grid::gpar(colour = "black", fontsize = 8), 
-                     at = seq(-5, 5, 1))
+htmp_params <- list(title = "legend title", 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_width = unit(8, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 8), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 8), 
+                    at = seq(-5, 5, 1))
 
-plot_heatmap(atcc_htmp3, 
+plot_heatmap(atcc_htmp, 
              plot = TRUE, 
              data_type = "log2intensity", 
              clust_fun = "euclidean", 
@@ -720,22 +710,16 @@ plot_heatmap(atcc_htmp3,
              k = 5, 
              legend_pos = "right",
              cluster_split = FALSE, 
-             split_order = c(5, 3, 1, 2, 4), 
+             split_order = c(4, 2, 5, 1, 3), 
              colour_lims = c(-4,4), 
-             heatmap_legend_param = htmp3_params)
+             heatmap_legend_param = htmp_params)
+
+htmp_cap <- "This is a figure caption."
 ```
 
 TEXT.
 
-```{r atccHeatmap2}
-
-# atcc_htmp2 <- atcc_overall %>% 
-#   select(1, matches("EV.vs.*W")) %>% 
-#   filter_at(.vars = vars(contains("vs")),
-#             all_vars(!is.na(.))) %>%
-#   tibble::column_to_rownames(var = "UP_accession") %>% 
-#   as.matrix()
-
+```{r atccHeatmap2, fig.cap=htmp2_cap, fig.heigh=7}
 atcc_htmp2 <- atcc_overall %>% 
   select(UP_accession, matches("EV.vs.*W"), significant) %>% 
   filter(significant == TRUE) %>% 
@@ -761,79 +745,8 @@ plot_heatmap(atcc_htmp2,
              legend_pos = "right", 
              split_order = c(4, 3, 1, 2, 5), 
              heatmap_legend_param = htmp2_params)
-```
 
-## Full results table
-
-TEXT.
-
-```{r markerComparison2, results='hide'}
-
-marker_comp2 <- list("a1_ev up" = a1_res %>% 
-                      filter(group == "A1_EV up") %>% 
-                      pull(CGD_gene_name), 
-                    "a1_ev ex" = a1_res %>% 
-                      filter(group == "A1_EV ex") %>% 
-                      pull(CGD_gene_name), 
-                    "a9_ev up" = a9_res %>% 
-                      filter(group == "A9_EV up") %>% 
-                      pull(CGD_gene_name), 
-                    "a9_ev ex" = a9_res %>% 
-                      filter(group == "A9_EV ex") %>% 
-                      pull(CGD_gene_name))
-
-upset(fromList(marker_comp2), 
-      point.size = 4.5, 
-      line.size = 2, 
-      mainbar.y.label = "\n\nIntersection protein number", 
-      mainbar.y.max = 400, 
-      sets.x.label = "Total protein number", 
-      text.scale = c(2, 2, 1.2, 1.2, 1.7, 2), 
-      order.by = "degree")
-marker_comp_tab2 <- plot_venn(vlist = marker_comp2, 
-                              use_uniprot = FALSE, type = "list")
-
-knitr::kable(marker_comp_tab2, 
-             caption = "A table caption")
-
-
-```
-
-## Potential marker proteins
-
-TEXT.
-
-```{r markerExtract2, eval=FALSE}
-marker_candidates2 <- marker_comp_tab2 %>% 
-  filter(..count.. > 0 & apply(.[, 1:4], 1, sum) > 1) %>% 
-  pull(..values..) %>% 
-  unlist()
-
-test_can <- intersect(marker_candidates, marker_candidates2) %>% 
-  stringr::str_extract_all(., "[^;]+") %>% 
-  unlist()
-
-test <- uniprot %>% 
-  filter(CGD_gene_name %in% test_can)
-
-DT::datatable(test, 
-              caption = "This is a table caption.", 
-              rownames = FALSE, 
-              colnames = c("Gene" = "CGD_gene_name"), 
-              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
-              class = "display compact", 
-              options = list(
-                autowidth = TRUE, 
-                columnDefs = list(list(targets = c(7:10, 13:21), 
-                                       render = DT::JS(
-                                         "function(data, type, row, meta) {",
-                                         "return type === 'display' && data.length > 40 ?",
-                                         "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
-                                         "}"))
-                                  )
-                )
-              )
-
+htmp2_cap <- "This is a figure caption."
 ```
 
 # Session information {-}
