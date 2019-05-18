@@ -60,8 +60,9 @@
 #' \code{label_fun != " "}.
 #'
 #' @examples
-#' # load dplyr
+#' # load dplyr and ggplot2
 #' library(dplyr)
+#' library(ggplot2)
 #'
 #' # load a proteinGroups data.frame supplied with this package
 #' my_proteinGroups <- atcc
@@ -149,7 +150,8 @@
 #'                                  "Not significant"),
 #'                       values = c("red",
 #'                                  "blue",
-#'                                  "grey")
+#'                                  "grey"))
+#'
 #' @importFrom rlang !!
 #' @export
 plot_volcano <- function(data, p_val, log2fc, group,

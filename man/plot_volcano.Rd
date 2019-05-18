@@ -72,8 +72,9 @@ colour.
 }
 }
 \examples{
-# load dplyr
+# load dplyr and ggplot2
 library(dplyr)
+library(ggplot2)
 
 # load a proteinGroups data.frame supplied with this package
 my_proteinGroups <- atcc
@@ -161,5 +162,6 @@ my_plot <- plot_volcano(data = result_a9,
                                  "Not significant"),
                       values = c("red",
                                  "blue",
-                                 "grey")
+                                 "grey"))
+
 }
