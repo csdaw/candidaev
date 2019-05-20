@@ -495,11 +495,11 @@ a5a <- grid::grid.grabExpr(plot_missval2(atcc_both))
 
 a5b <- grid::grid.grabExpr(plot_detect2(atcc_both))
 
-ggarrange(a5a, a5b, 
-          labels = c("A", "B"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, colour = "black"))
+ggpubr::ggarrange(a5a, a5b, 
+        labels = c("A", "B"), 
+        ncol = 2, 
+        nrow = 1, 
+        font.label = list(size = 24, colour = "black"))
 ```
 
 
@@ -680,7 +680,7 @@ TEXT.
 
 TEXT.
 
-```{r atccHeatmap, fig.cap=htmp_cap, fig.heigh=7}
+```{r atccHeatmap, fig.cap=htmp_cap, fig.height=8}
 atcc_htmp <- atcc_overall %>% 
   select(UP_accession, 
          matches("A9_EV[0-9]"), matches("A1_EV[0-9]"), 
@@ -691,33 +691,35 @@ atcc_htmp <- atcc_overall %>%
   select(-significant) %>% 
   as.matrix()
 
-htmp_params <- list(title = "legend title", 
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
                     color_bar = "continuous", 
                     direction = "vertical", 
-                    legend_width = unit(8, "cm"), 
+                    legend_height = unit(10, "cm"), 
                     title_position = "lefttop-rot", 
-                    title_gp = grid::gpar(colour = "black", fontsize = 8), 
-                    labels_gp = grid::gpar(colour = "black", fontsize = 8), 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                     at = seq(-5, 5, 1))
 
 plot_heatmap(atcc_htmp, 
              plot = TRUE, 
              data_type = "log2intensity", 
              clust_fun = "euclidean", 
-             split_type = "cutree", 
+             split_type = "kmeans", 
              k = 5, 
              legend_pos = "right",
-             cluster_split = FALSE, 
-             split_order = c(4, 2, 5, 1, 3), 
+             cluster_split = TRUE, 
              colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
              heatmap_legend_param = htmp_params)
+
 
 htmp_cap <- "This is a figure caption."
 ```
 
 TEXT.
 
-```{r atccHeatmap2, fig.cap=htmp2_cap, fig.heigh=7}
+```{r atccHeatmap2, fig.cap=htmp2_cap, fig.height=8}
 atcc_htmp2 <- atcc_overall %>% 
   select(UP_accession, matches("EV.vs.*W"), significant) %>% 
   filter(significant == TRUE) %>% 
@@ -728,21 +730,27 @@ atcc_htmp2 <- atcc_overall %>%
 htmp2_params <- list(title = expression(bold(log[2]("FC"))), 
                      color_bar = "continuous", 
                      direction = "vertical", 
-                     legend_width = unit(5, "cm"), 
+                     legend_height = unit(10, "cm"), 
                      title_position = "lefttop-rot", 
-                     title_gp = grid::gpar(colour = "black", fontsize = 8), 
-                     labels_gp = grid::gpar(colour = "black", fontsize = 8), 
+                     title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                     labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                      at = seq(-10, 10, 2))
 
-plot_heatmap(atcc_htmp2, 
-             plot = TRUE,
-             data_type = "log2fc", 
-             clust_fun = "euclidean", 
-             split_type = "kmeans", 
-             k = 5, 
-             legend_pos = "right", 
-             split_order = c(4, 3, 1, 2, 5), 
-             heatmap_legend_param = htmp2_params)
+htmp2 <- ggpubr::as_ggplot(grid::grid.grabExpr(plot_heatmap(atcc_htmp2, 
+                      plot = TRUE,
+                      data_type = "log2fc", 
+                      clust_fun = "euclidean", 
+                      split_type = "kmeans", 
+                      k = 5, 
+                      legend_pos = "right", 
+                      row_title_fontsize = 16, 
+                      col_name_fontsize = 14, 
+                      column_names_rot = 45, 
+                      heatmap_legend_param = htmp2_params))) + 
+  theme(plot.margin = margin(t = 0, l = 1.4, r = 1.4, b = 0, unit = "inches"))
+
+htmp2
+
 
 htmp2_cap <- "This is a figure caption."
 ```
