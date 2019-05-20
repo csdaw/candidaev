@@ -4,12 +4,18 @@
 \alias{plot_imputation2}
 \title{Visualise effect of imputation on protein intensities}
 \usage{
-plot_imputation2(exd, mat, ...)
+plot_imputation2(exd, facet_labels = NULL, mat, ...)
 }
 \arguments{
 \item{exd}{data.frame: contains information for plot labels. See the
 examples section of \code{\link{assert_exd}} or \code{\link{atcc_exp}} for
 examples of appropriately structured experimental designs.}
+
+\item{facet_labels}{\code{NULL} or a named vector: if\code{NULL} then
+the matrix names will be used for the facet labels (aka. strip text). Use a
+named vector to customise the facet labels. For example if you are plotting
+the following: \code{plot_imputation2(exp, facet_labels = x, mat1, mat2)}
+then \code{x} should be \code{c(mat1 = "Matrix 1", mat2 = "Matrix 2")}.}
 
 \item{mat}{numeric matrix: LFQ intensity data before imputation}
 

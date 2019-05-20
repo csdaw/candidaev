@@ -24,6 +24,12 @@
 #' examples section of \code{\link{assert_exd}} or \code{\link{atcc_exp}} for
 #' examples of appropriately structured experimental designs.
 #'
+#' @param facet_labels \code{NULL} or a named vector: if\code{NULL} then
+#' the matrix names will be used for the facet labels (aka. strip text). Use a
+#' named vector to customise the facet labels. For example if you are plotting
+#' the following: \code{plot_normalization2(exp, facet_labels = x, mat1, mat2)}
+#' then \code{x} should be \code{c(mat1 = "Matrix 1", mat2 = "Matrix 2")}.
+#'
 #' @param mat numeric matrix: LFQ intensity data before normalisation
 #'
 #' @param ... numeric matrix/matrices: LFQ intensity data after normalisation.
@@ -71,14 +77,14 @@
 #'                     my_norm2)
 #'
 #' @export
-plot_normalization2 <- function(exd, mat, ...) {
+plot_normalization2 <- function(exd, facet_labels = NULL, mat, ...) {
   # Get arguments from call
   call <- match.call()
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
   arglist <- lapply(arglist, eval.parent, n = 2)
   names(arglist) <- var.names
-  arglist <- arglist[-1]
+  arglist <- arglist[c(-1, -2)]
 
   # Show error if inputs are not the required classes
   assertthat::assert_that(is.data.frame(exd),
@@ -100,10 +106,19 @@ plot_normalization2 <- function(exd, mat, ...) {
 
   # Boxplots for conditions with facet_wrap
   # for the original and normalized values
-  ggplot(df, aes(x = ID, y = val, fill = condition)) +
-    geom_boxplot(notch = TRUE, na.rm = TRUE) +
-    coord_flip() +
-    facet_wrap(~var, ncol = 1) +
-    labs(x = "", y = expression(log[2]~"LFQ intensity")) +
-    theme_bw(base_size = 12)
+  if(is.null(facet_labels)) {
+    ggplot(df, aes(x = ID, y = val, fill = condition)) +
+      geom_boxplot(notch = TRUE, na.rm = TRUE) +
+      coord_flip() +
+      facet_wrap(~var, ncol = 1) +
+      labs(x = "", y = expression(log[2]~"LFQ intensity")) +
+      theme_bw(base_size = 12)
+  } else {
+    ggplot(df, aes(x = ID, y = val, fill = condition)) +
+      geom_boxplot(notch = TRUE, na.rm = TRUE) +
+      coord_flip() +
+      facet_wrap(~var, ncol = 1, labeller = labeller(var = facet_labels)) +
+      labs(x = "", y = expression(log[2]~"LFQ intensity")) +
+      theme_bw(base_size = 12)
+  }
 }

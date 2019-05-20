@@ -25,6 +25,12 @@
 #' examples section of \code{\link{assert_exd}} or \code{\link{atcc_exp}} for
 #' examples of appropriately structured experimental designs.
 #'
+#' @param facet_labels \code{NULL} or a named vector: if\code{NULL} then
+#' the matrix names will be used for the facet labels (aka. strip text). Use a
+#' named vector to customise the facet labels. For example if you are plotting
+#' the following: \code{plot_imputation2(exp, facet_labels = x, mat1, mat2)}
+#' then \code{x} should be \code{c(mat1 = "Matrix 1", mat2 = "Matrix 2")}.
+#'
 #' @param mat numeric matrix: LFQ intensity data before imputation
 #'
 #' @param ... numeric matrix/matrices: LFQ intensity data after imputation.
@@ -73,14 +79,14 @@
 #'                  my_imp,
 #'                  my_imp2)
 #' @export
-plot_imputation2 <- function(exd, mat, ...) {
+plot_imputation2 <- function(exd, facet_labels = NULL, mat, ...) {
   # Get arguments from call
   call <- match.call()
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
   arglist <- lapply(arglist, eval.parent, n = 2)
   names(arglist) <- var.names
-  arglist <- arglist[-1]
+  arglist <- arglist[c(-1,-2)]
 
   # Show error if inputs are not the required classes
   assertthat::assert_that(is.data.frame(exd),
@@ -102,9 +108,19 @@ plot_imputation2 <- function(exd, mat, ...) {
 
   # Density plots for different conditions with facet_wrap
   # for original and imputed samles
-  ggplot(df, aes(val, col = condition)) +
-    geom_density(na.rm = TRUE) +
-    facet_wrap(~var, ncol = 1) +
-    labs(x = expression(log[2]~"Intensity"), y = "Density") +
-    theme_bw(base_size = 12)
+  if(is.null(facet_labels)) {
+    ggplot(df, aes(val, col = condition)) +
+      geom_density(na.rm = TRUE) +
+      facet_wrap(~var, ncol = 1) +
+      labs(x = expression(log[2]~"Intensity"), y = "Density") +
+      theme_bw(base_size = 12)
+  } else {
+    ggplot(df, aes(val, col = condition)) +
+      geom_density(na.rm = TRUE) +
+      facet_wrap(~var, ncol = 1,
+                 labeller = labeller(var = facet_labels)) +
+      labs(x = expression(log[2]~"Intensity"), y = "Density") +
+      theme_bw(base_size = 12)
+  }
+
 }
