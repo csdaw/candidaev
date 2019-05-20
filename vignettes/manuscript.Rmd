@@ -758,12 +758,12 @@ f3b2 <- plot_volcano(data = a9_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (105)", "WCL enriched (134)", "Not significant (734)"),
+  scale_colour_manual(labels = c("EV enriched (99)", "WCL enriched (130)", "Not significant (744)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC90028')", parse = TRUE) + 
-  annotate("text", x = 3.5, y = 7, label = "bold('105')", parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('134')", parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('734')", parse = TRUE, colour = unname(ev_pal[1]))
+  annotate("text", x = 3.5, y = 7, label = "bold('99')", parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('130')", parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('744')", parse = TRUE, colour = unname(ev_pal[1]))
 ```
 
 
@@ -799,7 +799,7 @@ f3b3 <- plot_volcano(data = a1_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (106)", "WCL enriched (134)", "Not significant (445)"),
+  scale_colour_manual(labels = c("EV enriched (108)", "WCL enriched (142)", "Not significant (435)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC10231')", parse = TRUE) + 
   annotate("text", x = 3.5, y = 7, label = "bold('106')", parse = TRUE, colour = unname(ev_pal[2])) + 
@@ -840,13 +840,13 @@ f3b4 <- plot_volcano(data = biofilm_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (95)", "WCL enriched (81)", "Not significant (482)"), 
+  scale_colour_manual(labels = c("EV enriched (95)", "WCL enriched (79)", "Not significant (484)"), 
                       values = unname(ev_pal[c(2,1,3)]), 
                       breaks = c("EV up", "WCL up", "not sig")) + 
   annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 B')", parse = TRUE) + 
   annotate("text", x = 3.5, y = 7, label = "bold('95')", parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('81')", parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('482')", parse = TRUE, colour = unname(ev_pal[1]))
+  annotate("text", x = -3.5, y = 7, label = "bold('79')", parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('484')", parse = TRUE, colour = unname(ev_pal[1]))
 ```
 
 
