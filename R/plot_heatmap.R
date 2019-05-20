@@ -136,6 +136,14 @@
 #'   select(-significant) %>%
 #'   as.matrix()
 #'
+#' # define legend parameters
+#' htmp_params <- list(title = "legend title",
+#'                              color_bar = "continuous",
+#'                              direction = "vertical",
+#'                              legend_width = grid::unit(5, "cm"),
+#'                              title_position = "lefttop-rot",
+#'                              at = seq(-10, 10, 2)))
+#'
 #' plot_heatmap(htmp_data,
 #'              plot = TRUE,
 #'              df = FALSE,
@@ -144,12 +152,7 @@
 #'              split_type = "kmeans",
 #'              k = 5,
 #'              legend_pos = "right",
-#'              heatmap_legend_param = list(title = "legend title",
-#'                                          color_bar = "continuous",
-#'                                          direction = "vertical",
-#'                                          legend_width = grid::unit(5, "cm"),
-#'                                          title_position = "lefttop-rot",
-#'                                          at = seq(-10, 10, 2)))
+#'              heatmap_legend_param = htmp_params)
 #'
 #'
 #' ## log2FC type heatmap
@@ -161,6 +164,16 @@
 #'   select(-significant) %>%
 #'   as.matrix()
 #'
+#' # define legend parameters
+#' htmp_params2 <- list(title = expression(bold(log[2]("FC"))),
+#'                      color_bar = "continuous",
+#'                      direction = "vertical",
+#'                      legend_height = grid::unit(5, "cm"),
+#'                      title_position = "lefttop-rot",
+#'                      title_gp = grid::gpar(colour = "black", fontsize = 8),
+#'                      labels_gp = grid::gpar(colour = "black", fontsize = 8),
+#'                      at = seq(-10, 10, 2)))
+#'
 #' plot_heatmap(htmp_data2,
 #'              plot = TRUE,
 #'              df = FALSE,
@@ -170,14 +183,7 @@
 #'              k = 5,
 #'              legend_pos = "right",
 #'              split_order = c(2, 5, 1, 4, 3),
-#'              heatmap_legend_param = list(title = expression(bold(log[2]("FC"))),
-#'              color_bar = "continuous",
-#'              direction = "vertical",
-#'              legend_width = grid::unit(5, "cm"),
-#'              title_position = "lefttop-rot",
-#'              title_gp = grid::gpar(colour = "black", fontsize = 8),
-#'              labels_gp = grid::gpar(colour = "black", fontsize = 8),
-#'              at = seq(-10, 10, 2)))
+#'              heatmap_legend_param = htmp_params2)
 #'
 #' @export
 plot_heatmap <- function(mt,

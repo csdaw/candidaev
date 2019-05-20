@@ -74,7 +74,9 @@ plot_missval2 <- function(mat) {
   # Define heatmap legend parameters
   legend_param <- list(at = c(0, 1),
                        labels = c("Missing value",
-                                  "Valid value"))
+                                  "Valid value"),
+                       title_gp = grid::gpar(fontsize = 16),
+                       labels_gp = grid::gpar(fontsize = 14))
 
   # Plot binary heatmap
   ht2 = ComplexHeatmap::Heatmap(missval,

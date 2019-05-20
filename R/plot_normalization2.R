@@ -112,13 +112,13 @@ plot_normalization2 <- function(exd, facet_labels = NULL, mat, ...) {
       coord_flip() +
       facet_wrap(~var, ncol = 1) +
       labs(x = "", y = expression(log[2]~"LFQ intensity")) +
-      theme_bw(base_size = 12)
+      theme_bw(base_size = 16)
   } else {
     ggplot(df, aes(x = ID, y = val, fill = condition)) +
       geom_boxplot(notch = TRUE, na.rm = TRUE) +
       coord_flip() +
       facet_wrap(~var, ncol = 1, labeller = labeller(var = facet_labels)) +
       labs(x = "", y = expression(log[2]~"LFQ intensity")) +
-      theme_bw(base_size = 12)
+      theme_bw(base_size = 16)
   }
 }

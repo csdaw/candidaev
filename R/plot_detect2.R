@@ -91,11 +91,11 @@ plot_detect2 <- function(mat) {
     geom_density(na.rm = TRUE) +
     labs(x = expression(log[2]~"LFQ intensity"), y = "Density") +
     guides(col = guide_legend(title = "Missing values")) +
-    theme_bw(base_size = 12)
+    theme_bw(base_size = 16)
   p2 <- ggplot(cumsum, aes(mean, cs_frac, col = missval)) +
     geom_line() +
     labs(x = expression(log[2]~"LFQ intensity"), y = "Cumulative fraction") +
     guides(col = guide_legend(title = "Missing values")) +
-    theme_bw(base_size = 12)
+    theme_bw(base_size = 16)
   gridExtra::grid.arrange(p1, p2, ncol = 1)
 }
