@@ -51,8 +51,9 @@
 #' title text size, and key text size of the legend. For example
 #' \code{c("right", 11, 8)}.
 #'
-#' @param axis_params mixed vector (length = 2): specifies the colour and text
-#' size of the both axes text. For example \code{c("black", 10)}.
+#' @param axis_params mixed vector (length = 3): specifies axis text colour,
+#' axis title text size, and axis text text size for both axes.
+#' For example \code{c("black", 12, 10)}.
 #'
 #' @return Returns a volcano plot with the \code{log2fc} column data on the
 #' x axis and the \code{p_val} data on the y axis and with the points coloured
@@ -144,7 +145,7 @@
 #'                         x_lim = c(-10, 12),
 #'                         y_lim = c(0, 8),
 #'                         legend_params = c("left", 11, 8),
-#'                         axis_params = c("black", 10)) +
+#'                         axis_params = c("black", 11, 8)) +
 #'   scale_colour_manual(labels = c("EV enriched",
 #'                                  "WCL enriched",
 #'                                  "Not significant"),
@@ -160,7 +161,7 @@ plot_volcano <- function(data, p_val, log2fc, group,
                          point_size = 1, label_size = 2,
                          x_lim = c(-10, 10), y_lim = c(0, 10),
                          legend_params = c("left", 11, 10),
-                         axis_params = c("black", 10)) {
+                         axis_params = c("black", 11, 10)) {
 
   # enquo data columns and label function
   p_val <- rlang::enquo(p_val)
@@ -179,8 +180,9 @@ plot_volcano <- function(data, p_val, log2fc, group,
           legend.title = element_text(size = legend_params[2],
                                       face = "bold"),
           legend.text = element_text(size = legend_params[3]),
+          axis.title = element_text(size = axis_params[2]),
           axis.text = element_text(colour = axis_params[1],
-                                   size = axis_params[2]))
+                                   size = axis_params[3]))
 
   # adjust size of dots in legend and
   # add axis limits and axis labels

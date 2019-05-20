@@ -84,6 +84,7 @@ gg_colour <- function(n) {
   hues <- seq(15, 375, length = n + 1)
   grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
 }
+
 ```
 
 ```{r randomDraws, include=FALSE}
@@ -114,7 +115,6 @@ yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=",
                          pat2 = "W", val2 = 2)
 
 yeast_imp <- impute_QRILC(yeast_both) # first set of random draws
-
 
 # DAY286 biofilm
 biofilm_lfq <- biofilm %>% 
@@ -558,8 +558,17 @@ atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de,
 atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, 
                         p_val = 0.01, lfc = 0, type = "individual")
 
-a1_res <- atcc_ind[[1]]
-a9_res <- atcc_ind[[2]]
+a1_res <- get_results(efit = atcc_efit, 
+                      mat = atcc_de, 
+                      p_val = 0.01, 
+                      lfc = 0, 
+                      type = "individual")[[1]]
+
+a9_res <- get_results(efit = atcc_efit, 
+                      mat = atcc_de, 
+                      p_val = 0.01, 
+                      lfc = 0, 
+                      type = "individual")[[2]]
 ```
 
 
@@ -667,13 +676,61 @@ DT::datatable(a1_res_short,
 
 TEXT.
 
-```{r atccVolcanoData}
+```{r atccVolcanoData, include=FALSE}
+a1_vol <- plot_volcano(a1_res, 
+                       p_val = adj.P.Val, 
+                       log2fc = logFC, 
+                       group = group, 
+                       use_labels = TRUE, 
+                       label_fun = ifelse(logFC >= 6, CGD_gene_name, ""), 
+                       point_size = 2, 
+                       label_size = 4, 
+                       legend_params = c("right", 14, 14), 
+                       axis_params = c("black", 16, 14), 
+                       x_lim = c(-10, 12), 
+                       y_lim = c(0, 8)) + 
+  scale_colour_manual(values = c("#D55E00",
+                                 "#0072B2", 
+                                 "#999999"), 
+                      labels = c("EV enriched", 
+                                 "WCL enriched", 
+                                 "Not significant")) + 
+  theme(legend.title = element_blank())
 
+a9_vol <- plot_volcano(a9_res, 
+                       p_val = adj.P.Val, 
+                       log2fc = logFC, 
+                       group = group, 
+                       use_labels = TRUE, 
+                       label_fun = ifelse(logFC >= 6, CGD_gene_name, ""), 
+                       point_size = 2, 
+                       label_size = 4, 
+                       legend_params = c("right", 14, 12), 
+                       axis_params = c("black", 16, 14), 
+                       x_lim = c(-10, 12), 
+                       y_lim = c(0, 8)) + 
+  scale_colour_manual(values = c("#D55E00",
+                                 "#0072B2", 
+                                 "#999999"), 
+                      labels = c("EV enriched", 
+                                 "WCL enriched", 
+                                 "Not significant")) + 
+  theme(legend.title = element_blank())
 ```
 
-```{r atccVolcano}
+```{r atccVolcano, fig.cap=vol_cap, fig.wide=TRUE}
+ggpubr::ggarrange(a1_vol, a9_vol, 
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  align = "hv", 
+                  common.legend = TRUE, 
+                  legend = "bottom", 
+                  hjust = 0, 
+                  vjust = 1, 
+                  font.label = list(size = 24, colour = "black"))
 
-
+vol_cap <- "This is a figure caption."
 ```
 
 ## Heatmap

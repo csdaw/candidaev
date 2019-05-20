@@ -50,8 +50,9 @@ limits of the y axis.}
 title text size, and key text size of the legend. For example
 \code{c("right", 11, 8)}.}
 
-\item{axis_params}{mixed vector (length = 2): specifies the colour and text
-size of the both axes text. For example \code{c("black", 10)}.}
+\item{axis_params}{mixed vector (length = 3): specifies axis text colour,
+axis title text size, and axis text text size for both axes.
+For example \code{c("black", 12, 10)}.}
 }
 \value{
 Returns a volcano plot with the \code{log2fc} column data on the
@@ -156,7 +157,7 @@ my_plot <- plot_volcano(data = result_a9,
                         x_lim = c(-10, 12),
                         y_lim = c(0, 8),
                         legend_params = c("left", 11, 8),
-                        axis_params = c("black", 10)) +
+                        axis_params = c("black", 11, 8)) +
   scale_colour_manual(labels = c("EV enriched",
                                  "WCL enriched",
                                  "Not significant"),
