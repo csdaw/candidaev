@@ -33,7 +33,6 @@ vignette: >
 
 
 ```{r knitrOpts, include=FALSE}
-
 # knit options
 knitr::opts_knit$set(progress = TRUE, 
                      verbose = TRUE)
@@ -47,20 +46,74 @@ knitr::opts_chunk$set(collapse = FALSE,
                       comment = "#>")
 ```
 
-
 # Preface
 
 ## Introduction
 
-Xxx.
+This vignette outlines the method used to analyse the label-free quantitative 
+LC-MS/MS data obtained for _C. albicans_ (strains ATCC10231 and ATCC90028) 
+extracellular vesicles (EVs) and whole cell lysates (WCL) by Dawson et 
+al. (2019). It has been written in such a way as to allow the step-by-step 
+reproduction of the results presented in the paper using the tools provided 
+in the package `r Githubpkg("csdaw/candidaev")`. The manuscript in its 
+submitted form and the `.Rmarkdown` file used to generate it can found here.
 
-The raw proteinGroups.txt file on which these analyses are based can be 
-accessed [here](). 
+The analysis workflow used in this vignette is derived from the excellent 
+**Bioconductor** package `r Biocpkg("DEP")`[^1]. Furthermore, some of the 
+plotting functions available in `r Biocpkg("DEP")` have been modified for use 
+in this package, `candidaev`. 
+
+[^1]: Zhang, X., Smits, A. H., van Tilburg, G. B. A., Ovaa, H., Huber, W., & 
+Vermeulen, M. (2018). Proteome-wide identification of ubiquitin interactions 
+using UbIA-MS. _Nature Protocols, 13_(3), 530-550. 
+[doi:10.1038/nprot.2017.147](https://doi.org/10.1038/nprot.2017.147)
 
 ## Experimental design
-Strain used:
 
+Extracellular vesicles (EVs) were isolated using differential 
+ultracentrifugation from _C. albicans_ liquid cultures 
+from two clinical isolate strains; ATCC10231 (n = 3) and ATCC90028 (n = 3). 
+Additionally, cells from these liquid cultures were seperated and lysed to 
+generate whole cell lysates (WCL). Each EV biological replicate was paired 
+with a WCL replicate as they were derived from the same liquid culture.
 
+Samples analysed in this vignette:
+
+* ATCC10231 EV1
+* ATCC10231 EV2
+* ATCC10231 EV3
+* ATCC10231 WCL1 (W1)
+* ATCC10231 WCL2 (W2)
+* ATCC10231 WCL3 (W3)
+
+* ATCC90028 EV1
+* ATCC90028 EV2
+* ATCC90028 EV3
+* ATCC90028 WCL1 (W1)
+* ATCC90028 WCL2 (W2)
+* ATCC90028 WCL3 (W3)
+
+These samples were electrophoresed and the SDS-PAGE gel slices were 
+reduced, alkylated, and digested with trypsin. The resulting peptides were 
+analysed by nano-LC-ESI-MS/MS, identified using MaxQuant, and quantified via 
+the MaxLFQ algorithm in MaxQuant. The `proteinGroups.txt` file 
+output was used for subsequent analyses.
+
+## Data availability
+
+The raw data was searched against the _C. albicans_ (SC5314) UniProt 
+reference proteome (UP000000559) using MaxQuant version 1.6.0.16.  The 
+`proteinGroups.txt` file analysed in this vignette 
+can be easily accessed here. It is also installed along with the 
+`r Githubpkg("csdaw/candidaev")` package and can be loaded in R with 
+
+```
+data(atcc)
+```
+
+The LC-MS/MS raw data, peak data, and results files have been 
+deposited in the ProteomeXchange Consortium database via the PRIDE partner 
+repository with the data set identifier y and DOI x. 
 
 # Data analysis
     
@@ -144,13 +197,13 @@ biofilm_imp <- impute_QRILC(biofilm_both) # second set of random draws
 The _C. albicans_ ATCC LC-MS/MS data set is provided as a data.frame called 
 `atcc` in this package. 
 It has `r nrow(atcc)` rows each of which corresponds to a single protein 
-group[^1], and `r ncol(atcc)` columns. 
+group[^2], and `r ncol(atcc)` columns. 
 A key describing most of these columns can be found in the 
 [MaxQuant documentation](http://www.coxdocs.org/doku.php?id=maxquant:table:proteingrouptable). 
 The `LFQ.intensity` columns hold the protein quantification data that is 
 used for this analysis.
 
-[^1]: Each protein group comprises the group of proteins that could be 
+[^2]: Each protein group comprises the group of proteins that could be 
 reconstructed from a set of peptides by MaxQuant. In most cases this will be 
 a single protein but sometimes there will be two or more proteins that 
 could not be distinguished by the set of peptides.
@@ -519,7 +572,7 @@ missval_cap <- "This is a figure caption."
 
 TEXT.
 
-```{r atccImpute, fig.cap=imp_cap}
+```{r atccImpute, fig.cap=imp_cap, fig.wide=TRUE}
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 
