@@ -77,7 +77,7 @@ plot_frequency2 <- function(mat, plot = TRUE) {
     geom_col() +
     scale_fill_grey(start = 0.8, end = 0.2) +
     labs(title = "Protein quantification frequency",
-         x = "Identified in number of samples",
+         x = "Quantified in number of samples",
          y = "Number of proteins") +
     theme_bw(base_size = 16) +
     theme(legend.position="none")

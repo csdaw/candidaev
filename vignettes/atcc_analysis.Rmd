@@ -44,6 +44,27 @@ knitr::opts_chunk$set(collapse = FALSE,
                       echo = FALSE,
                       error = TRUE, 
                       comment = "#>")
+
+
+# define ggplot2 default colour palette function
+gg_colour <- function(n) {
+  hues <- seq(15, 375, length = n + 1)
+  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
+# check for installation of packages required to knit this vignette
+req_pkgs <- c("BiocStyle", "ggpubr", "stringi", "DT")
+
+check_pkgs <- function(x) {
+  if(!requireNamespace(x, quietly = TRUE)) {
+    stop(paste0("The package ",
+                paste0(x),
+                " is required to knit this document. 
+                Please install it."))
+  }
+}
+
+lapply(req_pkgs, check_pkgs)
 ```
 
 # Preface
@@ -86,6 +107,8 @@ Samples analysed in this vignette:
 * ATCC10231 WCL2 (W2)
 * ATCC10231 WCL3 (W3)
 
+and
+
 * ATCC90028 EV1
 * ATCC90028 EV2
 * ATCC90028 EV3
@@ -119,7 +142,7 @@ repository with the data set identifier y and DOI x.
     
 ## Setup
 
-The packages required for knitting this document are loaded and a specific 
+The packages required for the analyses are loaded and a specific 
 seed is set for the steps requiring random number generation (imputation 
 and clustering).
 
@@ -131,13 +154,6 @@ library(ggplot2)
 
 # set seed for imputation, kmeans, MDS plot
 set.seed(1)
-
-# define ggplot2 default colour palette function
-gg_colour <- function(n) {
-  hues <- seq(15, 375, length = n + 1)
-  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
-}
-
 ```
 
 ```{r randomDraws, include=FALSE}
@@ -227,13 +243,14 @@ column of `atcc_exp` is exactly the same as the names of the
 
 ```{r atccexpTable}
 knitr::kable(atcc_exp, 
-             caption = "A table caption. A table caption.")
+             caption = "Experimental design for this vignette.")
 ```
 
 ## Data preparation
 
-First, the `atcc` data.frame is filtered to remove reverse proteins, 
-contaminant proteins, and proteins identified by less than 2 unique peptides.
+First, the `atcc` proteinGroups data.frame is filtered to remove reverse 
+proteins, contaminant proteins, and proteins identified by less than 2 unique 
+peptides.
 
 ```{r atccInit, echo=TRUE}
 # filter out reverse, contaminant proteins, proteins with <2 unique peptides
@@ -260,9 +277,21 @@ function which performs the following:
 --------------------------------------------------------------------------------
 
 The resulting matrix `atcc_lfq` still has `r nrow(atcc_lfq)` rows but only 
-`r ncol(atcc_lfq)` columns, one for each LC-MS/MS sample. As it typical for 
-shotgun proteomics data, the proteins in this data set 
-are not quantified in every biological replicate of every strain.
+`r ncol(atcc_lfq)` columns, one for each LC-MS/MS sample. The total number of 
+proteins quantified (i.e. have a non-`NA` LFQ intensity) in each sample can 
+be explored using:
+```{r, echo=TRUE, eval=FALSE}
+# explore quantification across all 12 samples
+plot_frequency2(atcc_lfq)
+
+# explore protein quantification in individual samples
+plot_numbers2(atcc_lfq)
+```
+As it typical for shotgun proteomics data, the proteins in this data set 
+are not quantified in every biological replicate of every strain. 
+If fact in Figure \@ref(fig:atccInit2)A shows that most of the proteins are 
+only quantified in a single sample. Figure \@ref(fig:atccInit2)B shows the 
+total number of proteins quantified in each sample.
 
 ```{r atccInit2, fig.cap=atccInit2_cap, fig.wide=TRUE}
 freq1 <- plot_frequency2(atcc_lfq) + 
@@ -291,17 +320,23 @@ ggpubr::ggarrange(freq1, numb1,
                   widths = c(1, 1.4), 
                   vjust = 1)
 
-atccInit2_cap <- "This is a figure caption. This is the second sentence."
+atccInit2_cap <- "Protein quantification distributions. (A) Cumulative 
+number of proteins quantified in 1-12 samples. (B) Total number of proteins 
+quantified in each biological replicate sample."
 ```
 
-
-Table goes here.
-
-More text goes here.
+The percentage of non-valid (`NA`) values and other useful statistics for 
+each sample is shown using:
+```{r, echo=TRUE, eval=FALSE}
+# generate summary table from LFQ data
+sum_table(atcc_lfq)
+```
+Table \@ref(tab:atccInit3) shows that the ATCC10231 samples have higher 
+percentages of missing values than the ATCC90028 samples.
 
 ```{r atccInit3}
 knitr::kable(sum_table(atcc_lfq), 
-             caption = "A table caption", 
+             caption = "Descriptive statistics for each LC-MS/MS sample.", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -312,17 +347,30 @@ knitr::kable(sum_table(atcc_lfq),
 
 ## Protein filtering (replicate quantification)
 
-Filter for proteins identified in 2/3 reps of at least 1 condition.
+Prior to normalisation and imputation, proteins with too many missing values 
+across the 12 samples are removed. Only those with at least 2/3 valid values 
+in 1 of the 4 conditions are retained.
 
+This filtration is performed using `filter_na4`.
 
+```{r atccFilt, echo=TRUE}
+# filter for proteins quantified in min 2/3 reps of: 
+# A1 EV or A1 WCL or A9 EV or A9 WCL
+atcc_filt <- filter_na4(atcc_lfq, 
+                        logic = "or", 
+                        op = "<=", 
+                        pat1 = "A10231_EV", val1 = 1, 
+                        pat2 = "A10231_W", val2 = 1, 
+                        pat3 = "A90028_EV", val3 = 1, 
+                        pat4 = "A90028_W", val4 = 1)
+```
 
-```{r atccFilt, fig.cap=atccFilt_cap, fig.wide=TRUE}
-atcc_filt <- filter_na4(atcc_lfq, "or", "<=", 
-                        pat1 = "A10231_EV", 1, 
-                        pat2 = "A10231_W", 1, 
-                        pat3 = "A90028_EV", 1, 
-                        pat4 = "A90028_W", 1)
+The initial `r nrow(atcc_lfq)` proteins has been reduced to 
+`r nrow(atcc_filt)`. Now the majority of proteins are quantified in all 12 
+samples. The overall pattern of proteins in each sample remains similar 
+though.
 
+```{r atccFilt2, fig.cap=atccFilt2_cap, fig.wide=TRUE}
 freq2 <- plot_frequency2(atcc_filt) + 
   scale_y_continuous(limits = c(0,400), 
                      expand = expand_scale(mult = c(0, 0))) + 
@@ -349,16 +397,33 @@ ggpubr::ggarrange(freq2, numb2,
                   widths = c(1, 1.4), 
                   vjust = 1)
 
-atccFilt_cap <- "This is a figure caption. This is the second sentence."
+atccFilt2_cap <- "Protein quantification distributions after filtration. 
+                  (A) Cumulative number of proteins quantified in 1-12 samples. 
+                  (B) Total number of proteins quantified in each biological 
+                  replicate sample."
 ```
 
-Reduces `r nrow(atcc_lfq)` proteins to `r nrow(atcc_filt)`.
-
-```{r atccFilt2, fig.cap=atccFilt2_cap, fig.small=TRUE}
-mds1_labels <- c(rep("EV", 3), 
+A multidimensional scaling plot can be drawn via:
+```{r, echo=TRUE, eval=FALSE}
+# need labels for the MDS plot
+mds_labels <- c(rep("EV", 3), 
                 rep("WCL", 3), 
                 rep("EV", 3), 
                 rep("WCL", 3))
+
+# generate MDS plot
+plot_mds(atcc_filt, mat_labels = mds_labels, 
+         shape_size = 4)
+```
+It shows that the WCL samples from both strains cluster closer together than 
+the EV samples do to each other, indicating they have a smaller 
+log<sub>2</sub> fold change between them.
+
+```{r atccFilt3, fig.cap=atccFilt3_cap, fig.small=TRUE}
+mds1_labels <- c(rep("EV", 3), 
+                 rep("WCL", 3), 
+                 rep("EV", 3), 
+                 rep("WCL", 3))
 
 plot_mds(atcc_filt, mat_labels = mds1_labels, 
          shape_size = 4) + 
@@ -372,17 +437,30 @@ plot_mds(atcc_filt, mat_labels = mds1_labels,
   xlab("Dimension 1") + 
   ylab("Dimension 2")
 
-atccFilt2_cap <- "This is a figure caption. This is the second sentence."
+atccFilt3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
+                  biological replicate sample with the first 2 dimensions 
+                  plotted. Pairwise distance between samples approximately 
+                  indicates the log2 fold change between samples."
 ```
 
 
 ## LFQ intensity normalisation
 
-Text.
+Next, the LFQ intensity data is normalised using `r Biocpkg("limma")`.
 
-```{r atccNorm, fig.cap=atccNorm_cap, fig.height=7}
+```{r atccNorm, echo=TRUE}
+# normalise LFQ intensities
 atcc_norm <- limma::normalizeCyclicLoess(atcc_filt)
+```
 
+The effect of the normalisation on the distribution of LFQ intensities for 
+each sample is visualised using: 
+```{r, echo=TRUE, eval=FALSE}
+plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
+```
+
+
+```{r atccNorm2, fig.cap=atccNorm2_cap, fig.height=7}
 plot_normalization2(atcc_exp, 
                     facet_labels = c(atcc_filt = "Before normalisation", 
                                      atcc_norm = "After normalisation"), 
@@ -392,12 +470,16 @@ plot_normalization2(atcc_exp,
   theme(plot.margin = margin(t = 0, l = 1.5, r = 1.5, b = 0, unit = "inches"))
   
 
-atccNorm_cap <- "This is a figure caption. This is the second sentence."
+atccNorm2_cap <- "Distribution of protein LFQ intensities for each sample. Shown
+                  before and after normalisation."
 ```
 
-Text.
+The MDS plot now shows that the first dimension (which is the leading factor 
+causing the LFQ intensities differences between samples) separates the 
+samples according to the primary condition of interest; EV versus WCL. Then 
+the second dimension separates the samples according to the strain.
 
-```{r atccNorm2, fig.cap=atccNorm2_cap, fig.small=TRUE}
+```{r atccNorm3, fig.cap=atccNorm3_cap, fig.small=TRUE}
 mds2_labels <- c(rep("EV", 3), 
                 rep("WCL", 3), 
                 rep("EV", 3), 
@@ -415,15 +497,20 @@ plot_mds(atcc_norm, mat_labels = mds2_labels,
   xlab("Dimension 1") + 
   ylab("Dimension 2")
 
-atccNorm2_cap <- "This is a figure caption. This is the second sentence."
+atccNorm3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
+                  biological replicate sample after normalisation, with the 
+                  first 2 dimensions plotted. Pairwise distance between samples 
+                  approximately 
+                  indicates the log2 fold change between samples."
 ```
 
 
 ## ATCC strain protein comparison
 
-Text.
+Lists of proteins quantified in at least 1/3 biological replicates of each 
+condition are generated using:
 
-```{r atccVenn, fig.cap=venn_cap}
+```{r atccVennData, echo=TRUE}
 # filter for proteins identified in min 1/3 reps of 10231 EV
 atcc1_ev <- filter_na(atcc_norm, op = "<=", 
                       pat = "A10231_EV", val = 2)
@@ -439,16 +526,35 @@ atcc9_ev <- filter_na(atcc_norm, op = "<=",
 # filter for proteins identified in min 1/3 reps of 90028 WCL
 atcc9_w <- filter_na(atcc_norm, op = "<=", 
                       pat = "A90028_W", val = 2)
+```
 
+These are then compared using a Venn diagram.
+```{r, echo=TRUE, eval=FALSE}
+# define a comparison list for a Venn diagram
+venn_comp <- list("A10231_EV" = rownames(atcc1_ev), 
+                  "A10231_WCL" = rownames(atcc1_w), 
+                  "A90028_EV" = rownames(atcc9_ev), 
+                  "A90028_WCL" = rownames(atcc9_w))
+                  
+# plot the Venn diagram
+venn <- plot_venn(venn_comp, 
+                  type = "plot")
+                  
+grid::grid.draw(venn)
+```
+Of the `r nrow(atcc_norm)` proteins quantified in at least 2/3 replicates of 
+1 out of 4 conditions, 641 (41.7%) are quantified in all 4 conditions. 
+
+```{r atccVenn, fig.cap=venn_cap}
 # define comparison list for Venn diagram
-venn1_comp <- list("A10231_EV" = atcc1_ev, 
-                   "A10231_WCL" = atcc1_w, 
-                   "A90028_EV" = atcc9_ev, 
-                   "A90028_WCL" = atcc9_w)
+venn1_comp <- list("A10231_EV" = rownames(atcc1_ev), 
+                   "A10231_WCL" = rownames(atcc1_w), 
+                   "A90028_EV" = rownames(atcc9_ev), 
+                   "A90028_WCL" = rownames(atcc9_w))
 
 # plot Venn diagram
 venn1 <- plot_venn(venn1_comp, 
-                   use_uniprot = TRUE, 
+                   use_uniprot = FALSE, 
                    type = "plot", 
                    fontfamily = "sans", 
                    cat.fontfamily = "sans", 
@@ -460,12 +566,15 @@ venn1 <- plot_venn(venn1_comp,
 # draw Venn diagram
 grid::grid.draw(venn1)
 
-venn_cap <- "This is a figure caption. This is the second sentence."
+venn_cap <- "Venn diagram of proteins quantified in each condition. 
+             Proteins in this plot are quantified in at least 2/3 replicates 
+             of at least condition."
 ```
 
-Text. 
+Next most abundant proteins that are only detected in ATCC10231 EVs and not 
+in ATCC10231 WCL can be identified.
 
-```{r atcc1Top10}
+```{r atcc1Top10Data, echo=TRUE}
 # get top 10 most abundant protein exclusive to 10231 EVs
 # in descending order of abundance
 atcc1_top10 <- atcc1_ev %>% 
@@ -479,17 +588,21 @@ atcc1_top10 <- atcc1_ev %>%
                  new = c("CGD_gene_name", 
                          "CGD_description")) %>% 
   select(CGD_gene_name, CGD_description, everything(), -id)
+```
 
+```{r atcc1Top10}
 knitr::kable(atcc1_top10, 
-             caption = "This is a table caption", 
+             caption = "Top 10 most abundant ATCC10231 EV proteins. They are 
+                        not detected in ATCC10231 WCL.", 
              col.names = c("Name", "Function", "EV1 LFQ", 
                            "EV2 LFQ", "EV3 LFQ", "Mean LFQ"), 
              digits = 1)
 ```
 
-TEXT.
+This is repeated for ATCC90028. The proteins MSB2, PLB4.5, orf19.6119, and 
+orf19.1054 are highly abundant and exclusive to EVs from both strains.
 
-```{r atcc9Top10}
+```{r atcc9Top10Data, echo=TRUE}
 atcc9_top10 <- atcc9_ev %>% 
   tibble::as_tibble(rownames = "id") %>% 
   filter_na(., op = "==", pat = "A90028_W", val = 3) %>% 
@@ -501,9 +614,12 @@ atcc9_top10 <- atcc9_ev %>%
                  new = c("CGD_gene_name", 
                          "CGD_description")) %>% 
   select(CGD_gene_name, CGD_description, everything(), -id)
+```
 
+```{r atcc9Top10}
 knitr::kable(atcc9_top10, 
-             caption = "This is a table caption", 
+             caption = "Top 10 most abundant ATCC90028 EV proteins. They are 
+                        not detected in ATCC90028 WCL.", 
              col.names = c("Name", "Function", "EV1 LFQ", 
                            "EV2 LFQ", "EV3 LFQ", "Mean LFQ"), 
              digits = 1)
@@ -790,16 +906,7 @@ a9_vol <- plot_volcano(a9_res,
 ```
 
 ```{r atccVolcano, fig.cap=vol_cap, fig.wide=TRUE}
-ggpubr::ggarrange(a1_vol, a9_vol, 
-                  labels = c("A", "B"), 
-                  ncol = 2, 
-                  nrow = 1, 
-                  align = "hv", 
-                  common.legend = TRUE, 
-                  legend = "bottom", 
-                  hjust = 0, 
-                  vjust = 1, 
-                  font.label = list(size = 24, colour = "black"))
+
 
 vol_cap <- "This is a figure caption."
 ```
@@ -864,7 +971,7 @@ htmp2_params <- list(title = expression(bold(log[2]("FC"))),
                      labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                      at = seq(-10, 10, 2))
 
-htmp2 <- ggpubr::as_ggplot(grid::grid.grabExpr(plot_heatmap(atcc_htmp2, 
+htmp2 <- plot_heatmap(atcc_htmp2, 
                       plot = TRUE,
                       data_type = "log2fc", 
                       clust_fun = "euclidean", 
@@ -874,11 +981,12 @@ htmp2 <- ggpubr::as_ggplot(grid::grid.grabExpr(plot_heatmap(atcc_htmp2,
                       row_title_fontsize = 16, 
                       col_name_fontsize = 14, 
                       column_names_rot = 45, 
-                      heatmap_legend_param = htmp2_params))) + 
+                      heatmap_legend_param = htmp2_params)
+
+htmp2 <- ggpubr::as_ggplot(grid::grid.grabExpr(htmp2)) + 
   theme(plot.margin = margin(t = 0, l = 1.4, r = 1.4, b = 0, unit = "inches"))
 
 htmp2
-
 
 htmp2_cap <- "This is a figure caption."
 ```
