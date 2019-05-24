@@ -112,14 +112,14 @@ plot_imputation2 <- function(exd, facet_labels = NULL, mat, ...) {
     ggplot(df, aes(val, col = condition)) +
       geom_density(na.rm = TRUE) +
       facet_wrap(~var, ncol = 1) +
-      labs(x = expression(log[2]~"Intensity"), y = "Density") +
+      labs(x = expression(log[2]~"LFQ intensity"), y = "Density") +
       theme_bw(base_size = 16)
   } else {
     ggplot(df, aes(val, col = condition)) +
       geom_density(na.rm = TRUE) +
       facet_wrap(~var, ncol = 1,
                  labeller = labeller(var = facet_labels)) +
-      labs(x = expression(log[2]~"Intensity"), y = "Density") +
+      labs(x = expression(log[2]~"LFQ intensity"), y = "Density") +
       theme_bw(base_size = 16)
   }
 

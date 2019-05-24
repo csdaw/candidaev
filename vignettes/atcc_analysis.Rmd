@@ -45,13 +45,6 @@ knitr::opts_chunk$set(collapse = FALSE,
                       error = TRUE, 
                       comment = "#>")
 
-
-# define ggplot2 default colour palette function
-gg_colour <- function(n) {
-  hues <- seq(15, 375, length = n + 1)
-  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
-}
-
 # check for installation of packages required to knit this vignette
 req_pkgs <- c("BiocStyle", "ggpubr", "stringi", "DT")
 
@@ -74,10 +67,10 @@ lapply(req_pkgs, check_pkgs)
 This vignette outlines the method used to analyse the label-free quantitative 
 LC-MS/MS data obtained for _C. albicans_ (strains ATCC10231 and ATCC90028) 
 extracellular vesicles (EVs) and whole cell lysates (WCL) by Dawson et 
-al. (2019). It has been written in such a way as to allow the step-by-step 
-reproduction of the results presented in the paper using the tools provided 
-in the package `r Githubpkg("csdaw/candidaev")`. The manuscript in its 
-submitted form and the `.Rmarkdown` file used to generate it can found here.
+al. (2019). The tools provided in the package `r Githubpkg("csdaw/candidaev")` 
+allows the step-by-step reproduction of the results presented in the paper. 
+The manuscript in its submitted form and the `.Rmarkdown` file used to 
+generate it can found here.
 
 The analysis workflow used in this vignette is derived from the excellent 
 **Bioconductor** package `r Biocpkg("DEP")`[^1]. Furthermore, some of the 
@@ -156,7 +149,13 @@ library(ggplot2)
 set.seed(1)
 ```
 
-```{r randomDraws, include=FALSE}
+To reproduce the results exactly as they are in Dawson et al. (2019), the 
+following code block is run to perform a specific number of draws from 
+a random distribution before performing the analysis of the `atcc` data. 
+Otherwise, the results will be extremely similar but not identical to Dawson 
+et al. (2019).
+
+```{r randomDraws, echo=TRUE}
 # for results to be reproducible in seperate documents
 # need to use set.seed AND need to perform same number of 
 # 'random' draws in the same order as manuscript.Rmd
@@ -209,6 +208,7 @@ biofilm_both <- filter_na2(biofilm_norm, logic = "and", op = "<=",
 biofilm_imp <- impute_QRILC(biofilm_both) # second set of random draws
 ```
 
+## Exploring the `atcc` data set
 
 The _C. albicans_ ATCC LC-MS/MS data set is provided as a data.frame called 
 `atcc` in this package. 
@@ -287,7 +287,7 @@ plot_frequency2(atcc_lfq)
 # explore protein quantification in individual samples
 plot_numbers2(atcc_lfq)
 ```
-As it typical for shotgun proteomics data, the proteins in this data set 
+The proteins in this data set 
 are not quantified in every biological replicate of every strain. 
 If fact in Figure \@ref(fig:atccInit2)A shows that most of the proteins are 
 only quantified in a single sample. Figure \@ref(fig:atccInit2)B shows the 
@@ -456,6 +456,7 @@ atcc_norm <- limma::normalizeCyclicLoess(atcc_filt)
 The effect of the normalisation on the distribution of LFQ intensities for 
 each sample is visualised using: 
 ```{r, echo=TRUE, eval=FALSE}
+# explore effect of normalisation on intensity distributions
 plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
 ```
 
@@ -512,20 +513,28 @@ condition are generated using:
 
 ```{r atccVennData, echo=TRUE}
 # filter for proteins identified in min 1/3 reps of 10231 EV
-atcc1_ev <- filter_na(atcc_norm, op = "<=", 
-                      pat = "A10231_EV", val = 2)
+atcc1_ev <- filter_na(atcc_norm, 
+                      op = "<=", 
+                      pat = "A10231_EV", 
+                      val = 2)
 
 # filter for proteins identified in min 1/3 reps of 10231 WCL
-atcc1_w <- filter_na(atcc_norm, op = "<=", 
-                     pat = "A10231_W", val = 2)
+atcc1_w <- filter_na(atcc_norm, 
+                     op = "<=", 
+                     pat = "A10231_W", 
+                     val = 2)
 
 # filter for proteins identified in min 1/3 reps of 90028 EV
-atcc9_ev <- filter_na(atcc_norm, op = "<=", 
-                      pat = "A90028_EV", val = 2)
+atcc9_ev <- filter_na(atcc_norm, 
+                      op = "<=", 
+                      pat = "A90028_EV", 
+                      val = 2)
 
 # filter for proteins identified in min 1/3 reps of 90028 WCL
-atcc9_w <- filter_na(atcc_norm, op = "<=", 
-                      pat = "A90028_W", val = 2)
+atcc9_w <- filter_na(atcc_norm, 
+                     op = "<=", 
+                     pat = "A90028_W", 
+                     val = 2)
 ```
 
 These are then compared using a Venn diagram.
@@ -552,6 +561,12 @@ venn1_comp <- list("A10231_EV" = rownames(atcc1_ev),
                    "A90028_EV" = rownames(atcc9_ev), 
                    "A90028_WCL" = rownames(atcc9_w))
 
+# define ggplot2 default colour palette function
+gg_colour <- function(n) {
+  hues <- seq(15, 375, length = n + 1)
+  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
 # plot Venn diagram
 venn1 <- plot_venn(venn1_comp, 
                    use_uniprot = FALSE, 
@@ -571,8 +586,8 @@ venn_cap <- "Venn diagram of proteins quantified in each condition.
              of at least condition."
 ```
 
-Next most abundant proteins that are only detected in ATCC10231 EVs and not 
-in ATCC10231 WCL can be identified.
+Next, the most abundant proteins that are only detected in ATCC10231 EVs and 
+not in ATCC10231 WCL can be identified.
 
 ```{r atcc1Top10Data, echo=TRUE}
 # get top 10 most abundant protein exclusive to 10231 EVs
@@ -627,12 +642,15 @@ knitr::kable(atcc9_top10,
 
 ## Imputation of missing values
 
-TEXT. 
+Missing values in the data will be imputed prior to the 
+differential abundance analysis. Before imputation the percentage of missing 
+values in each sample is explored again with `sum_table(atcc_norm)`.
 
 ```{r atccSum}
 # explore percentage missing values in each sample
 knitr::kable(sum_table(atcc_norm), 
-             caption = "A table caption", 
+             caption = "Descriptive statistics for each LC-MS/MS sample. After 
+                        normalisation.", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -641,26 +659,67 @@ knitr::kable(sum_table(atcc_norm),
              digits = 1)
 ```
 
-TEXT
+The percentage of missing values ranges from 25.4% up to 64.7% which is 
+quite high, typical of label-free quantitative proteomics data[^3]. The 
+pattern of missing values across the data is visualised using:
 
-```{r atccSum2}
+[^3]: Lazar, C., Gatto, L., Ferro, M., Bruley, C., Burger, T. (2016). 
+Accounting for the Multiple Natures of Missing Values in Label-Free 
+Quantitative Proteomics Data Sets to Compare Imputation Strategies. 
+_Journal of Proteome Research, 15_(4), 1116-1125. 
+[doi:10.1021/acs.jproteome.5b00981](https://doi.org/10.1021/acs.jproteome.5b00981)
+
+```{r, echo=TRUE, eval=FALSE}
+# visualise missing values using a heatmap
+plot_missval2(atcc_norm)
+```
+
+```{r atccMissVal, fig.cap=missval_cap, fig.height=8}
+plot_missval2(atcc_norm)
+
+missval_cap <- "Pattern of missing LFQ intensity values."
+```
+
+There are large chunks of data missing in either all of 
+the WCL samples or all of the EV samples. To minimise the percentage of 
+missing values in each sample, these proteins are removed prior to 
+imputation and hence are not imputed.
+```{r, echo=TRUE}
 # should not impute with so many missing values
 # filter for exclusive to 10231 EV or WCL or 90028 EV or WCL
-atcc_excl <- filter_na4(atcc_norm, logic = "or", op = "==", 
+# these will not be imputed
+atcc_excl <- filter_na4(atcc_norm, 
+                        logic = "or", 
+                        op = "==", 
                         pat1 = "A10231_EV", val1 = 3, 
                         pat2 = "A10231_W", val2 = 3, 
                         pat3 = "A90028_EV", val3 = 3, 
                         pat4 = "A90028_W", val4 = 3)
+```
 
+Only proteins quantified in at least 1/3 replicates from all 4 conditions 
+are retained for imputation.
+```{r, echo=TRUE}
 # filter for proteins with min 1 valid value in all 4 sample types
-atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=", 
+atcc_both <- filter_na4(atcc_norm, 
+                        logic = "and", 
+                        op = "<=", 
                         pat1 = "A10231_EV", val1 = 2, 
                         pat2 = "A10231_W", val2 = 2, 
                         pat3 = "A90028_EV", val3 = 2, 
                         pat4 = "A90028_W", val4 = 2)
+```
 
+`r nrow(atcc_excl)` proteins which are exclusive to either ATCC10231 EV, 
+ATCC10231 WCL, ATCC90028 EV, or ATCC90028 WCL are removed (`atcc_excl`). 
+Conversely, `r nrow(atcc_both)` proteins are kept to have missing values 
+imputed (`atcc_both`). The percentage of missing values across each sample 
+in `atcc_both` now ranges from 1.4% to 29.3%. 
+
+```{r atccSum2}
 knitr::kable(sum_table(atcc_both), 
-             caption = "A table caption", 
+             caption = "Descriptive statistics for each LC-MS/MS sample. Prior 
+                        to imputation.", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -669,24 +728,49 @@ knitr::kable(sum_table(atcc_both),
              digits = 1)
 ```
 
-TEXT.
+The pattern of missing values in `atcc_both` seems to be biased to certain 
+samples, especially ATCC10231 EV replicate 1. Therefore, these proteins may be 
+missing not at random (MNAR). 
+
+```{r atccMissVal2, fig.cap=missval2_cap , fig.height=8}
+plot_missval2(atcc_both)
+
+missval2_cap <- "Pattern of missing LFQ intensity values."
+```
+
+The LFQ intensity distributions and cumulative fraction of proteins with and 
+without missing values can be plotted with: 
+
+```{r, echo=TRUE, eval=FALSE}
+# detect intensity differences for proteins with missing values
+plot_detect2(atcc_both)
+```
 
 ```{r atccSum3, fig.cap=detect_cap, fig.wide=TRUE}
 plot_detect2(atcc_both)
 
-detect_cap <- "This is a figure caption."
+detect_cap <- "LFQ intensities of proteins with and without missing values."
 ```
 
-TEXT. 
+These plots show that missing values are biased to proteins with lower 
+average intensities, and are likely MNAR. Hence, a left-censored imputation 
+method is used for imputation of missing values. 
 
-```{r atccSum4, fig.cap=missval_cap , fig.height=8}
-plot_missval2(atcc_both)
-
-missval_cap <- "This is a figure caption."
+```{r, echo=TRUE, eval=FALSE}
+# impute missing values with QRILC method
+atcc_imp <- impute_QRILC(atcc_both)
 ```
 
+The effect of imputation on the distribution of protein intensities is 
+visualised with:
 
-TEXT.
+```{r, echo=TRUE, eval=FALSE}
+plot_imputation2(atcc_exp, 
+                 facet_labels = c(atcc_both = "Before imputation", 
+                                  atcc_imp = "After imputation"), 
+                 atcc_both, 
+                 atcc_imp)
+```
 
 ```{r atccImpute, fig.cap=imp_cap, fig.wide=TRUE}
 # proteins with missing values tend to have lower intensity
@@ -699,22 +783,36 @@ plot_imputation2(atcc_exp, facet_labels = c(atcc_both = "Before imputation",
                                             atcc_imp = "After imputation"),  
                  atcc_both, atcc_imp)
 
-imp_cap <- "This is a figure caption."
+imp_cap <- "LFQ intensity distribution before and after imputation."
 ```
 
-TEXT.
+The changes to the distributions are minimal, but most noticable for ATCC10231 
+EV. ATCC10231 samples EV1 and EV2 had the most missing values to impute.
 
 ## Differential abundance analysis with _limma_
 
-```{r atccDE}
-# recombine imputed proteins and non-imputed proteins in matrix
+Prior to differential abundance analysis, the imputed and non-imputed proteins 
+are recombined in the same matrix.
+
+```{r atccDE, echo=TRUE}
+# combine matrices
 atcc_de <- rbind(atcc_excl, atcc_imp)
 
+# shorten column names
 colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de), 
                                                      c("A10231_", "A90028_"), 
                                                      c("A1_", "A9_"), 
                                                      vectorize_all = FALSE)
+```
 
+A design matrix is constructed for this proteomics experiment. This is 
+required for the linear model fit function (`lmFit()`) from 
+`r Biocpkg("limma")` which is called inside the `limma_eBayes()` function in 
+this package. See the _limma_ User Guide section 9.2
+[here](https://bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf) 
+for more information about constructing design matrices.
+
+```{r atccDesign, echo=TRUE}
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
 atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", 
@@ -722,17 +820,39 @@ atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL",
 
 atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
 colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
-
-knitr::kable(atcc_design, 
-             caption = "A table caption.")
 ```
 
-TEXT.
 
-```{r atccDE2, include=FALSE}
+```{r atccDE2}
+knitr::kable(atcc_design, 
+             caption = "Design matrix for comparing EV and WCL samples.")
+```
+
+The comparisons between samples that one is interested in are defined in a 
+character vector. These must be two column names from the design matrix 
+separated by ` - `.
+
+```{r atccDE3, echo=TRUE}
 # specify comparisons of interest
 atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
+```
 
+Finally, the differential abundance analysis is performed using the 
+`limma_eBayes()` function from this package which calls `eBayes()` from 
+`r Biocpkg("limma")`. 
+
+To perform the analysis, the following objects are provided:
+* a numeric matrix of log<sub>2</sub> LFQ intensity data (`atcc_de`).
+* a numeric design matrix (`atcc_design`).
+* a character vector with the contrasts of interest (`atcc_contrasts`).
+
+The results from `limma_eBayes()` are extracted using `get_results()` 
+which allows the adjusted p-value cutoff and 
+log<sub>2</sub> fold change cutoff for significance to be specified. To get the 
+overall differences for all the samples included in the design matrix, 
+`type = "overall"` is used.
+
+```{r atccDE4, echo=TRUE, warning=FALSE}
 # make all pair-wise comparisons for specified contrasts
 # and perform limma::eBayes()
 atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
@@ -740,7 +860,14 @@ atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
 # extract overall results
 atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, 
                             p_val = 0.01, lfc = 0, type = "overall")
+```
 
+Alternatively, to obtain the log<sub>2</sub> fold changes and adjusted p-values 
+for each individual comparison specified then `type = "individual"` is used. 
+This outputs a list of data.frames, one for each contrast. They can be accessed 
+by subsetting the resulting list.
+
+```{r atccDE5, echo=TRUE}
 # extract results for individual comparisons defined in atcc_contrasts
 atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, 
                         p_val = 0.01, lfc = 0, type = "individual")
@@ -758,59 +885,11 @@ a9_res <- get_results(efit = atcc_efit,
                       type = "individual")[[2]]
 ```
 
-
 # Results
 
-## ATCC90028
+## ATCC10231
 
-```{r a9ResData, include=FALSE}
-a9_res_short <- a9_res %>% 
-  select(CGD_gene_name, Protein_name, logFC, 
-         contains("_mean"), adj.P.Val, group) %>% 
-  mutate_at(.vars = vars(logFC, contains("_mean")), 
-            .funs = list(~round(., digits = 2))) %>% 
-  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
-         group = as.factor(group))
-```
-
-```{r a9Res}
-js1 <- DT::JS("function(data, type, row, meta) {",
-              "return type === 'display' && data.length > 40 ?",
-              "'<span title=\"' + data + '\">' + data.substr(0, 40) + 
-              '...</span>' : data;",
-              "}")
-
-js2 <- DT::JS("function(data, type, row, meta) {",
-              "return type === 'display' && data.length > 12 ?",
-              "'<span title=\"' + data + '\">' + data.substr(0, 12) + 
-              '...</span>' : data;",
-              "}")
-
-DT::datatable(a9_res_short, 
-              caption = "This is a table caption. Note that adjusted p-values 
-              have been shortened to three significant figures for ease of 
-              display.", 
-              rownames = FALSE, 
-              colnames = c("Gene" = "CGD_gene_name", 
-                           "Protein" = "Protein_name", 
-                           "p.adj" = "adj.P.Val"), 
-              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
-              class = "display compact", 
-              options = list(
-                autowidth = TRUE, 
-                columnDefs = list(list(width = "40%", targets = 1), 
-                                  list(width = "10%", targets = c(0, 2:6)), 
-                                  list(targets = 1, 
-                                       render = js1), 
-                                  list(targets = 0, 
-                                       render = js2)
-                )
-              )
-)
-```
-
-
-## ATCC10231 results table
+Differential abundance comparison of proteins in ATCC10231 EVs versus WCL.
 
 ```{r a1ResData, include=FALSE}
 a1_res_short <- a1_res %>% 
@@ -858,12 +937,62 @@ DT::datatable(a1_res_short,
 )
 ```
 
+## ATCC90028
+
+Differential abundance comparison of proteins in ATCC90028 EVs versus WCL.
+
+```{r a9ResData, include=FALSE}
+a9_res_short <- a9_res %>% 
+  select(CGD_gene_name, Protein_name, logFC, 
+         contains("_mean"), adj.P.Val, group) %>% 
+  mutate_at(.vars = vars(logFC, contains("_mean")), 
+            .funs = list(~round(., digits = 2))) %>% 
+  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
+         group = as.factor(group))
+```
+
+```{r a9Res}
+js1 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 40 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 40) + 
+              '...</span>' : data;",
+              "}")
+
+js2 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 12 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 12) + 
+              '...</span>' : data;",
+              "}")
+
+DT::datatable(a9_res_short, 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name", 
+                           "Protein" = "Protein_name", 
+                           "p.adj" = "adj.P.Val"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(width = "40%", targets = 1), 
+                                  list(width = "10%", targets = c(0, 2:6)), 
+                                  list(targets = 1, 
+                                       render = js1), 
+                                  list(targets = 0, 
+                                       render = js2)
+                )
+              )
+)
+```
 
 ## Volcano plot
 
-TEXT.
+The results tables are used to construct volcano plots for ATCC10231 and 
+ATCC9002. The `plot_volcano()` function requires a data.frame input (`a1_res`) 
+and specification of the column names that contain the data to be plotted 
+(`adj.P.Val` and `logFC`). The `group` column in `a1_res` is used to separate 
+the data into three groups that have different colours.
 
-```{r atccVolcanoData, include=FALSE}
+```{r a1Volcano, echo=TRUE}
 a1_vol <- plot_volcano(a1_res, 
                        p_val = adj.P.Val, 
                        log2fc = logFC, 
@@ -875,15 +1004,10 @@ a1_vol <- plot_volcano(a1_res,
                        legend_params = c("right", 14, 14), 
                        axis_params = c("black", 16, 14), 
                        x_lim = c(-10, 12), 
-                       y_lim = c(0, 8)) + 
-  scale_colour_manual(values = c("#D55E00",
-                                 "#0072B2", 
-                                 "#999999"), 
-                      labels = c("EV enriched", 
-                                 "WCL enriched", 
-                                 "Not significant")) + 
-  theme(legend.title = element_blank())
+                       y_lim = c(0, 8))
+```
 
+```{r a9Volcano, echo=TRUE}
 a9_vol <- plot_volcano(a9_res, 
                        p_val = adj.P.Val, 
                        log2fc = logFC, 
@@ -895,7 +1019,20 @@ a9_vol <- plot_volcano(a9_res,
                        legend_params = c("right", 14, 12), 
                        axis_params = c("black", 16, 14), 
                        x_lim = c(-10, 12), 
-                       y_lim = c(0, 8)) + 
+                       y_lim = c(0, 8))
+```
+
+```{r atccVolcanoData, include=FALSE}
+a1_volcano <- a1_vol + 
+  scale_colour_manual(values = c("#D55E00",
+                                 "#0072B2", 
+                                 "#999999"), 
+                      labels = c("EV enriched", 
+                                 "WCL enriched", 
+                                 "Not significant")) + 
+  theme(legend.title = element_blank())
+
+a9_volcano <- a9_vol + 
   scale_colour_manual(values = c("#D55E00",
                                  "#0072B2", 
                                  "#999999"), 
@@ -906,16 +1043,40 @@ a9_vol <- plot_volcano(a9_res,
 ```
 
 ```{r atccVolcano, fig.cap=vol_cap, fig.wide=TRUE}
+ggpubr::ggarrange(a1_volcano, a9_volcano,
+                  labels = c("A", "B"),
+                  ncol = 2,
+                  nrow = 1,
+                  align = "hv",
+                  common.legend = TRUE,
+                  legend = "bottom",
+                  hjust = 0,
+                  vjust = 1,
+                  font.label = list(size = 24, colour = "black"))
 
-
-vol_cap <- "This is a figure caption."
+vol_cap <- "Volcano plots for proteins quantified in EV and WCL. (A) ATCC10231 
+            volcano plot. (B) ATCC90028 volcano plot."
 ```
 
-## Heatmap
+## Log<sub>2</sub> LFQ intensity heatmap
 
-TEXT.
+The `atcc_overall` data.frame is used to construct heatmaps based on the 
+proteins that are significantly different across all four samples groups; 
+ATCC90028 EV, WCL and ATCC10231 EV, WCL.
 
-```{r atccHeatmap, fig.cap=htmp_cap, fig.height=8}
+There are two type of heatmaps: one for plotting log<sub>2</sub> LFQ intensity 
+data and one for plotting log<sub>2</sub> fold change data.To plot an LFQ 
+intensity heatmap, a numeric matrix must be used as the input.
+
+In this case the `atcc_overall` data.frame is subset to remove all columns 
+except a column with identifiers (e.g. UniProt accessions), 
+log2FC data columns, and a logical significance column. Then the data.frame is 
+filtered for significant proteins, the UniProt accession column is converted to 
+rownames, the significance column is dropped, and the data.frame is converted 
+to a matrix.
+
+```{r lfqHeatmapData, echo=TRUE}
+# get data for log2 LFQ intensity heatmap
 atcc_htmp <- atcc_overall %>% 
   select(UP_accession, 
          matches("A9_EV[0-9]"), matches("A1_EV[0-9]"), 
@@ -925,7 +1086,34 @@ atcc_htmp <- atcc_overall %>%
   tibble::column_to_rownames(var = "UP_accession") %>% 
   select(-significant) %>% 
   as.matrix()
+```
 
+The heatmap is plotted with: 
+```{r, echo=TRUE, eval=FALSE}
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_height = unit(10, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    at = seq(-5, 5, 1))
+
+plot_heatmap(atcc_htmp, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "euclidean", 
+             split_type = "kmeans", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = TRUE, 
+             colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
+             heatmap_legend_param = htmp_params)
+```
+
+```{r lfqHeatmap, fig.cap=htmp_cap, fig.height=8}
 htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
                     color_bar = "continuous", 
                     direction = "vertical", 
@@ -949,19 +1137,58 @@ plot_heatmap(atcc_htmp,
              heatmap_legend_param = htmp_params)
 
 
-htmp_cap <- "This is a figure caption."
+htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been 
+             centred around 0."
 ```
 
-TEXT.
+## Log<sub>2</sub> fold change heatmap
 
-```{r atccHeatmap2, fig.cap=htmp2_cap, fig.height=8}
+To plot a log<sub>2</sub> fold change heatmap, a numeric matrix must be used 
+as the input.
+
+In this case the `atcc_overall` data.frame is subset to remove all columns 
+except a column with identifiers (e.g. UniProt accessions), 
+log2FC data columns, and a logical significance column. Then the data.frame is 
+filtered for significant proteins, the UniProt accession column is converted to 
+rownames, the significance column is dropped, and the data.frame is converted 
+to a matrix.
+
+```{r logfcHeatmapData, echo=TRUE}
 atcc_htmp2 <- atcc_overall %>% 
   select(UP_accession, matches("EV.vs.*W"), significant) %>% 
   filter(significant == TRUE) %>% 
   tibble::column_to_rownames(var = "UP_accession") %>% 
   select(-significant) %>% 
   as.matrix()
+```
 
+The heatmap is plotted with:
+
+```{r echo=TRUE, eval=FALSE}
+htmp2_params <- list(title = expression(bold(log[2]("FC"))), 
+                     color_bar = "continuous", 
+                     direction = "vertical", 
+                     legend_height = unit(10, "cm"), 
+                     title_position = "lefttop-rot", 
+                     title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                     labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                     at = seq(-10, 10, 2))
+
+htmp2 <- plot_heatmap(atcc_htmp2, 
+                      plot = TRUE,
+                      data_type = "log2fc", 
+                      clust_fun = "euclidean", 
+                      split_type = "kmeans", 
+                      k = 5, 
+                      legend_pos = "right", 
+                      row_title_fontsize = 16, 
+                      col_name_fontsize = 14, 
+                      column_names_rot = 45, 
+                      heatmap_legend_param = htmp2_params)
+```
+
+
+```{r logfcHeatmap, fig.cap=htmp2_cap, fig.small=TRUE}
 htmp2_params <- list(title = expression(bold(log[2]("FC"))), 
                      color_bar = "continuous", 
                      direction = "vertical", 
@@ -983,13 +1210,9 @@ htmp2 <- plot_heatmap(atcc_htmp2,
                       column_names_rot = 45, 
                       heatmap_legend_param = htmp2_params)
 
-htmp2 <- ggpubr::as_ggplot(grid::grid.grabExpr(htmp2)) + 
-  theme(plot.margin = margin(t = 0, l = 1.4, r = 1.4, b = 0, unit = "inches"))
-
-htmp2
-
-htmp2_cap <- "This is a figure caption."
+htmp2_cap <- "Protein log<sub>2</sub> fold change heatmap."
 ```
+
 
 # Session information {-}
 
