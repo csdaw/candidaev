@@ -1,9 +1,12 @@
 ---
-title: "**Defining protein markers for *Candida albicans* extracellular vesicles**"
-author: "*Charlotte Dawson^a^, Mark Bleackley^a^, Donovan Garcia Ceron^a^, Marilyn Anderson^a^*"
+title: | 
+   **Defining protein markers for *Candida albicans* extracellular vesicles**
+author: | 
+   *Charlotte Dawson^a^, Mark Bleackley^a^, Donovan Garcia Ceron^a^, 
+   Marilyn Anderson^a^*
 date: | 
-   *^a^Department of Biochemistry and Genetics, La Trobe Institute for Molecular Science, 
-   La Trobe University, Victoria, 3086, Australia*
+   *^a^Department of Biochemistry and Genetics, La Trobe Institute for 
+   Molecular Science, La Trobe University, Victoria, 3086, Australia*
 output: 
     bookdown::pdf_document2:
       latex_engine: xelatex
@@ -19,7 +22,7 @@ output:
 bibliography: "components/references.bib" 
 csl: "components/molecular-and-cellular-proteomics.csl"
 link-citations: yes
-linkcolor: blue
+linkcolor: black
 fontsize: 12pt
 geometry: margin=1in
 classoption: letterpaper
@@ -41,7 +44,8 @@ header-includes:
   - \usepackage{float}
   - \let\origfigure\figure
   - \let\endorigfigure\endfigure
-  - \renewenvironment{figure}[1][2]{\expandafter\origfigure\expandafter[H]}{\endorigfigure}
+  - \renewenvironment{figure}[1][2]{\expandafter\origfigure\expandafter[H]}
+    {\endorigfigure}
   - \usepackage{caption}
   - \captionsetup{font={normalsize,stretch=1.3},labelfont=bf}
   - \usepackage{threeparttable}
@@ -65,7 +69,7 @@ knitr::opts_chunk$set(collapse = TRUE,
                       echo = FALSE,
                       comment = "#>")
 
-# load libraries
+# load packages
 library(candidaev)
 library(tidyNano)
 library(limma)
@@ -76,6 +80,9 @@ library(kableExtra)
 
 # set seed for random number generation
 set.seed(1)
+
+# reference external R script with protein function lists
+knitr::read_chunk('components/protein_funs.R')
 
 # define colour palette to distinguish between strains
 # colours = yellow, blue, green, pink
@@ -299,20 +306,22 @@ colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de),
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-atcc_samp <- data.frame(T = rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3))
+atcc_samp <- data.frame(T = rep(c("A1_EV", "A1_WCL", 
+                                  "A9_EV", "A9_WCL"), each = 3))
 
 atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
 colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
 
 # define sample comparisons of interest
-atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W")
+atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
 
 # make all pair-wise comparisons for specified contrasts
 # and perform limma::eBayes()
 atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
 
 # extract overall results
-atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "overall")
+atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, 
+                            p_val = 0.01, lfc = 0, type = "overall")
 
 # extract results for ATCC strains
 a1_res <- get_results(efit = atcc_efit, 
@@ -389,7 +398,9 @@ marker_comp <- list("DAY Y" = yeast_res %>%
                       pull(CGD_gene_name))
 
 # get venn segments
-marker_comp_tab <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "list")
+marker_comp_tab <- plot_venn(vlist = marker_comp, 
+                             use_uniprot = FALSE, 
+                             type = "df")
 
 # extract protein names from venn overlap
 marker_candidates <- marker_comp_tab %>% 
@@ -402,10 +413,14 @@ marker_candidates <- marker_comp_tab %>%
 # construct table 1
 marker_longlist <- marker_candidates %>% 
   mutate(Function = match_id(Name, uniprot, "CGD_gene_name", "Protein_name"),
-         DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         A9 = match_id(Name, a9_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", str_split = FALSE), 
-         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", str_split = FALSE), 
+         DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", "logFC", 
+                          str_split = FALSE), 
+         A9 = match_id(Name, a9_res, "CGD_gene_name", "logFC", 
+                       str_split = FALSE), 
+         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", 
+                       str_split = FALSE), 
+         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", 
+                          str_split = FALSE), 
          TM = match_id(Name, uniprot, "CGD_gene_name", "Transmembrane"), 
          SP = match_id(Name, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
@@ -421,61 +436,20 @@ marker_longlist <- marker_candidates %>%
   rename("DAY Y" = DAY.Y, "DAY B" = DAY.B) %>% 
   arrange(Name)
 
-# write list of proper protein functions
-protein_desc <- c("1,3-beta-glucanosyltransferase", 
-                  "Rho family GTPase", 
-                  "Multidrug transporter of ABC superfamily", 
-                  "Major chitin synthase of yeast and hyphae", 
-                  "GPI-anchored cell wall transglycosylase", 
-                  "GPI-anchored cell wall protein", 
-                  paste0("Predicted P-type ATPase sodium pump", footnote_marker_alphabet(1)), 
-                  "ER oxidoreductin", 
-                  paste0("Long-chain fatty acid-CoA ligase", footnote_marker_alphabet(1)),
-                  "Multicopper feroxidase", 
-                  "High-affinity S-adenosylmethionine permease", 
-                  "1,3-beta-glucan synthase", 
-                  "High-affinity MFS glucose transporter", 
-                  "Putative high-affinity MFS glucose transporter", 
-                  paste0("Putative mitochondrial phosphate transporter", footnote_marker_alphabet(1)), 
-                  paste0("Glycolipid 2-alpha-mannosyltransferase", footnote_marker_alphabet(1)), 
-                  "Cell surface mannoprotein", 
-                  "Mucin family adhesin-like protein", 
-                  "Sphingolipid C9-methyltransferase", 
-                  paste0("\\textit{S. cerevisiae} ortholog is POM33, transmembrane nucleoporin", footnote_marker_alphabet(2)), 
-                  paste0("\\textit{S. cerevisiae} ortholog is RTN1, reticulon protein", footnote_marker_alphabet(2)), 
-                  paste0("Hexadecenal dehydrogenase", footnote_marker_alphabet(2)), 
-                  paste0("\\textit{S. cerevisiae} ortholog is PUN1, plasma membrane protein", footnote_marker_alphabet(2)), 
-                  "1,3-beta-glucanosyltransferase", 
-                  "GPI-anchored cell surface protein of unknown function", 
-                  "Putative ion transporter", 
-                  "Cell surface glycosidase", 
-                  "Glycosidase", 
-                  "Phospholipase B", 
-                  "Plasma membrane ATPase", 
-                  paste0("Mitochondrial outer membrane porin", footnote_marker_alphabet(1)), 
-                  "G-protein of RAC subfamily", 
-                  "Rho family GTPase", 
-                  "Rho family GTPase", 
-                  "Secreted aspartyl protease", 
-                  "Plasma membrane t-SNARE", 
-                  paste0("Protein required for normal cell wall, plasma membrane", footnote_marker_alphabet(3)), 
-                  paste0("Protein involved in vacuolar inheritance", footnote_marker_alphabet(1)), 
-                  "\\textit{S. cerevisiae} ortholog is YCK2, casein kinase", 
-                  paste0("Palmitoyltransferase, putative vacuolar SNARE complex protein", footnote_marker_alphabet(1)), 
-                  paste0("Rab family GTPase", footnote_marker_alphabet(1)),  
-                  "Putative vacuolar cation channel", 
-                  "Secreted yeast cell wall protein")
+# load vector of protein functions from external R script
+<<fun_list1>>
 
 # add proper protein functions to table 1
 # also add vesicle depleted supernatant info and 
 # group proteins according to localisation
 marker_longlist <- marker_longlist %>% 
-  mutate(Function = protein_desc, 
+  mutate(Function = function_desc1, 
          VDM = c("Y", rep("",3), rep("Y", 2), "", "Y", rep("", 8), rep("Y", 2), 
-                 rep("", 4), rep("Y", 3), rep("", 2), rep("Y", 2), rep("", 5), "Y", rep("", 7), "Y"), 
-         pack_row = c(5, rep(1,3), rep(5,2), 1, 2, rep(1,3), rep(1,3), 4, 2, rep(5,2), 
-                      1, rep(2,2), 4, 1, rep(5,2), 1, rep(5,3), 1, 4, rep(1,3), 5, 1, 1, 
-                      3, 1, 3, 2, 3, 5)) %>% 
+                 rep("", 4), rep("Y", 3), rep("", 2), rep("Y", 2), rep("", 5), 
+                 "Y", rep("", 7), "Y"), 
+         pack_row = c(5, rep(1,3), rep(5,2), 1, 2, rep(1,3), rep(1,3), 4, 2, 
+                      rep(5,2), 1, rep(2,2), 4, 1, rep(5,2), 1, rep(5,3), 1, 
+                      4, rep(1,3), 5, 1, 1, 3, 1, 3, 2, 3, 5)) %>% 
   arrange(pack_row)
 
 # fix number of TM domains for CDR1;CDR2
@@ -496,20 +470,26 @@ marker_longlist[19, 8] <- ""
 (ref:footnote3) [@tsirigos2015]
 
 ```{r table1}
-tab1_cap <- "\\textbf{Candidate positive protein markers for \\textit{C. albicans} EVs.} 
-             This list of proteins consists of those that were found to be exclusive to EVs or 
-             significantly enriched in EVs across the four \\textit{C. albicans} strains examined in 
-             this study. Proteins are grouped according to their subcellular localisation as annotated 
-             in the Candida Genome Database (candidagenome.org) (ref:footnote1). The log\\textsubscript{2} ratio 
-             of the abundance (mean MaxQuant LFQ intensity) of each protein in EVs compared to 
-             whole cell lysate (WCL) for each strain is listed. \`\`ex\" indicates where a protein was only 
-             identified in the EV fraction and not the WCL for that strain. The \`\`TM\" 
-             column indicates the number of transmembrane domains for each protein as annotated in 
-             UniProtKB. \`\`SP\" indicates whether a protein is annotated as having a signal peptide 
-             according to UniProtKB. \`\`VDM\" shows whether a protein has previously been detected in 
-             vesicle-depleted culture media (i.e. the proteins may also be in the soluble secretome) 
-             (ref:table1). Underlined proteins are those identified as the best candidates for positive
-             EV markers according to the criteria depicted in Figure \\ref{fig:figure1}."
+tab1_cap <- "\\textbf{Candidate positive protein markers for 
+             \\textit{C. albicans} EVs.} This list of proteins consists of 
+             those that were found to be exclusive to EVs or significantly 
+             enriched in EVs across the four \\textit{C. albicans} strains 
+             examined in this study. Proteins are grouped according to their 
+             subcellular localisation as annotated in the Candida Genome 
+             Database (candidagenome.org) (ref:footnote1). 
+             The log\\textsubscript{2} ratio of the abundance (mean MaxQuant 
+             LFQ intensity) of each protein in EVs compared to whole cell 
+             lysate (WCL) for each strain is listed. \`\`ex\" indicates where 
+             a protein was only quantified in the EV fraction and not the WCL 
+             for that strain. The \`\`TM\" column indicates the number of 
+             transmembrane domains for each protein as annotated in UniProtKB. 
+             \`\`SP\" indicates whether a protein is annotated as having a 
+             signal peptide according to UniProtKB. \`\`VDM\" shows whether a 
+             protein has previously been detected in vesicle-depleted culture 
+             media (i.e. the proteins may also be in the soluble secretome) 
+             (ref:table1). Underlined proteins are those identified as the 
+             best candidates for positive EV markers according to the 
+             criteria depicted in Figure \\ref{fig:figure1}."
 
 # draw table 1
 knitr::kable(marker_longlist[ ,-10],
@@ -520,19 +500,24 @@ knitr::kable(marker_longlist[ ,-10],
              linesep = "", 
              escape = FALSE)  %>% 
   row_spec(row = c(1, 5, 6, 11, 12, 15:20, 22:27, 39), underline = TRUE) %>% 
-  add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, " " = 2), escape = FALSE) %>% 
+  add_header_above(c(" " = 2, 
+                     "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, 
+                     " " = 2), escape = FALSE) %>% 
   kable_styling(font_size = 8) %>% 
   pack_rows("Plasma membrane", 1, 20) %>% 
   pack_rows("Golgi, ER, secretory pathway", 21, 25) %>% 
   pack_rows("Vacuole", 26, 28) %>% 
   pack_rows("Mitochondria", 29, 31) %>% 
   pack_rows("Cell wall, cell surface", 32, 43) %>% 
-  footnote(alphabet = c("Protein localisation was inferred from sequence similarity with 
-                         \\\\textit{S. cerevisiae} ortholog as annotated in the Candida 
-                         Genome Database (ref:footnote1)", 
-                        "Protein localisation was predicted using DeepLoc-1.0 (ref:footnote2)", 
-                        "Presence of transmembrane domains and absense of a signal peptide was predicted 
-                         using TOPCONS2 (ref:footnote3)"), 
+  footnote(alphabet = c("Protein localisation was inferred from sequence 
+                         similarity with \\\\textit{S. cerevisiae} ortholog as 
+                         annotated in the Candida Genome Database 
+                        (ref:footnote1)", 
+                        "Protein localisation was predicted using DeepLoc-1.0 
+                        (ref:footnote2)", 
+                        "Presence of transmembrane domains and absense of a 
+                        signal peptide was predicted using TOPCONS2 
+                        (ref:footnote3)"), 
            escape = FALSE, 
            threeparttable = TRUE)
 ```
@@ -543,16 +528,18 @@ knitr::kable(marker_longlist[ ,-10],
 
 ```{r figure1, fig.cap=f1_cap, fig.width=5.45, fig.height=6}
 # construct figure 1
-f1_cap <- "\\textbf{Schematic of the workflow used for the isolation and proteomic analysis of 
-           \\textit{C. albicans} EVs and the selection of EV protein markers.} Steps 1 to 6 
-           were performed for each of the four strains examined in this study: DAY286 yeast, 
-           ATCC90028 yeast, ATCC10231 yeast, and DAY286 biofilm. 
-           The results from the four seperate analyses were combined (step 7) to identify 
-           proteins which commonly appeared as EV marker candidates. The MISEV2018 criteria 
-           for protein content-based EV characterisation and other considerations were 
-           used to select the best \\textit{C. albicans} EV marker proteins."
+f1_cap <- "\\textbf{Schematic of the workflow used for the isolation and 
+           proteomic analysis of \\textit{C. albicans} EVs and the selection 
+           of EV protein markers.} Steps 1 to 6 were performed for each of the 
+           four strains examined in this study: DAY286 yeast, ATCC90028 yeast, 
+           ATCC10231 yeast, and DAY286 biofilm. The results from the four 
+           seperate analyses were combined (step 7) to identify proteins which 
+           commonly appeared as EV marker candidates. The MISEV2018 criteria 
+           for protein content-based EV characterisation and other 
+           considerations were used to select the best \\textit{C. albicans} 
+           EV marker proteins."
 
-f1 <- png::readPNG("./vignettes/figures/figure1.png")
+f1 <- png::readPNG("figures/figure1.png")
 
 # draw figure 1
 ggplot() + 
@@ -565,7 +552,8 @@ ggplot() +
 # construct data.frame with nta experiment info
 nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", 
                                   "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
-                                  "Biofilm_1", "Biofilm_2", "Biofilm_3", "Biofilm_4", "Biofilm_5", 
+                                  "Biofilm_1", "Biofilm_2", "Biofilm_3", 
+                                  "Biofilm_4", "Biofilm_5", 
                                   "DAY286_1", "DAY286_2", "DAY286_3"), 
                            protein_conc = c(0.192, 0.282, 0.287, 
                                             0.424, 0.716, 0.584, 
@@ -578,6 +566,7 @@ nta_techavg <- nta %>%
   nanolyze(particle_size, Strain, Bio_rep, Dilution, 
            name = "Tech_rep", 
            param_var = True_count)
+
 # average the nta biological replicate data
 nta_bioavg <- nta_techavg %>% 
   nanolyze(particle_size, Strain,
@@ -585,16 +574,17 @@ nta_bioavg <- nta_techavg %>%
            param_var = Tech_rep_mean) %>% 
   mutate(facet = case_when(Strain == "Biofilm" ~ "second", TRUE ~ "first"))
 
-# determine the total particle concentration for each 
-# biological replicate
+# determine the total particle concentration for each biological replicate
 nta_total <- nta_techavg %>% 
   nanocount(Strain, Bio_rep, Dilution, 
             param_var = Tech_rep_mean) %>% 
   tidyr::unite("id", Strain, Bio_rep) %>% 
-  mutate(protein_conc = as.numeric(match_id(id, nta_metadata, "id", "protein_conc")), 
+  mutate(protein_conc = as.numeric(match_id(id, nta_metadata, 
+                                            "id", "protein_conc")), 
          od = match_id(id, nta_metadata, "id", "OD600"), 
          part_per_prot = Particle_count / protein_conc / 1000) %>% 
-  tidyr::separate(col = id, into = c("Strain", "Bio_rep"), sep = "_", remove = TRUE)
+  tidyr::separate(col = id, into = c("Strain", "Bio_rep"), sep = "_", 
+                  remove = TRUE)
 
 # use ANOVA with Tukey HSD to compare mean particle per ug protein 
 # ratio across the strains
@@ -605,7 +595,7 @@ nta_total_tukey <- aov(part_per_prot ~ Strain, data = nta_total) %>%
 
 ```{r figure2plots, include=FALSE}
 # construct figure 2a
-f2a_img <- png::readPNG("./vignettes/figures/figure2a.png")
+f2a_img <- png::readPNG("figures/figure2a.png")
 
 f2a <- ggplot() + 
   background_image(f2a_img) + 
@@ -615,8 +605,10 @@ f2a <- ggplot() +
 f2b <- nta_bioavg %>% 
   ggplot(aes(x = particle_size, y = Bio_rep_mean, colour = Strain)) + 
   scale_colour_manual(values = st_pal[c(3, 2, 4, 1)], 
-                      breaks = c("DAY286", "ATCC90028", "ATCC10231", "Biofilm"), 
-                      labels = c("DAY286 Y", "ATCC90028", "ATCC10231", "DAY286 B")) + 
+                      breaks = c("DAY286", "ATCC90028", 
+                                 "ATCC10231", "Biofilm"), 
+                      labels = c("DAY286 Y", "ATCC90028", 
+                                 "ATCC10231", "DAY286 B")) + 
   geom_vline(xintercept = 100, colour = "#999999", linetype = "dashed") +
   geom_line(size = 0.5) + 
   facet_wrap(~ facet, scales = "free", ncol = 2, nrow = 1) + 
@@ -632,7 +624,8 @@ f2b <- nta_bioavg %>%
 
 # construct figure 2c
 nta_total$Strain <- factor(nta_total$Strain, 
-                           levels = c("DAY286", "ATCC90028", "ATCC10231", "Biofilm"))
+                           levels = c("DAY286", "ATCC90028", 
+                                      "ATCC10231", "Biofilm"))
 
 f2c <- nta_total %>% 
   ggboxplot(x = "Strain", y = "part_per_prot", 
@@ -651,9 +644,12 @@ f2c <- ggpar(f2c,
                      tip.length = 1e-2, 
                      label.size = 3) + 
   theme(axis.title.x = element_blank(), 
-        plot.margin = margin(t = 0.2, l = 0.2, r = 0, b = 0.15, unit = "inches")) + 
-  scale_x_discrete(labels = c("ATCC90028" = "A9", "ATCC10231" = "A1", "Biofilm" = "B", "DAY286" = "Y"))
-
+        plot.margin = margin(t = 0.2, l = 0.2, r = 0, b = 0.15, 
+                             unit = "inches")) + 
+  scale_x_discrete(labels = c("ATCC90028" = "A9", 
+                              "ATCC10231" = "A1", 
+                              "Biofilm" = "B", 
+                              "DAY286" = "Y"))
 ```
 
 
@@ -670,20 +666,23 @@ ggarrange(f2a,
           ncol = 1, 
           heights = c(1,1))
 
-f2_cap <- "\\textbf{Characterisation and quantification of EVs from different \\textit{C. albicans} strains.} 
-           \\textit{(A)} Representative TEM images of EVs isolated from 4 different \\textit{C. albicans} strains.
-           Scale bar indicates 0.5 $\\mu$m. \\textit{(B)} Size distribution of DAY286 yeast (n = 3), 
-           ATCC90028 yeast (n = 3), ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5) EVs 
-           as measured by nanoparticle tracking analysis. 
-           Line plots shown are the average of the biological replicates and the dashed grey line indicates 100 nm. 
-           Plots for the individual biological replicates are presented in supplemental Figure S1.
-           \\textit{(C)} Comparison of the ratio of particle concentration to protein concentration of the EV fraction, 
-           (particles/mL) $\\div$ ($\\mu$g protein/mL), across the four EV sources. 
-           Each dot represents one biological replicate. Sample means were compared using ANOVA followed by 
-           Tukey's HSD \\textit{post-hoc} test. P-values indicating significant 
-           differences are shown. The particle and protein concentrations for each biological replicate are 
-           provided in supplemental Table S1."
-
+f2_cap <- "\\textbf{Characterisation and quantification of EVs from different 
+           \\textit{C. albicans} strains.} \\textit{(A)} Representative TEM 
+           images of EVs isolated from 4 different \\textit{C. albicans} 
+           strains. Scale bar indicates 0.5 $\\mu$m. \\textit{(B)} Size 
+           distribution of DAY286 yeast (n = 3), ATCC90028 yeast (n = 3), 
+           ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5) EVs as measured 
+           by nanoparticle tracking analysis. Line plots shown are the average 
+           of the biological replicates and the dashed grey line indicates 100 
+           nm. Plots for the individual biological replicates are presented in 
+           supplemental Figure S1. \\textit{(C)} Comparison of the ratio of 
+           particle concentration to protein concentration of the EV fraction, 
+           (particles/mL) $\\div$ ($\\mu$g protein/mL), across the four EV 
+           sources. Each dot represents one biological replicate. Sample means 
+           were compared using ANOVA followed by Tukey's HSD \\textit{post-hoc} 
+           test. P-values indicating significant differences are shown. The 
+           particle and protein concentrations for each biological replicate 
+           are provided in supplemental Table S1."
 ```
 
 \newpage
@@ -701,7 +700,8 @@ f3a1 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl),
 # DAY286 yeast venn
 f3a1 <- as_ggplot(f3a1) + 
   theme(plot.margin = unit(c(1,0.5,1,0.5), "lines")) + 
-  annotate("text", x = 0.5, y = 0.92, label = "bold('DAY286 yeast')", parse = TRUE)
+  annotate("text", x = 0.5, y = 0.92, 
+           label = "bold('DAY286 yeast')", parse = TRUE)
 
 # generate volcano plot
 f3b1 <- plot_volcano(data = yeast_res, 
@@ -715,14 +715,19 @@ f3b1 <- plot_volcano(data = yeast_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched", "WCL enriched", "Not significant"), 
+  scale_colour_manual(labels = c("EV enriched", 
+                                 "WCL enriched", 
+                                 "Not significant"), 
                       values = unname(ev_pal[c(2,1,3)]), 
                       breaks = c("EV up", "WCL up", "not sig"), 
                       name = element_blank()) + 
   annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 Y')", parse = TRUE) + 
-  annotate("text", x = 3.5, y = 7, label = "bold('88')", parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('88')", parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('318')", parse = TRUE, colour = unname(ev_pal[1]))
+  annotate("text", x = 3.5, y = 7, label = "bold('88')", 
+           parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('88')", parse = TRUE, 
+           colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('318')", parse = TRUE, 
+           colour = unname(ev_pal[1]))
 ```
 
 
@@ -758,12 +763,16 @@ f3b2 <- plot_volcano(data = a9_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (99)", "WCL enriched (130)", "Not significant (744)"),
+  scale_colour_manual(labels = c("EV enriched (99)", "WCL enriched (130)", 
+                                 "Not significant (744)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC90028')", parse = TRUE) + 
-  annotate("text", x = 3.5, y = 7, label = "bold('99')", parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('130')", parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('744')", parse = TRUE, colour = unname(ev_pal[1]))
+  annotate("text", x = 3.5, y = 7, label = "bold('99')", 
+           parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('130')", 
+           parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('744')", 
+           parse = TRUE, colour = unname(ev_pal[1]))
 ```
 
 
@@ -799,12 +808,16 @@ f3b3 <- plot_volcano(data = a1_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (108)", "WCL enriched (142)", "Not significant (435)"),
+  scale_colour_manual(labels = c("EV enriched (108)", "WCL enriched (142)", 
+                                 "Not significant (435)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC10231')", parse = TRUE) + 
-  annotate("text", x = 3.5, y = 7, label = "bold('106')", parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('134')", parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('445')", parse = TRUE, colour = unname(ev_pal[1]))
+  annotate("text", x = 3.5, y = 7, label = "bold('106')", 
+           parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('134')", 
+           parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('445')", 
+           parse = TRUE, colour = unname(ev_pal[1]))
 ```
 
 
@@ -826,7 +839,8 @@ f3a4 <- plot_venn(list("EV" = b_ev, "WCL" = b_wcl),
 # DAY286 biofilm venn
 f3a4 <- as_ggplot(f3a4) + 
   theme(plot.margin = unit(c(1,0,1,0), "lines")) + 
-  annotate("text", x = 0.5, y = 0.92, label = "bold('DAY286 biofilm')", parse = TRUE)
+  annotate("text", x = 0.5, y = 0.92, label = "bold('DAY286 biofilm')", 
+           parse = TRUE)
 
 # generate volcano plot
 f3b4 <- plot_volcano(data = biofilm_res, 
@@ -840,13 +854,17 @@ f3b4 <- plot_volcano(data = biofilm_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (95)", "WCL enriched (79)", "Not significant (484)"), 
+  scale_colour_manual(labels = c("EV enriched (95)", "WCL enriched (79)", 
+                                 "Not significant (484)"), 
                       values = unname(ev_pal[c(2,1,3)]), 
                       breaks = c("EV up", "WCL up", "not sig")) + 
   annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 B')", parse = TRUE) + 
-  annotate("text", x = 3.5, y = 7, label = "bold('95')", parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('79')", parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('484')", parse = TRUE, colour = unname(ev_pal[1]))
+  annotate("text", x = 3.5, y = 7, label = "bold('95')", 
+           parse = TRUE, colour = unname(ev_pal[2])) + 
+  annotate("text", x = -3.5, y = 7, label = "bold('79')", 
+           parse = TRUE, colour = unname(ev_pal[3])) + 
+  annotate("text", x = 0, y = 6, label = "bold('484')", 
+           parse = TRUE, colour = unname(ev_pal[1]))
 ```
 
 
@@ -872,20 +890,24 @@ ggarrange(ggarrange(f3a1, f3a2, f3a3, f3a4,
           nrow = 2, 
           heights = c(1,2))
 
-f3_cap <- "\\textbf{Differential abundance analysis of proteins identified in \\textit{C. albicans} 
-           EVs and whole cell lysates (WCL).} \\textit{(A)} Venn diagrams comparing the EV and WCL 
-           proteomes from four \\textit{C. albicans} strains; DAY286 yeast (n = 3),
-           ATCC90028 yeast (n = 3), ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5). 
-           Whole cell lysates were prepared from the EV 
-           source cells. Proteins were quantified (MaxQuant LFQ intensity) in minimum 2/3 (yeast) and 4/5 (biofilm) biological 
-           replicates of EV or WCL. \\textit{(B)} Volcano plots depicting significantly enriched EV or WCL proteins. 
-           Differential abundance analysis was performed by comparing the mean normalised LFQ intensities of proteins 
-           identified in both EV and WCL (i.e. proteins in the venn overlap) using the Bioconductor package 
-           \\textit{limma} [@cox2014; @ritchie2015]. Significantly enriched proteins were identified using a 
-           Benjamini-Hochberg adjusted p-value cut off of 0.01. Counts of significant and 
-           non-significant proteins are indicated on each graph. Proteins with a 
-           log\\textsubscript{2}(FC) greater than 8 are labelled. 
-           Data tables underlying the venn diagrams and volcano plots are provided in 
+f3_cap <- "\\textbf{Differential abundance analysis of proteins identified in 
+           \\textit{C. albicans} EVs and whole cell lysates (WCL).} 
+           \\textit{(A)} Venn diagrams comparing the EV and WCL proteomes from 
+           four \\textit{C. albicans} strains; DAY286 yeast (n = 3), ATCC90028 
+           yeast (n = 3), ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5). 
+           Whole cell lysates were prepared from the EV source cells. Proteins 
+           were quantified (MaxQuant LFQ intensity) in minimum 2/3 (yeast) and 
+           4/5 (biofilm) biological replicates of EV or WCL. \\textit{(B)} 
+           Volcano plots depicting significantly enriched EV or WCL proteins. 
+           Differential abundance analysis was performed by comparing the mean 
+           normalised LFQ intensities of proteins identified in both EV and 
+           WCL (i.e. proteins in the venn overlap) using the Bioconductor 
+           package \\textit{limma} [@cox2014; @ritchie2015]. Significantly 
+           enriched proteins were identified using a Benjamini-Hochberg 
+           adjusted p-value cut off of 0.01. Counts of significant and 
+           non-significant proteins are indicated on each graph. Proteins with 
+           a log\\textsubscript{2}(FC) greater than 8 are labelled. Data tables 
+           underlying the venn diagrams and volcano plots are provided in 
            supplemental File S2."
 ```
 
@@ -952,10 +974,10 @@ f4_a1_go <- marker_comp[4] %>%
 
 ```{r figure4Plots, include=FALSE}
 # import FungiFun2 GO enrichment results
-f4_y_go_table <- process_fungifun("./vignettes/figures/f4_GO_DAY_Y.csv")
-f4_b_go_table <- process_fungifun("./vignettes/figures/f4_GO_DAY_B.csv")
-f4_a1_go_table <- process_fungifun("./vignettes/figures/f4_GO_ATCC10231.csv")
-f4_a9_go_table <- process_fungifun("./vignettes/figures/f4_GO_ATCC90028.csv")
+f4_y_go_table <- process_fungifun("figures/f4_GO_DAY_Y.csv")
+f4_b_go_table <- process_fungifun("figures/f4_GO_DAY_B.csv")
+f4_a1_go_table <- process_fungifun("figures/f4_GO_ATCC10231.csv")
+f4_a9_go_table <- process_fungifun("figures/f4_GO_ATCC90028.csv")
 
 # define the colour palette
 f4_pal <- c("#6D2077", "#E4002B", "#FFB81C")
@@ -990,14 +1012,15 @@ ggarrange(f4_y, f4_a9,
           legend = "bottom", 
           align = "hv")
 
-f4_cap <- "\\textbf{Functional enrichment analyses of the significantly enriched 
-          and exclusive \\textit{C. albicans} EV proteins.} 
-          The online tool FungiFun2 (elbe.hki-jena.de/fungifun) was used to identify enriched biological process (BP), 
-          cellular component (CC), and molecular function (MF) GO terms [@priebe2015]. A selection of the
-          most significantly enriched terms for each GO domain are shown. They are presented top to bottom 
-          in order of increasing Benjamini-Hochberg adjusted p-value. 
-          Full lists of enriched GO terms can be found in supplemental File S3."
-
+f4_cap <- "\\textbf{Functional enrichment analyses of the significantly 
+           enriched and exclusive \\textit{C. albicans} EV proteins.} The 
+           online tool FungiFun2 (elbe.hki-jena.de/fungifun) was used to 
+           identify enriched biological process (BP), cellular component (CC), 
+           and molecular function (MF) GO terms [@priebe2015]. A selection of 
+           the most significantly enriched terms for each GO domain are shown. 
+           They are presented top to bottom in order of increasing 
+           Benjamini-Hochberg adjusted p-value. Full lists of enriched GO 
+           terms can be found in supplemental File S3."
 ```
 
 \newpage
@@ -1008,7 +1031,9 @@ f5a_comp <- list("DAY Y" = rownames(y_ev),
                  "DAY B" = rownames(b_ev),
                  "ATCC90028" = rownames(atcc9_ev), 
                  "ATCC10231" = rownames(atcc1_ev))
-f5a_comp <- lapply(f5a_comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
+f5a_comp <- lapply(f5a_comp, function(x) match_id(x, ref = uniprot, 
+                                                  match = "UP_accession", 
+                                                  new = "CGD_gene_name"))
 
 f5a_venn <- plot_venn(vlist = f5a_comp, use_uniprot = FALSE, type = "plot", 
                       fontfamily = "sans", 
@@ -1021,7 +1046,8 @@ f5a_venn <- plot_venn(vlist = f5a_comp, use_uniprot = FALSE, type = "plot",
 f5a <- as_ggplot(f5a_venn) + 
   theme(plot.margin = unit(c(0,2,0,2), "lines"))
 
-f5a_overlap <- plot_venn(vlist = f5a_comp, use_uniprot = FALSE, type = "list") %>% 
+f5a_overlap <- plot_venn(vlist = f5a_comp, 
+                         use_uniprot = FALSE, type = "df") %>% 
   filter(..count.. == 403) %>% 
   pull(..values..) %>% 
   unlist()
@@ -1031,7 +1057,9 @@ f5b_comp <- list("DAY Y" = rownames(y_wcl),
                  "DAY B" = rownames(b_wcl),
                  "ATCC90028" = rownames(atcc9_w), 
                  "ATCC10231" = rownames(atcc1_w))
-f5b_comp <- lapply(f5b_comp, function(x) match_id(x, ref = uniprot, match = "UP_accession", new = "CGD_gene_name"))
+f5b_comp <- lapply(f5b_comp, function(x) match_id(x, ref = uniprot, 
+                                                  match = "UP_accession", 
+                                                  new = "CGD_gene_name"))
 
 f5b_venn <- plot_venn(vlist = f5b_comp, use_uniprot = FALSE, type = "plot", 
                       fontfamily = "sans", 
@@ -1062,7 +1090,8 @@ mds_labels <- c(rep("EV", 3), rep("WCL", 3),
                 rep("EV", 3), rep("WCL", 3))
 
 # figure 5c MDS [dim1, dim2]
-f5c <- plot_mds(mds_data, mat_labels = mds_labels, shape_size = 3, dim.plot = c(1,2)) + 
+f5c <- plot_mds(mds_data, mat_labels = mds_labels, 
+                shape_size = 3, dim.plot = c(1,2)) + 
   scale_x_continuous(limits = c(-1.5, 2.5), 
                      expand = c(0,0)) + 
   scale_y_continuous(limits = c(-1.5, 2.5), 
@@ -1082,7 +1111,8 @@ f5c <- plot_mds(mds_data, mat_labels = mds_labels, shape_size = 3, dim.plot = c(
   ylab(label = "Dimension 2")
   
 # figure 5d MDS [dim3, dim2]
-f5d <- plot_mds(mds_data, mat_labels = mds_labels, shape_size = 3, dim.plot = c(3,2)) + 
+f5d <- plot_mds(mds_data, mat_labels = mds_labels, 
+                shape_size = 3, dim.plot = c(3,2)) + 
   scale_x_continuous(limits = c(-1.5, 2.5), 
                      expand = c(0,0)) + 
   scale_y_continuous(limits = c(-1.5, 2.5), 
@@ -1121,20 +1151,24 @@ ggarrange(ggarrange(f5a, f5b,
           nrow = 2,
           heights = c(2, 3))
 
-f5_cap <- "\\textbf{Combined comparison of \\textit{C. albicans} proteomes.} \\textit{(A)} 
-          Venn diagram comparing four \\textit{C. albicans} EV proteomes. Lists of proteins 
-          present in the centre and right partitions of each venn diagram in Figure \\@ref(fig:figure3)A were 
-          compared to identify proteins present in all four datasets. \\textit{(B)} Venn diagram comparing 
-          four \\textit{C. albicans} WCL proteomes. Lists of proteins 
-          present in the centre and left partitions of each venn diagram in Figure \\@ref(fig:figure3)A were 
-          compared to identify proteins present in all four datasets.
-          The data tables underlying Figures \\@ref(fig:figure5)A and \\@ref(fig:figure5)B are provided in 
-          supplemental File S4. \\textit{(C)} Multidimensional scaling (MDS) plot of each LC-MS/MS
-          biological replicate sample with the first 2 dimensions shown. Pairwise distance between 
-          samples approximately indicates the log\\textsubscript{2}(FC) between samples. \\textit{limma} was 
-          used to generate the MDS plots [@ritchie2015]. 
-          \\textit{(D)} MDS plot of each LC-MS/MS biological replicate sample with the second and 
-          third dimensions shown."
+f5_cap <- "\\textbf{Combined comparison of \\textit{C. albicans} proteomes.} 
+           \\textit{(A)} Venn diagram comparing four \\textit{C. albicans} EV 
+           proteomes. Lists of proteins present in the centre and right 
+           partitions of each venn diagram in Figure \\@ref(fig:figure3)A were 
+           compared to identify proteins present in all four datasets. 
+           \\textit{(B)} Venn diagram comparing four \\textit{C. albicans} WCL 
+           proteomes. Lists of proteins present in the centre and left 
+           partitions of each venn diagram in Figure \\@ref(fig:figure3)A were 
+           compared to identify proteins present in all four datasets. The data 
+           tables underlying Figures \\@ref(fig:figure5)A and 
+           \\@ref(fig:figure5)B are provided in supplemental File S4. 
+           \\textit{(C)} Multidimensional scaling (MDS) plot of each LC-MS/MS 
+           biological replicate sample with the first 2 dimensions shown. 
+           Pairwise distance between samples approximately indicates the 
+           log\\textsubscript{2}(FC) between samples. \\textit{limma} was used 
+           to generate the MDS plots [@ritchie2015]. \\textit{(D)} MDS plot of 
+           each LC-MS/MS biological replicate sample with the second and third 
+           dimensions shown."
 ```
 
 \newpage
@@ -1143,9 +1177,12 @@ f5_cap <- "\\textbf{Combined comparison of \\textit{C. albicans} proteomes.} \\t
 # figure 6 heatmap
 f6_table <- a9_res %>% 
   select(logFC, CGD_gene_name) %>% 
-  full_join(., select(a1_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
-  full_join(., select(yeast_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
-  full_join(., select(biofilm_res, logFC, CGD_gene_name), by = "CGD_gene_name") %>% 
+  full_join(., select(a1_res, logFC, CGD_gene_name), 
+            by = "CGD_gene_name") %>% 
+  full_join(., select(yeast_res, logFC, CGD_gene_name), 
+            by = "CGD_gene_name") %>% 
+  full_join(., select(biofilm_res, logFC, CGD_gene_name), 
+            by = "CGD_gene_name") %>% 
   rename(a9_lfc = logFC.x, 
          a1_lfc = logFC.y, 
          y_lfc = logFC.x.x, 
@@ -1168,6 +1205,18 @@ f6_table_excl <- f6_table %>%
   tibble::column_to_rownames(var = "CGD_gene_name") %>% 
   as.matrix()
 
+# heatmap legend parameters
+f6_params <- list(color_bar = "continuous", 
+                  title = expression(bold(log[2]("FC"))), 
+                  direction = "horizontal", 
+                  legend_width = unit(2, "cm"), 
+                  title_position = "lefttop", 
+                  title_gp = grid::gpar(colour = "black", 
+                                        fontsize = 5), 
+                  labels_gp = grid::gpar(colour = "black", 
+                                         fontsize = 5), 
+                  at = seq(-6, 6, 2))
+
 # plot heatmap
 f6_htmp <- plot_heatmap(mt = f6_table_filt, 
                         plot = FALSE,
@@ -1179,26 +1228,18 @@ f6_htmp <- plot_heatmap(mt = f6_table_filt,
                         cluster_split = FALSE, 
                         split_order = c(3, 1, 4, 2, 5), 
                         colour_lims = c(-4, 4),
-                        column_labels = c("ATCC90028", "ATCC10231", "DAY286 Y", "DAY286 B"), 
+                        column_labels = c("ATCC90028", "ATCC10231", 
+                                          "DAY286 Y", "DAY286 B"), 
                         col_name_fontsize = 6, 
                         column_names_rot = 45, 
                         row_title_fontsize = 6, 
                         row_title_rot = 0, 
                         row_title = c("1", "2", "3", "4", "5"), 
-                        heatmap_legend_param = list(color_bar = "continuous", 
-                                                    title = expression(bold(log[2]("FC"))), 
-                                                    direction = "horizontal", 
-                                                    legend_width = unit(2, "cm"), 
-                                                    title_position = "lefttop", 
-                                                    title_gp = grid::gpar(colour = "black", 
-                                                                          fontsize = 5), 
-                                                    labels_gp = grid::gpar(colour = "black", 
-                                                                           fontsize = 5), 
-                                                    at = seq(-6, 6, 2)))
+                        heatmap_legend_param = f6_params)
 
 # save heatmap as pdf file for editing in inkscape
 # not run in rmarkdown but manually in console
-# pdf(file = "./vignettes/figures/figure5_unf.pdf", width = 1.7, height = 4)
+# pdf(file = "figures/figure5_unf.pdf", width = 1.7, height = 4)
 # ComplexHeatmap::draw(f5_htmp, heatmap_legend_side = "bottom")
 # dev.off()
 ```
@@ -1213,7 +1254,8 @@ f6_clusters <- plot_heatmap(mt = f6_table_filt,
                             split_type = "cutree", 
                             k = 5, 
                             cluster_split = FALSE) %>% 
-  mutate(cluster = recode(cluster, "1" = 2, "2" = 4, "3" = 1, "4" = 3, "5" = 5)) %>% 
+  mutate(cluster = recode(cluster, 
+                          "1" = 2, "2" = 4, "3" = 1, "4" = 3, "5" = 5)) %>% 
   arrange(cluster)
 
 # extract identifiers from each cluster
@@ -1255,55 +1297,60 @@ f6_clust5 <- f6_clusters %>%
 f6_clust6 <- sort(rownames(f6_table_excl))
 
 # import FungiFun2 results
-f6_go1 <- process_fungifun(filename = "./vignettes/figures/f6_GO_clust1.csv") %>% 
+f6_go1 <- process_fungifun("figures/f6_GO_clust1.csv") %>% 
   mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found))
 
 # issue with PEP1, ambiguous ID in FungiFun, used CaO19.3767 as identifier
-f6_go2 <- process_fungifun(filename = "./vignettes/figures/f6_GO_clust2.csv") %>% 
+f6_go2 <- process_fungifun("figures/f6_GO_clust2.csv") %>% 
   mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found))
 
-f6_go3 <- process_fungifun(filename = "./vignettes/figures/f6_GO_clust3.csv")
+f6_go3 <- process_fungifun("figures/f6_GO_clust3.csv")
 
 # issue with CHS3, ambiguous ID in FungiFun, used CaO19.4937 as identifier
-f6_go4 <- process_fungifun(filename = "./vignettes/figures/f6_GO_clust4.csv")
+f6_go4 <- process_fungifun("figures/f6_GO_clust4.csv")
 
 # issue with ALA1, MDH1, used CaO19.5746 and CaO19.7481 as identifiers
-f6_go5 <- process_fungifun(filename = "./vignettes/figures/f6_GO_clust5.csv") %>% 
+f6_go5 <- process_fungifun("figures/f6_GO_clust5.csv") %>% 
   mutate(Prot.found = gsub("CaO19.5746", "ALA1", Prot.found), 
          Prot.found = gsub("CaO19.7481", "MDH1", Prot.found), 
          Prot.found = gsub("CaO19.3002", "RPS1", Prot.found), 
          Prot.found = gsub("CaO19.7417", "TSA1", Prot.found))
 
-f6_go6 <- process_fungifun(filename = "./vignettes/figures/f6_GO_clust6.csv")
+f6_go6 <- process_fungifun("figures/f6_GO_clust6.csv")
 ```
 
 ```{r figure6, fig.cap=f6_cap, fig.height=6}
-f6 <- png::readPNG("./vignettes/figures/figure6.png")
+f6 <- png::readPNG("figures/figure6.png")
 
 # draw figure 6
 ggplot() + 
   background_image(f6) + 
-  theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, unit = "inches"))
+  theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, 
+                             unit = "inches"))
 
-f6_cap <- "\\textbf{Identification of commonly enriched EV proteins across different \\textit{C. albicans} strains.} 
-           Heatmap of proteins (n = 403) identified in all four EV samples (venn overlap in Figure \\@ref(fig:figure5)A). 
-           Each column 
-           represents a \\textit{C. albicans} strain and each row represents a protein. The colours
-           indicate the log\\textsubscript{2}(FC) of the protein for that particular strain; red is EV enriched, blue is 
-           EV depleted, and black is EV exclusive. Unsupervised clustering of rows and columns was performed 
-           using Gower's formula via the daisy function from the R package \\textit{cluster} [@maechler2019].
-           Proteins which were exclusive to EVs from all four strains could not be clustered and were 
-           seperated prior to clustering, in the group designated \`\`cluster 6\".
-           Functional enrichment analyses were performed on the heatmap protein clusters using the online 
-           tool FungiFun2 [@priebe2015]. A selection of significantly enriched GO terms are presented in the 
-           table inset. Lists of the proteins identified in each cluster are shown and are also available in 
-           supplemental File S5. "
+f6_cap <- "\\textbf{Identification of commonly enriched EV proteins across 
+           different \\textit{C. albicans} strains.} Heatmap of proteins 
+           (n = 403) identified in all four EV samples (venn overlap in Figure 
+           \\@ref(fig:figure5)A). Each column represents a 
+           \\textit{C. albicans} strain and each row represents a protein. The 
+           colours indicate the log\\textsubscript{2}(FC) of the protein for 
+           that particular strain; red is EV enriched, blue is EV depleted, and 
+           black is EV exclusive. Unsupervised clustering of rows and columns 
+           was performed using Gower's formula via the daisy function from the 
+           R package \\textit{cluster} [@maechler2019]. Proteins which were 
+           exclusive to EVs from all four strains could not be clustered and 
+           were seperated prior to clustering, in the group designated 
+           \`\`cluster 6\". Functional enrichment analyses were performed on 
+           the heatmap protein clusters using the online tool FungiFun2 
+           [@priebe2015]. A selection of significantly enriched GO terms are 
+           presented in the table inset. Lists of the proteins identified in 
+           each cluster are shown and are also available in supplemental 
+           File S5."
 ```
 
 \newpage
 
 ```{r figure7Data, include=FALSE}
-
 f7a_venn <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "plot", 
                       fontfamily = "sans", 
                       cat.fontfamily = "sans", 
@@ -1346,7 +1393,6 @@ f7b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot",
 
 f7b <- as_ggplot(f7b_venn) + 
   theme(plot.margin = unit(c(1.2,0,0,0), "lines"))
-
 ```
 
 ```{r figure7, fig.cap=f7_cap, fig.width=2.5, fig.height=4}
@@ -1355,29 +1401,32 @@ ggarrange(f7a, f7b,
           ncol = 1,
           nrow = 2)
 
-f7_cap <- "\\textbf{Identification of common signficantly enriched or exclusive \\textit{C. albicans} 
-           EV and WCL proteins.} Proteins identified as significantly enriched or exclusive to EVs
-           in Figure \\@ref(fig:figure3) were compared to select those which were common to all 
-           4 datasets. 43 proteins were identified as potential positive EV protein markers and 52 
-           proteins as potential negative EV protein markers. The data tables underlying Figure 
-           \\@ref(fig:figure7) are provided in supplemental File S4. Details of the 43 positive EV
-           protein marker candidates and 52 negative candidates can be found in Table \\@ref(tab:table1) and 
-           supplemental Table S2 respectively."
+f7_cap <- "\\textbf{Identification of common signficantly enriched or exclusive 
+           \\textit{C. albicans} EV and WCL proteins.} Proteins identified as 
+           significantly enriched or exclusive to EVs in Figure 
+           \\@ref(fig:figure3) were compared to select those which were common 
+           to all 4 datasets. 43 proteins were identified as potential positive 
+           EV protein markers and 52 proteins as potential negative EV protein 
+           markers. The data tables underlying Figure 
+           \\@ref(fig:figure7) are provided in supplemental File S4. Details of 
+           the 43 positive EV protein marker candidates and 52 negative 
+           candidates can be found in Table \\@ref(tab:table1) and supplemental 
+           Table S2 respectively."
 ```
 
 \newpage
 
 ```{r figure8, fig.cap=f8_cap, fig.width=3.5, fig.height=2.8}
+f8_cap <- "\\textbf{Eighteen best potential \\textit{C. albicans} positive EV 
+           protein markers.} These proteins are those underlined in Table 
+           \\@ref(tab:table1). They are are enriched or exclusive to EVs 
+           isolated from all of the \\textit{C. albicans} strains investigated 
+           in this study. The proteins fit within the EV biomarker categories 
+           1a, 2a, and 2b from MISEV2018 which includes transmembrane, 
+           GPI-anchored, and cytosolic proteins that are EV enriched 
+           [@thery2018]."
 
-f8_cap <- "\\textbf{Eighteen best potential \\textit{C. albicans} positive EV protein markers.} 
-           These proteins are those underlined in Table \\@ref(tab:table1). They are 
-           are enriched or exclusive to EVs isolated from all of the 
-           \\textit{C. albicans} strains investigated in this study. The proteins
-           fit within the EV biomarker categories 1a, 2a, and 2b from MISEV2018 which 
-           includes transmembrane, GPI-anchored, and cytosolic proteins that are EV 
-           enriched [@thery2018]."
-
-f8 <- png::readPNG("./vignettes/figures/figure8.png")
+f8 <- png::readPNG("figures/figure8.png")
 
 ggplot() + 
   background_image(f8)
@@ -1386,19 +1435,20 @@ ggplot() +
 \newpage
 
 ```{r figure9, fig.cap=f9_cap, fig.width=7.2, fig.height=6}
+f9_cap <- "\\textbf{Predicted topology and palmitoylation sites of 
+           \\textit{C. albicans} MCC/eisosome proteins SUR7 and orf19.6741 
+           compared to the human tetraspanin CD81.} The presence of 
+           transmembrane (TM) domains and palmitoylation sites shown on the 
+           left side of the figure were predicted using the online tools 
+           TOPCONS2 (topcons.cbr.su.se) [@tsirigos2015] and CSS-PALM 4.0 
+           (csspalm.biocuckoo.org) [@ren2008] respectively. For CD81, 
+           palmitoylation sites experimentally determined in previous 
+           literature are shown [@delandre2009]. The right side of the figure 
+           shows a cartoon representation of the TOPCONS2 consensus topology 
+           prediction for the three proteins as well as the crystal structure 
+           of CD81 (PDB: 5TCX) [@zimmerman2016]."
 
-f9_cap <- "\\textbf{Predicted topology and palmitoylation sites of \\textit{C. albicans} 
-           MCC/eisosome proteins SUR7 and orf19.6741 compared to the human tetraspanin CD81.} 
-           The presence of transmembrane (TM) domains and palmitoylation sites shown 
-           on the left side of the figure were predicted 
-           using the online tools TOPCONS2 (topcons.cbr.su.se) [@tsirigos2015] and 
-           CSS-PALM 4.0 (csspalm.biocuckoo.org) [@ren2008] respectively.
-           For CD81, palmitoylation sites experimentally determined in previous literature 
-           are shown [@delandre2009]. The right side of the figure shows a cartoon representation of the 
-           TOPCONS2 consensus topology prediction for the three proteins as well as 
-           the crystal structure of CD81 (PDB: 5TCX) [@zimmerman2016]."
-
-f9 <- png::readPNG("./vignettes/figures/figure9.png")
+f9 <- png::readPNG("figures/figure9.png")
 
 ggplot() + 
   background_image(f9)

@@ -1,9 +1,12 @@
 ---
-title: "**Defining protein markers for *Candida albicans* extracellular vesicles**"
-author: "*Charlotte Dawson^a^, Mark Bleackley^a^, Donovan Garcia Ceron^a^, Marilyn Anderson^a^*"
+title: | 
+   **Defining protein markers for *Candida albicans* extracellular vesicles**
+author: | 
+   *Charlotte Dawson^a^, Mark Bleackley^a^, Donovan Garcia Ceron^a^, 
+   Marilyn Anderson^a^*
 date: | 
-   *^a^Department of Biochemistry and Genetics, La Trobe Institute for Molecular Science, 
-   La Trobe University, Victoria, 3086, Australia*
+   *^a^Department of Biochemistry and Genetics, La Trobe Institute for 
+   Molecular Science, La Trobe University, Victoria, 3086, Australia*
 output: 
     bookdown::pdf_document2:
       latex_engine: xelatex
@@ -14,7 +17,7 @@ output:
 bibliography: "components/references.bib" 
 csl: "components/molecular-and-cellular-proteomics.csl"
 link-citations: yes
-linkcolor: blue
+linkcolor: black
 fontsize: 12pt
 geometry: margin=1in
 classoption: letterpaper
@@ -36,7 +39,8 @@ header-includes:
   - \usepackage{float}
   - \let\origfigure\figure
   - \let\endorigfigure\endfigure
-  - \renewenvironment{figure}[1][2] {\expandafter\origfigure\expandafter[H]} {\endorigfigure}
+  - \renewenvironment{figure}[1][2]{\expandafter\origfigure\expandafter[H]}
+    {\endorigfigure}
   - \newcommand{\beginsupplement}{
       \setcounter{table}{0} 
       \renewcommand{\thetable}{S\arabic{table}} 
@@ -60,12 +64,11 @@ knitr::opts_knit$set(progress = TRUE,
                      verbose = TRUE)
 
 # set chunk options
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  warning = FALSE,
-  message = FALSE,
-  echo = FALSE,
-  comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      echo = FALSE, 
+                      comment = "#>")
 
 # load libraries
 library(candidaev)
@@ -78,6 +81,9 @@ library(kableExtra)
 
 # set seed for random number generation
 set.seed(1)
+
+# reference external R script with protein function lists
+knitr::read_chunk('components/protein_funs.R')
 ```
 
 
@@ -292,20 +298,22 @@ colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de),
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", "A9_EV", "A9_WCL"), each = 3)))
+atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", 
+                                   "A9_EV", "A9_WCL"), each = 3)))
 
 atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
 colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
 
 # define sample comparisons of interest
-atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W", "A1_EV - A9_EV", "A1_W - A9_W")
+atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
 
 # make all pair-wise comparisons for specified contrasts
 # and perform limma::eBayes()
 atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
 
 # extract overall results
-atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, p_val = 0.01, lfc = 0, type = "overall")
+atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, 
+                            p_val = 0.01, lfc = 0, type = "overall")
 
 # extract DE results
 a1_res <- get_results(efit = atcc_efit, 
@@ -327,11 +335,11 @@ a9_res <- get_results(efit = atcc_efit,
 \beginsupplement
 
 ```{r figureS1, fig.cap=fS1_cap, fig.height=5, fig.width=5}
-
-fS1_cap <- c("\\textbf{Size distribution of \\textit{C. albicans} EVs as determined by 
-              nanoparticle tracking analysis (NTA).} A line plot for each EV biological 
-              replicate from each strain is shown. Each line plots represents the average 
-             of three technical replicates and the dashed grey lines indicate 100 nm.")
+fS1_cap <- c("\\textbf{Size distribution of \\textit{C. albicans} EVs as 
+              determined by nanoparticle tracking analysis (NTA).} A line plot 
+              for each EV biological replicate from each strain is shown. Each 
+              line plots represents the average of three technical replicates 
+              and the dashed grey lines indicate 100 nm.")
 
 figS1_labels <- c("ATCC10231", 
                   "ATCC90028", 
@@ -343,6 +351,7 @@ names(figS1_labels) <- c("ATCC10231",
                          "Biofilm", 
                          "DAY286")
 
+# average the nta technical replicate data
 nta_techavg <- nta %>% 
   nanolyze(particle_size, Strain, Bio_rep, Dilution, 
            name = "Tech_rep", 
@@ -353,6 +362,7 @@ nta_techavg$Strain <- factor(nta_techavg$Strain, levels = c("DAY286",
                                                             "ATCC10231", 
                                                             "Biofilm"))
 
+# plot nta distribution for each bio rep
 nta_techavg %>% 
   ggplot(aes(x = particle_size, y = Tech_rep_mean, colour = Bio_rep)) + 
   geom_line(size = 0.5) + 
@@ -371,15 +381,18 @@ nta_techavg %>%
 \newpage
 
 ```{r tableS1Data}
+# construct data.frame with nta experiment info
 nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", 
                                   "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
-                                  "Biofilm_1", "Biofilm_2", "Biofilm_3", "Biofilm_4", "Biofilm_5", 
+                                  "Biofilm_1", "Biofilm_2", "Biofilm_3", 
+                                  "Biofilm_4", "Biofilm_5", 
                                   "DAY286_1", "DAY286_2", "DAY286_3"), 
                            strain = c(rep("ATCC10231", 3), 
                                       rep("ATCC90028", 3), 
                                       rep("Biofilm", 5), 
                                       rep("DAY286", 3)), 
-                           replicate = c(seq(1, 3), seq(1, 3), seq(1, 5), seq(1, 3)), 
+                           replicate = c(seq(1, 3), seq(1, 3), 
+                                         seq(1, 5), seq(1, 3)), 
                            OD600 = c(0.455*20, 0.557*20, 0.615*20, 
                                      0.310*50, 0.337*50, 0.297*50, 
                                      rep(NA, 5), 
@@ -424,9 +437,11 @@ nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3",
                                    301.4, 381.1, 285.8, 
                                    151.5, 239.7, 240.8, 210.2, 171.2, 
                                    320.4, 308.0, 290.9),
-                           sort_order = c(rep(3, 3), rep(2, 3), rep(4, 5), rep(1, 3)), 
+                           sort_order = c(rep(3, 3), rep(2, 3), 
+                                          rep(4, 5), rep(1, 3)), 
                            stringsAsFactors = FALSE)
 
+# determine the total particle concentration for each biological replicate
 nta_total <- nta_techavg %>% 
   nanocount(Strain, Bio_rep, Dilution, 
             param_var = Tech_rep_mean) %>% 
@@ -438,13 +453,9 @@ nta_total <- nta_techavg %>%
   mutate(OD600 = case_when(is.na(OD600) == TRUE ~ "NA", 
                            TRUE ~ as.character(OD600)), 
          Particle_count = signif(Particle_count, digits = 3))
-
-
-
 ```
 
 ```{r tableS1}
-
 tabS1_labs <- c("Biological\nreplicate", 
                 "OD600", 
                 "Culture vol.\n(mL)", 
@@ -456,11 +467,12 @@ tabS1_labs <- c("Biological\nreplicate",
                 "SD")
 
 tabS1_cap <- "\\textbf{Metadata for each EV isolation analysed in this study.} 
-              The optical density (at 600 nm) and volume of each culture from which 
-              the EVs were isolated is given. The protein and particle concentration 
-              of the EVs along with the NTA size distribution results 
-              for each biological replicate are also shown."
+              The optical density (at 600 nm) and volume of each culture from 
+              which the EVs were isolated is given. The protein and particle 
+              concentration of the EVs along with the NTA size distribution 
+              results for each biological replicate are also shown."
 
+# construct a table of metadata for each EV biological replicate
 nta_total %>% 
   select(-strain) %>% 
   mutate_all(linebreak) %>% 
@@ -483,6 +495,7 @@ nta_total %>%
 \newpage
 
 ```{r tableS2Data}
+# make list of WCL sig. enriched and exclusive proteins for each strain
 wcl_comp <- list("yeast" = yeast_res %>% 
                    filter(group == "WCL up" | group == "WCL ex") %>% 
                    pull(CGD_gene_name), 
@@ -496,8 +509,12 @@ wcl_comp <- list("yeast" = yeast_res %>%
                    filter(group == "A9_W up" | group == "A9_W ex") %>% 
                    pull(CGD_gene_name))
 
-wcl_comp_tab <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "list")
+# get venn segments
+wcl_comp_tab <- plot_venn(vlist = wcl_comp, 
+                          use_uniprot = FALSE, 
+                          type = "df")
 
+# extract protein names from venn overlap
 wcl_candidates <- wcl_comp_tab %>% 
   filter(apply(.[, 1:4], 1, sum) == 4) %>% 
   pull(..values..) %>% 
@@ -505,12 +522,18 @@ wcl_candidates <- wcl_comp_tab %>%
   as.data.frame(stringsAsFactors = FALSE) %>% 
   rename(Name = 1)
 
+# construct table S2
 wcl_longlist <- wcl_candidates %>% 
-  mutate(Function = match_id(Name, uniprot, "CGD_gene_name", "Protein_name", concat = TRUE, str_split = FALSE),
-         DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
-         A9 = match_id(Name, a9_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
-         A1 = match_id(Name, a1_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
-         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", "logFC", concat = TRUE, str_split = FALSE), 
+  mutate(Function = match_id(Name, uniprot, "CGD_gene_name", 
+                             "Protein_name", concat = TRUE, str_split = FALSE),
+         DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", 
+                          "logFC", concat = TRUE, str_split = FALSE), 
+         A9 = match_id(Name, a9_res, "CGD_gene_name", 
+                       "logFC", concat = TRUE, str_split = FALSE), 
+         A1 = match_id(Name, a1_res, "CGD_gene_name", 
+                       "logFC", concat = TRUE, str_split = FALSE), 
+         DAY.B = match_id(Name, biofilm_res, "CGD_gene_name", 
+                          "logFC", concat = TRUE, str_split = FALSE), 
          TM = match_id(Name, uniprot, "CGD_gene_name", "Transmembrane"), 
          SP = match_id(Name, uniprot, "CGD_gene_name", "Signal_peptide")) %>% 
   mutate_at(.vars = vars(DAY.Y, DAY.B, A1, A9), 
@@ -526,69 +549,20 @@ wcl_longlist <- wcl_candidates %>%
   rename("DAY Y" = DAY.Y, "DAY B" = DAY.B) %>% 
   arrange(Name)
 
-function_desc <- c(paste0("\\textit{S. cerevisiae} ortholog is ABP1, actin binding protein", footnote_marker_alphabet(1)), 
-                   paste0("Putative alpha-mannosidase", footnote_marker_alphabet(1)), 
-                   "Vacuolar aspartic proteinase", 
-                   paste0("Thioredoxin peroxidase", footnote_marker_alphabet(1)), 
-                   paste0("Putative 2-enoyl thioester reductase", footnote_marker_alphabet(1)), 
-                   paste0("Glycine decarboxylase P subunit", footnote_marker_alphabet(1)), 
-                   "Glycerol 2-dehydrogenase", 
-                   paste0("Putative glycogen debranching enzyme", footnote_marker_alphabet(2)), 
-                   paste0("Glutathione reductase", footnote_marker_alphabet(1)), 
-                   "Glutathione-independent glyoxalase", 
-                   "Phosphoglycerate mutase", 
-                   "NADH-linked methylglyoxal oxidoreductase", 
-                   paste0("Aspartate-semialdehyde dehydrogenase", footnote_marker_alphabet(2)), 
-                   paste0("Isocitrate dehydrogenase subunit", footnote_marker_alphabet(1)), 
-                   paste0("Isocitrate dehydrogenase", footnote_marker_alphabet(1)), 
-                   paste0("Ketol-acid reductoisomerase", footnote_marker_alphabet(1)), 
-                   "Inorganic pyrophosphatase", 
-                   paste0("Putative dihydrolipoamide S-succinyltransferase", footnote_marker_alphabet(1)), 
-                   "Metalloaminopeptidase", 
-                   "Dihydrolipoamide dehydrogenase", 
-                   paste0("NADH-cytochrome-b5 reductase", footnote_marker_alphabet(1)), 
-                   "O-acetylhomoserine O-acetylserine sulfhydrylase", 
-                   paste0("Non-histone chromosomal protein 6", footnote_marker_alphabet(1)), 
-                   paste0("\\textit{S. cerevisiae} ortholog is NIF3, mitochondrial protein", footnote_marker_alphabet(1)), 
-                   paste0("\\textit{S. cerevisiae} ortholog is LPX1, peroxisomal lipase", footnote_marker_alphabet(2)), 
-                   paste0("Putative phosphoglycerate mutase family protein", footnote_marker_alphabet(2)), 
-                   paste0("Protein of unknown function", footnote_marker_alphabet(3)), 
-                   paste0("\\textit{S. cerevisiae} ortholog is PRE7, 20S proteasome subunit (beta6)", footnote_marker_alphabet(1)), 
-                   paste0("Predicted dienelactone hydrolase domain", footnote_marker_alphabet(2)), 
-                   "Protein of unknown function", 
-                   paste0("20S proteasome subunit (beta7)", footnote_marker_alphabet(1)), 
-                   paste0("Putative phosphatidyl synthase", footnote_marker_alphabet(2)), 
-                   paste0("Stationary phase enriched protein", footnote_marker_alphabet(2)), 
-                   "Putative thiamine biosynthesis enzyme", 
-                   paste0("\\textit{S. cerevisiae} ortholog is STM1, regulates translation", footnote_marker_alphabet(1)), 
-                   paste0("\\textit{S. cerevisiae} ortholog is NAS6, proteasome chaperone", footnote_marker_alphabet(1)), 
-                   paste0("Putative esterase", footnote_marker_alphabet(1)), 
-                   paste0("\\textit{S. cerevisiae} ortholog is HSP10, mitochondrial co-chaperonin", footnote_marker_alphabet(1)), 
-                   paste0("Putative X-Pro aminopeptidase", footnote_marker_alphabet(2)), 
-                   paste0("NADPH oxidoreductase family protein", footnote_marker_alphabet(2)), 
-                   paste0("Pyridoxamine-phosphate oxidase", footnote_marker_alphabet(1)), 
-                   paste0("Glucose-6-phosphate isomerase", footnote_marker_alphabet(2)), 
-                   "20S proteasome subunit (alpha5)", 
-                   paste0("\\textit{S. cerevisiae} ortholog is SBP1, eIF4G binding protein", footnote_marker_alphabet(1)), 
-                   paste0("Proteasome subunit YC7alpha", footnote_marker_alphabet(1)), 
-                   "Superoxide dismutase", 
-                   paste0("HSP90 co-chaperone", footnote_marker_alphabet(1)), 
-                   paste0("Translation initiation factor eIF1a", footnote_marker_alphabet(1)), 
-                   "\\textit{S. cerevisiae} ortholog is TMA19, ribosome associated protein", 
-                   paste0("Predicted succinate semialdehyde dehydrogenase", footnote_marker_alphabet(1)), 
-                   paste0("Putative xylulokinase", footnote_marker_alphabet(2)), 
-                   "Nucleoside disphosphate kinase")
+# load vector of protein functions from external R script
+<<fun_list2>>
 
+# add proper protein functions to table 1
+# also add vesicle depleted supernatant info and 
+# group proteins according to localisation
 wcl_longlist <- wcl_longlist %>% 
-  mutate(Function = function_desc, 
+  mutate(Function = function_desc2, 
          VDM = c(rep("", 52)), 
          pack_row = c(8, rep(4, 2), 3, rep(2, 2), 7, rep(1, 2), rep(7, 3), 1, 
                       rep(2, 3), 7, 2, 4, rep(2, 2), 7, 3, 2, 5, rep(1, 2), 6, 
                       2, 7, 6, 2, 1, 7, rep(1, 3), 2, 1, 5, 2, 1, 6, 
                       1, 6, 2, 1, 9, 7, rep(1, 3))) %>% 
   arrange(pack_row)
-
-
 ```
 
 (ref:table1) [@gil-bona2015]
@@ -601,23 +575,29 @@ wcl_longlist <- wcl_longlist %>%
 
 
 ```{r tableS2}
-tabs2_cap <- "\\textbf{Candidate negative protein markers for \\textit{C. albicans} EVs.} 
-             This list of proteins consists of those that were found to be exclusive to 
-             whole cell lysate (WCL) or 
-             significantly enriched in WCL across the four \\textit{C. albicans} strains examined in 
-             this study. Proteins are grouped according to their subcellular localisation as annotated 
-             in the Candida Genome Database (candidagenome.org) (ref:footnote1). The log\\textsubscript{2} ratio 
-             of the abundance (mean MaxQuant LFQ intensity) of each protein in EVs compared to 
-             WCL for each strain is listed. A negative value indicates that a protein 
-             was enriched in WCL compared to EV. \`\`ex\" indicates where a protein was only 
-             identified in the WCL fraction and not in EVs for that strain. The \`\`TM\" 
-             column indicates the number of transmembrane domains for each protein as annotated in 
-             UniProtKB. \`\`SP\" indicates whether a protein is annotated as having a signal peptide 
-             according to UniProtKB. \`\`VDM\" shows whether a protein has previously been detected in 
-             vesicle-depleted culture media (i.e. the proteins may also be in the soluble secretome) 
-             (ref:table1). Underlined proteins are those identified as the best candidates for negative
-             EV markers according to the criteria depicted in Figure 1."
+tabs2_cap <- "\\textbf{Candidate negative protein markers for 
+              \\textit{C. albicans} EVs.} This list of proteins consists of 
+              those that were found to be exclusive to whole cell lysate (WCL) 
+              or significantly enriched in WCL across the four 
+              \\textit{C. albicans} strains examined in this study. Proteins 
+              are grouped according to their subcellular localisation as 
+              annotated in the Candida Genome Database (candidagenome.org) 
+              (ref:footnote1). The log\\textsubscript{2} ratio of the abundance 
+              (mean MaxQuant LFQ intensity) of each protein in EVs compared to 
+              WCL for each strain is listed. A negative value indicates that a 
+              protein was enriched in WCL compared to EV. \`\`ex\" indicates 
+              where a protein was only quantified in the WCL fraction and not 
+              in EVs for that strain. The \`\`TM\" column indicates the number 
+              of transmembrane domains for each protein as annotated in 
+              UniProtKB. \`\`SP\" indicates whether a protein is annotated as 
+              having a signal peptide according to UniProtKB. \`\`VDM\" shows 
+              whether a protein has previously been detected in 
+              vesicle-depleted culture media (i.e. the proteins may also be in 
+              the soluble secretome) (ref:table1). Underlined proteins are 
+              those identified as the best candidates for negative
+              EV markers according to the criteria depicted in Figure 1."
 
+# draw table S2
 knitr::kable(wcl_longlist[, -10], 
              caption = tabs2_cap, 
              format = "latex", 
@@ -626,7 +606,9 @@ knitr::kable(wcl_longlist[, -10],
              linesep = "", 
              escape = FALSE) %>% 
   row_spec(row = c(23, 30, 34, 35, 44, 51), underline = TRUE) %>% 
-  add_header_above(c(" " = 2, "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, " " = 3), escape = FALSE) %>% 
+  add_header_above(c(" " = 2, 
+                     "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, 
+                     " " = 3), escape = FALSE) %>% 
   kable_styling(font_size = 8, 
                 latex_options = c("HOLD_position")) %>% 
   pack_rows("Cytoplasm", 1, 16) %>% 
@@ -638,11 +620,14 @@ knitr::kable(wcl_longlist[, -10],
   pack_rows("Cell wall, cell surface, fungal biofilm matrix", 42, 50) %>% 
   pack_rows("Cytoskeleton", 51, 51) %>% 
   pack_rows("Translation preinitiation complex", 52, 52) %>% 
-  footnote(alphabet = c("Protein localisation was inferred from sequence similarity with 
-                         \\\\textit{S. cerevisiae} ortholog as annotated in the Candida 
-                         Genome Database (ref:footnote1)", 
-                        "Protein localisation was predicted using DeepLoc-1.0 (ref:footnote2)", 
-                        "Protein localisation was predicted using BUSCA (ref:footnote3)"), 
+  footnote(alphabet = c("Protein localisation was inferred from sequence 
+                         similarity with \\\\textit{S. cerevisiae} ortholog as 
+                         annotated in the Candida Genome Database 
+                         (ref:footnote1)", 
+                        "Protein localisation was predicted using DeepLoc-1.0 
+                         (ref:footnote2)", 
+                        "Protein localisation was predicted using BUSCA 
+                         (ref:footnote3)"), 
            escape = FALSE, 
            threeparttable = TRUE)
 ```
