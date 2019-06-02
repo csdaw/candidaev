@@ -44,6 +44,7 @@ Suggests:
     kableExtra,
     ggpubr,
     stringi,
-    DT
+    DT,
+    writexl
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1

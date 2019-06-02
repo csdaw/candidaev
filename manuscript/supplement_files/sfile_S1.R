@@ -3,6 +3,10 @@
 # post-filtration but pre-log2 transformation
 # pre-normalisation, pre-imputation etc.
 
+# need writexl package to write output to .xlsx
+requireNamespace("writexl", quietly = TRUE)
+
+# load packages
 library(dplyr)
 library(candidaev)
 
@@ -107,4 +111,4 @@ s1_sheets <- list("DAY286 yeast" = s1_a,
                   "ATCC90028" = s1_b,
                   "ATCC10231" = s1_c,
                   "DAY286 biofilm" = s1_d)
-writexl::write_xlsx(s1_sheets, "vignettes/supplement_files/sfile_S1.xlsx")
+writexl::write_xlsx(s1_sheets, "manuscript/supplement_files/sfile_S1.xlsx")
