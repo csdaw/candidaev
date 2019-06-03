@@ -67,15 +67,16 @@ lapply(req_pkgs, check_pkgs)
 This vignette outlines the method used to analyse the label-free quantitative 
 LC-MS/MS data obtained for _C. albicans_ (strains ATCC10231 and ATCC90028) 
 extracellular vesicles (EVs) and whole cell lysates (WCL) by Dawson et 
-al. (2019). The tools provided in the package `r Githubpkg("csdaw/candidaev")` 
-allows the step-by-step reproduction of the results presented in the paper. 
+al. (2019). The tools provided in this package, `r Githubpkg("csdaw/candidaev")`
+, allows the step-by-step reproduction of the results presented in the paper. 
 The manuscript in its submitted form and the `.Rmarkdown` file used to 
-generate it can found here.
+generate it can found 
+[here](https://github.com/csdaw/candidaev/tree/master/manuscript).
 
 The analysis workflow used in this vignette is derived from the excellent 
 **Bioconductor** package `r Biocpkg("DEP")`[^1]. Furthermore, some of the 
 plotting functions available in `r Biocpkg("DEP")` have been modified for use 
-in this package, `candidaev`. 
+in this package, `r Githubpkg("csdaw/candidaev")`. 
 
 [^1]: Zhang, X., Smits, A. H., van Tilburg, G. B. A., Ovaa, H., Huber, W., & 
 Vermeulen, M. (2018). Proteome-wide identification of ubiquitin interactions 
@@ -87,7 +88,7 @@ using UbIA-MS. _Nature Protocols, 13_(3), 530-550.
 Extracellular vesicles (EVs) were isolated using differential 
 ultracentrifugation from _C. albicans_ liquid cultures 
 from two clinical isolate strains; ATCC10231 (n = 3) and ATCC90028 (n = 3). 
-Additionally, cells from these liquid cultures were seperated and lysed to 
+Additionally, cells from these liquid cultures were separated and lysed to 
 generate whole cell lysates (WCL). Each EV biological replicate was paired 
 with a WCL replicate as they were derived from the same liquid culture.
 
@@ -111,16 +112,18 @@ and
 
 These samples were electrophoresed and the SDS-PAGE gel slices were 
 reduced, alkylated, and digested with trypsin. The resulting peptides were 
-analysed by nano-LC-ESI-MS/MS, identified using MaxQuant, and quantified via 
-the MaxLFQ algorithm in MaxQuant. The `proteinGroups.txt` file 
-output was used for subsequent analyses.
+extracted with acetonitrile, analysed by nano-LC-ESI-MS/MS, identified using 
+MaxQuant, and quantified via the MaxLFQ algorithm in MaxQuant. 
+The `proteinGroups.txt` file output was used for subsequent analyses.
 
 ## Data availability
 
 The raw data was searched against the _C. albicans_ (SC5314) UniProt 
 reference proteome (UP000000559) using MaxQuant version 1.6.0.16.  The 
 `proteinGroups.txt` file analysed in this vignette 
-can be easily accessed here. It is also installed along with the 
+can be easily accessed 
+[here](https://github.com/csdaw/candidaev/tree/master/data-raw/lcms). 
+It is also installed along with the 
 `r Githubpkg("csdaw/candidaev")` package and can be loaded in R with 
 
 ```
@@ -210,14 +213,14 @@ biofilm_imp <- impute_QRILC(biofilm_both) # second set of random draws
 
 ## Exploring the `atcc` data set
 
-The _C. albicans_ ATCC LC-MS/MS data set is provided as a data.frame called 
-`atcc` in this package. 
+As above, the _C. albicans_ ATCC LC-MS/MS data set is provided as a 
+data.frame called `atcc` in this package. 
 It has `r nrow(atcc)` rows each of which corresponds to a single protein 
 group[^2], and `r ncol(atcc)` columns. 
 A key describing most of these columns can be found in the 
 [MaxQuant documentation](http://www.coxdocs.org/doku.php?id=maxquant:table:proteingrouptable). 
 The `LFQ.intensity` columns hold the protein quantification data that is 
-used for this analysis.
+used for the following analyses.
 
 [^2]: Each protein group comprises the group of proteins that could be 
 reconstructed from a set of peptides by MaxQuant. In most cases this will be 
@@ -806,8 +809,8 @@ colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de),
 ```
 
 A design matrix is constructed for this proteomics experiment. This is 
-required for the linear model fit function (`lmFit()`) from 
-`r Biocpkg("limma")` which is called inside the `limma_eBayes()` function in 
+required for the linear model fit function (`lmFit`) from 
+`r Biocpkg("limma")` which is called inside the `limma_eBayes` function in 
 this package. See the _limma_ User Guide section 9.2
 [here](https://bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf) 
 for more information about constructing design matrices.
@@ -838,7 +841,7 @@ atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
 ```
 
 Finally, the differential abundance analysis is performed using the 
-`limma_eBayes()` function from this package which calls `eBayes()` from 
+`limma_eBayes` function from this package which calls `eBayes` from 
 `r Biocpkg("limma")`. 
 
 To perform the analysis, the following objects are provided:
@@ -846,7 +849,7 @@ To perform the analysis, the following objects are provided:
 * a numeric design matrix (`atcc_design`).
 * a character vector with the contrasts of interest (`atcc_contrasts`).
 
-The results from `limma_eBayes()` are extracted using `get_results()` 
+The results from `limma_eBayes` are extracted using `get_results` 
 which allows the adjusted p-value cutoff and 
 log<sub>2</sub> fold change cutoff for significance to be specified. To get the 
 overall differences for all the samples included in the design matrix, 
@@ -987,7 +990,7 @@ DT::datatable(a9_res_short,
 ## Volcano plot
 
 The results tables are used to construct volcano plots for ATCC10231 and 
-ATCC9002. The `plot_volcano()` function requires a data.frame input (`a1_res`) 
+ATCC9002. The `plot_volcano` function requires a data.frame input (`a1_res`) 
 and specification of the column names that contain the data to be plotted 
 (`adj.P.Val` and `logFC`). The `group` column in `a1_res` is used to separate 
 the data into three groups that have different colours.
