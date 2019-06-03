@@ -284,6 +284,7 @@ The resulting matrix `atcc_lfq` still has `r nrow(atcc_lfq)` rows but only
 `r ncol(atcc_lfq)` columns, one for each LC-MS/MS sample. The total number of 
 proteins quantified (i.e. have a non-`NA` LFQ intensity) in each sample can 
 be explored using:
+
 ```{r, echo=TRUE, eval=FALSE}
 # explore quantification across all 12 samples
 plot_frequency2(atcc_lfq)
@@ -291,6 +292,7 @@ plot_frequency2(atcc_lfq)
 # explore protein quantification in individual samples
 plot_numbers2(atcc_lfq, atcc_exp)
 ```
+
 The proteins in this data set 
 are not quantified in every biological replicate of every strain. 
 If fact in Figure \@ref(fig:atccInit2)A shows that most of the proteins are 
@@ -331,10 +333,12 @@ quantified in each biological replicate sample."
 
 The percentage of non-valid (`NA`) values and other useful statistics for 
 each sample is shown using:
+
 ```{r, echo=TRUE, eval=FALSE}
 # generate summary table from LFQ data
 sum_table(atcc_lfq)
 ```
+
 Table \@ref(tab:atccInit3) shows that the ATCC10231 samples have higher 
 percentages of missing values than the ATCC90028 samples.
 
@@ -408,6 +412,7 @@ atccFilt2_cap <- "Protein quantification distributions after filtration.
 ```
 
 A multidimensional scaling plot can be drawn via:
+
 ```{r, echo=TRUE, eval=FALSE}
 # need labels for the MDS plot
 mds_labels <- c(rep("EV", 3), 
@@ -419,6 +424,7 @@ mds_labels <- c(rep("EV", 3),
 plot_mds(atcc_filt, mat_labels = mds_labels, 
          shape_size = 4)
 ```
+
 It shows that the WCL samples from both strains cluster closer together than 
 the EV samples do to each other, indicating they have a smaller 
 log<sub>2</sub> fold change between them.
@@ -458,6 +464,7 @@ atcc_norm <- limma::normalizeCyclicLoess(atcc_filt)
 
 The effect of the normalisation on the distribution of LFQ intensities for 
 each sample is visualised using: 
+
 ```{r, echo=TRUE, eval=FALSE}
 # explore effect of normalisation on intensity distributions
 plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
@@ -541,6 +548,7 @@ atcc9_w <- filter_na(atcc_norm,
 These are then compared via a Venn diagram. As per section 2.4, every protein 
 that appears in the Venn diagram has been quantified in at least 2/3 replicates 
 of one condition. 
+
 ```{r, echo=TRUE, eval=FALSE}
 # define a comparison list for a Venn diagram
 venn_comp <- list("A10231_EV" = rownames(atcc1_ev), 
@@ -554,6 +562,7 @@ venn <- plot_venn(venn_comp,
                   
 grid::grid.draw(venn)
 ```
+
 Of `r nrow(atcc_norm)` proteins, 641 (41.7%) are quantified in at least 1/3 
 replicates from all 4 conditions **and** are quantified in at least 2/3 
 replicates of 1 condition.
@@ -848,6 +857,7 @@ Finally, the differential abundance analysis is performed using the
 `r Biocpkg("limma")`. 
 
 To perform the analysis, the following objects are provided:
+
 * a numeric matrix of log<sub>2</sub> LFQ intensity data (`atcc_de`).
 * a numeric design matrix (`atcc_design`).
 * a character vector with the contrasts of interest (`atcc_contrasts`).
@@ -927,9 +937,6 @@ js2 <- DT::JS("function(data, type, row, meta) {",
               "}")
 
 DT::datatable(a1_res_short, 
-              caption = "This is a table caption. Note that adjusted p-values 
-              have been shortened to three significant figures for ease of 
-              display.", 
               rownames = FALSE, 
               colnames = c("Gene" = "CGD_gene_name", 
                            "Protein" = "Protein_name", 
@@ -1073,11 +1080,11 @@ vol_cap <- "Volcano plots for proteins quantified in EV and WCL. (A) ATCC10231
 ## Log<sub>2</sub> LFQ intensity heatmap
 
 The `atcc_overall` data.frame is used to construct heatmaps based on the 
-proteins that are significantly different across all four samples groups; 
+proteins that are significantly different across all four sample groups; 
 ATCC90028 EV, WCL and ATCC10231 EV, WCL.
 
 There are two type of heatmaps: one for plotting log<sub>2</sub> LFQ intensity 
-data and one for plotting log<sub>2</sub> fold change data.To plot an LFQ 
+data and one for plotting log<sub>2</sub> fold change data. To plot an LFQ 
 intensity heatmap, a numeric matrix must be used as the input.
 
 In this case the `atcc_overall` data.frame is subset to remove all columns 
@@ -1101,6 +1108,7 @@ atcc_htmp <- atcc_overall %>%
 ```
 
 The heatmap is plotted with: 
+
 ```{r, echo=TRUE, eval=FALSE}
 htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
                     color_bar = "continuous", 
@@ -1148,7 +1156,6 @@ plot_heatmap(atcc_htmp,
              col_name_fontsize = 14, 
              heatmap_legend_param = htmp_params)
 
-
 htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been 
              centred around 0."
 ```
@@ -1160,10 +1167,10 @@ as the input.
 
 In this case the `atcc_overall` data.frame is subset to remove all columns 
 except a column with identifiers (e.g. UniProt accessions), 
-log2FC data columns, and a logical significance column. Then the data.frame is 
-filtered for significant proteins, the UniProt accession column is converted to 
-rownames, the significance column is dropped, and the data.frame is converted 
-to a matrix.
+the `logFC` data columns, and a logical significance column. Then the 
+data.frame is filtered for significant proteins, the UniProt accession column 
+is converted to rownames, the significance column is dropped, and the 
+data.frame is converted to a matrix.
 
 ```{r logfcHeatmapData, echo=TRUE}
 atcc_htmp2 <- atcc_overall %>% 
@@ -1199,7 +1206,6 @@ htmp2 <- plot_heatmap(atcc_htmp2,
                       heatmap_legend_param = htmp2_params)
 ```
 
-
 ```{r logfcHeatmap, fig.cap=htmp2_cap, fig.small=TRUE}
 htmp2_params <- list(title = expression(bold(log[2]("FC"))), 
                      color_bar = "continuous", 
@@ -1225,7 +1231,6 @@ htmp2 <- plot_heatmap(atcc_htmp2,
 htmp2_cap <- "Protein log<sub>2</sub> fold change heatmap."
 ```
 
-
 # Session information {-}
 
 The system on which this document was compiled was running 
@@ -1235,27 +1240,3 @@ pandoc v`r rmarkdown::pandoc_version()`. Here is output of
 ```{r sessionInfo}
 sessionInfo()
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

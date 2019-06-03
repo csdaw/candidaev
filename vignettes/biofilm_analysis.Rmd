@@ -66,8 +66,9 @@ lapply(req_pkgs, check_pkgs)
 This vignette outlines the method used to analyse the label-free quantitative 
 LC-MS/MS data obtained for _C. albicans_ (strain DAY286 biofilm) 
 extracellular vesicles (EVs) and whole cell lysates (WCL) by Dawson et 
-al. (2019). The tools provided in this package, `r Githubpkg("csdaw/candidaev")`
-, allows the step-by-step reproduction of the results presented in the paper. 
+al. (2019). The tools provided in this package, 
+`r Githubpkg("csdaw/candidaev")`, allows the step-by-step reproduction of the 
+results presented in the paper. 
 The manuscript in its submitted form and the `.Rmarkdown` file used to 
 generate it can found 
 [here](https://github.com/csdaw/candidaev/tree/master/manuscript).
@@ -255,6 +256,7 @@ The resulting matrix `biofilm_lfq` still has `r nrow(biofilm_lfq)` rows but
 only `r ncol(biofilm_lfq)` columns, one for each LC-MS/MS sample. The total
 number of proteins quantified (i.e. have a non-`NA` LFQ intensity) in each
 sample can be explored using:
+
 ```{r, echo=TRUE, eval=FALSE}
 # explore quantification across all 12 samples
 plot_frequency2(biofilm_lfq)
@@ -262,6 +264,7 @@ plot_frequency2(biofilm_lfq)
 # explore protein quantification in individual samples
 plot_numbers2(biofilm_lfq, biofilm_exp)
 ```
+
 The proteins in this data set 
 are not quantified in every biological replicate of every strain. 
 If fact in Figure \@ref(fig:bInit2)A shows that most of the proteins are 
@@ -302,10 +305,12 @@ bInit2_cap <- "Protein quantification distributions. (A) Cumulative
 
 The percentage of non-valid (`NA`) values and other useful statistics for 
 each sample is shown using:
+
 ```{r, echo=TRUE, eval=FALSE}
 # generate summary table from LFQ data
 sum_table(biofilm_lfq)
 ```
+
 Table \@ref(tab:bInit3) shows that biological replicate 3 of both EV and WCL 
 has the highest percentage of missing values compared to the other replicates. 
 
@@ -374,6 +379,7 @@ bFilt2_cap <- "Protein quantification distributions after filtration.
 ```
 
 A multidimensional scaling plot can be drawn via:
+
 ```{r, echo=TRUE, eval=FALSE}
 # need labels for the MDS plot
 mds_labels <- c(rep("EV", 5), 
@@ -383,10 +389,10 @@ mds_labels <- c(rep("EV", 5),
 plot_mds(biofilm_filt, mat_labels = mds_labels, 
          shape_size = 4)
 ```
+
 It shows that the WCL samples generally cluster closer together than 
 the EV samples do to each other, indicating they have a smaller 
 log<sub>2</sub> fold change between them.
-
 
 ```{r bFilt3, fig.cap=bFilt3_cap, fig.small=TRUE}
 mds1_labels <- c(rep("EV", 5), 
@@ -421,12 +427,13 @@ biofilm_norm <- limma::normalizeCyclicLoess(biofilm_filt)
 
 The effect of the normalisation on the distribution of LFQ intensities for 
 each sample is visualised using: 
+
 ```{r, echo=TRUE, eval=FALSE}
 # explore effect of normalisation on intensity distributions
 plot_normalization2(biofilm_exp, biofilm_filt, biofilm_norm)
 ```
 
-```{r, bNorm2, fi.cap=bNorm2_cap, fig.height=7}
+```{r, bNorm2, fig.cap=bNorm2_cap, fig.height=7}
 plot_normalization2(biofilm_exp, 
                     facet_labels = c(biofilm_filt = "Before normalisation", 
                                      biofilm_norm = "After normalisation"), 
@@ -490,6 +497,7 @@ b_wcl <- filter_na(biofilm_norm,
 These are then compared via a Venn diagram. As per section 2.4, every protein 
 that appears in the Venn diagram has been quantified in at least 4/5 
 replicates of EV or WCL.
+
 ```{r, echo=TRUE, eval=FALSE}
 # define a comparison list for a Venn diagram
 venn_comp <- list("EV" = rownames(b_ev), 
@@ -501,11 +509,12 @@ venn <- plot_venn(venn_comp,
 
 grid::grid.draw(venn)
 ```
+
 Of `r nrow(biofilm_norm)` proteins, 658 (77.1%) are quantified by at least 1/5 
 biological replicates of both EV and WCL **and** at least 4/5 replicates of 
 either EV or WCL. 
 
-```{r bVenn, fig.cap=venn_cap}
+```{r bVenn, fig.cap=venn_cap, fig.small=TRUE}
 # define comparison list for Venn diagram
 venn1_comp <- list("EV" = rownames(b_ev), 
                    "WCL" = rownames(b_wcl))
@@ -607,6 +616,7 @@ There are large chunks of data missing in either all of
 the WCL samples or all of the EV samples. To minimise the percentage of 
 missing values in each sample, these proteins are removed prior to 
 imputation and hence are not imputed.
+
 ```{r bExcl, echo=TRUE}
 # should not impute with so many missing values
 # select proteins with 4/5 or 5/5 missing values in EV or WCL
@@ -755,6 +765,7 @@ Finally, the differential abundance analysis is performed using the
 `r Biocpkg("limma")`. 
 
 To perform the analysis, the following objects are provided:
+
 * a numeric matrix of log<sub>2</sub> LFQ intensity data (`biofilm_de`).
 * a numeric design matrix (`b_design`).
 * a character vector with the contrasts of interest (`b_contrasts`).
@@ -786,3 +797,176 @@ biofilm_res <- get_results(efit = b_efit,
 
 ## DAY286 biofilm EV versus WCL
 
+Differential abundance comparison of proteins in DAY286 biofilm EVs versus WCL.
+
+
+```{r bResData, include=FALSE}
+biofilm_res_short <- biofilm_res %>% 
+  select(CGD_gene_name, Protein_name, logFC, 
+         contains("_mean"), adj.P.Val, group) %>% 
+  mutate_at(.vars = vars(logFC, contains("_mean")), 
+            .funs = list(~round(., digits = 2))) %>% 
+  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
+         group = as.factor(group))
+
+# caption for volcano plot below
+vol_cap <- "Volcano plot for proteins quantified in EV and WCL."
+```
+
+```{r bRes}
+js1 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 40 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 40) + 
+              '...</span>' : data;",
+              "}")
+
+js2 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 12 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 12) + 
+              '...</span>' : data;",
+              "}")
+
+DT::datatable(biofilm_res_short, 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name", 
+                           "Protein" = "Protein_name", 
+                           "p.adj" = "adj.P.Val"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(width = "40%", targets = 1), 
+                                  list(width = "10%", targets = c(0, 2:6)), 
+                                  list(targets = 1, 
+                                       render = js1), 
+                                  list(targets = 0, 
+                                       render = js2)
+                )
+              )
+)
+```
+
+## Volcano plot
+
+The result table is used to construct a volcano plots for DAY286 biofilm. 
+The `plot_volcano` function requires a data.frame input (`biofilm_res`) 
+and specification of the column names that contain the data to be plotted 
+(`adj.P.Val` and `logFC`). The `group` column in `biofilm_res` is used to 
+separate the data into three groups that have different colours.
+
+```{r bVolcano, fig.cap=vol_cap, echo=TRUE}
+plot_volcano(biofilm_res, 
+             p_val = adj.P.Val, 
+             log2fc = logFC, 
+             group = group, 
+             use_labels = TRUE, 
+             label_fun = ifelse(logFC >= 6, CGD_gene_name, ""), 
+             point_size = 2, 
+             label_size = 4, 
+             legend_params = c("right", 14, 14), 
+             axis_params = c("black", 16, 14), 
+             x_lim = c(-10, 12), 
+             y_lim = c(0, 8)) + 
+  scale_colour_manual(values = c("#D55E00",
+                                 "#999999",
+                                 "#0072B2"), 
+                      labels = c("EV enriched", 
+                                 "Not significant", 
+                                 "WCL enriched")) + 
+  theme(legend.title = element_blank())
+```
+
+## Log<sub>2</sub> LFQ intensity heatmap
+
+The `biofilm_res` data.frame is used to construct heatmaps based on the 
+proteins that are significantly different across all both sample groups; 
+EV and WCL.
+
+There are two type of heatmaps: one for plotting log<sub>2</sub> LFQ intensity 
+data and one for plotting log<sub>2</sub> fold change data. To plot an LFQ 
+intensity heatmap, a numeric matrix must be used as the input.
+
+In this case the `biofilm_res` data.frame is subset to remove all columns 
+except a column with identifiers (e.g. UniProt accessions), 
+log2FC data columns, and a logical significance column. Then the data.frame is 
+filtered for significant proteins, the UniProt accession column is converted to 
+rownames, the significance column is dropped, and the data.frame is converted 
+to a matrix.
+
+```{r lfqHeatmapData, echo=TRUE}
+# get data for log2 LFQ intensity heatmap
+biofilm_htmp <- biofilm_res %>% 
+  select(UP_accession, 
+         matches("EV_[0-9]"), 
+         matches("WCL_[0-9]"), 
+         significant) %>% 
+  filter(significant == TRUE) %>% 
+  tibble::column_to_rownames(var = "UP_accession") %>% 
+  select(-significant) %>% 
+  as.matrix()
+```
+
+The heatmap is plotted with: 
+
+```{r, echo=TRUE, eval=FALSE}
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_height = unit(10, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    at = seq(-5, 5, 1))
+
+plot_heatmap(biofilm_htmp, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "gower", 
+             split_type = "cutree", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = FALSE, 
+             split_order = c(4, 3, 1, 2, 5), 
+             colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
+             heatmap_legend_param = htmp_params)
+```
+
+```{r lfqHeatmap, fig.cap=htmp_cap, fig.height=8}
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_height = unit(10, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    at = seq(-5, 5, 1))
+
+plot_heatmap(biofilm_htmp, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "gower", 
+             split_type = "cutree", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = FALSE, 
+             split_order = c(4, 3, 1, 2, 5), 
+             colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
+             heatmap_legend_param = htmp_params)
+
+htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been 
+             centred around 0. Black bars indicate missing values."
+```
+
+# Session information {-}
+
+The system on which this document was compiled was running 
+pandoc v`r rmarkdown::pandoc_version()`. Here is output of 
+`sessionInfo()`.
+
+```{r sessionInfo}
+sessionInfo()
+```
