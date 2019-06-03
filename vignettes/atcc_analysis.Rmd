@@ -829,7 +829,6 @@ atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
 colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
 ```
 
-
 ```{r atccDE2}
 knitr::kable(atcc_design, 
              caption = "Design matrix for comparing EV and WCL samples.")
@@ -865,8 +864,11 @@ overall differences for all the samples included in the design matrix,
 atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
 
 # extract overall results
-atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, 
-                            p_val = 0.01, lfc = 0, type = "overall")
+atcc_overall <- get_results(efit = atcc_efit, 
+                            mat = atcc_de, 
+                            p_val = 0.01, 
+                            lfc = 0, 
+                            type = "overall")
 ```
 
 Alternatively, to obtain the log<sub>2</sub> fold changes and adjusted p-values 
@@ -876,8 +878,11 @@ by subsetting the resulting list.
 
 ```{r atccDE5, echo=TRUE}
 # extract results for individual comparisons defined in atcc_contrasts
-atcc_ind <- get_results(efit = atcc_efit, mat = atcc_de, 
-                        p_val = 0.01, lfc = 0, type = "individual")
+atcc_ind <- get_results(efit = atcc_efit, 
+                        mat = atcc_de, 
+                        p_val = 0.01, 
+                        lfc = 0, 
+                        type = "individual")
 
 a1_res <- get_results(efit = atcc_efit, 
                       mat = atcc_de, 

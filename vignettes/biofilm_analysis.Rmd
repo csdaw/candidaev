@@ -712,116 +712,77 @@ imp_cap <- "LFQ intensity distribution before and after imputation."
 
 ## Differential abundance analysis with _limma_
 
-```{r biofilmDE}
-# recombine imputed proteins and non-imputed proteins in matrix
-biofilm_de <- rbind(biofilm_excl, biofilm_imp)
+Prior to differential abundance analysis, the imputed and non-imputed proteins 
+are recombined in the same matrix.
 
+```{r bDE, echo=TRUE}
+# combine matrices
+biofilm_de <- rbind(biofilm_excl, biofilm_imp)
+```
+
+A design matrix is constructed for this proteomics experiment. This is 
+required for the linear model fit function (`lmFit`) from 
+`r Biocpkg("limma")` which is called inside the `limma_eBayes` function in 
+this package. See the _limma_ User Guide section 9.2
+[here](https://bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf) 
+for more information about constructing design matrices.
+
+```{r bDesign, echo=TRUE}
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
 b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+
 b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
 colnames(b_design) <- c("EV", "WCL")
+```
 
+```{r bDE2}
+knitr::kable(b_design, 
+             caption = "Design matrix for comparing EV and WCL samples.")
+```
+
+The comparisons between samples that one is interested in are defined in a 
+character vector. These must be two column names from the design matrix 
+separated by ` - `.
+
+```{r bDE3, echo=TRUE}
+# specify comparisons of interest
+b_contrasts <- c("EV - WCL")
+```
+
+Finally, the differential abundance analysis is performed using the 
+`limma_eBayes` function from this package which calls `eBayes` from 
+`r Biocpkg("limma")`. 
+
+To perform the analysis, the following objects are provided:
+* a numeric matrix of log<sub>2</sub> LFQ intensity data (`biofilm_de`).
+* a numeric design matrix (`b_design`).
+* a character vector with the contrasts of interest (`b_contrasts`).
+
+The results from `limma_eBayes` are extracted using `get_results` 
+which allows the adjusted p-value cutoff and 
+log<sub>2</sub> fold change cutoff for significance to be specified. To get the 
+overall differences for all the samples included in the design matrix, 
+`type = "overall"` is used. However in this case there is only one contrast of 
+interest in which case `type = "individual"` should be used to obtain the 
+log<sub>2</sub> fold changes and adjusted p-values 
+for this comparison. The result table is accessed by subsetting the list of 
+data.frames output by `get_results`.
+
+```{r bDE4, echo=TRUE, warning=FALSE}
 # make all pair-wise comparisons between EV and WCL
-b_cm <- makeContrasts("EV_vs_WCL" = EV - WCL, levels = b_design)
-b_fit <- lmFit(biofilm_de, design = b_design)
-b_fit_cm <- contrasts.fit(b_fit, b_cm)
-b_efit <- eBayes(b_fit_cm)
+# and perform limma::eBayes()
+b_efit <- limma_eBayes(biofilm_de, b_design, b_contrasts)
 
-# extract DE results and create results table
-biofilm_tt <- topTable(b_efit, sort.by = "none", number = Inf) %>% 
-  as.matrix()
-
-biofilm_res <- combine_result(mat = biofilm_de, toptab = biofilm_tt) %>% 
-  as.data.frame() %>% 
-  tibble::rownames_to_column(var = "UP_accession") %>% 
-  mutate(group = case_when(significant == 0 ~ "not sig",
-                           significant == 1 & logFC > 0 ~ "ev up",
-                           significant == 1 & logFC < 0 ~ "wcl up",
-                           is.na(significant) == TRUE & UP_accession %in% rownames(b_ev) ~ "ev ex",
-                           is.na(significant) == TRUE & UP_accession %in% rownames(b_wcl) ~ "wcl ex"),
-         in_ev = ifelse(UP_accession %in% rownames(b_ev), TRUE, FALSE),
-         in_wcl = ifelse(UP_accession %in% rownames(b_wcl), TRUE, FALSE),
-         CGD_gene_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "CGD_gene_name"),
-         Protein_name = match_id(.[["UP_accession"]], uniprot, "UP_accession", "Protein_name"), 
-         significant = as.logical(significant)) %>%
-  select(UP_accession, CGD_gene_name, Protein_name, everything())
-
-biofilm_res_short <- biofilm_res %>% 
-  select(CGD_gene_name, Protein_name, logFC, AveExpr, adj.P.Val, significant, group) %>% 
-  mutate_at(.vars = vars(logFC, AveExpr), 
-            .funs = list(~round(., digits = 2))) %>% 
-  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
-         group = as.factor(group))
-
-DT::datatable(biofilm_res_short, 
-              caption = "This is a table caption. Note that adjusted p values have been shortened
-              to three significant figures for ease of display.", 
-              rownames = FALSE, 
-              colnames = c("Gene" = "CGD_gene_name", 
-                           "Protein" = "Protein_name", 
-                           "p.adj" = "adj.P.Val", 
-                           "sig" = "significant"), 
-              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
-              class = "display compact", 
-              options = list(
-                autowidth = TRUE, 
-                columnDefs = list(list(width = "40%", targets = 1), 
-                                  list(width = "10%", targets = c(0, 2:6)), 
-                                  list(targets = 1, 
-                                       render = DT::JS(
-                                         "function(data, type, row, meta) {",
-                                         "return type === 'display' && data.length > 40 ?",
-                                         "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
-                                         "}")), 
-                                  list(targets = 0, 
-                                       render = DT::JS("function(data, type, row, meta) {",
-                                         "return type === 'display' && data.length > 12 ?",
-                                         "'<span title=\"' + data + '\">' + data.substr(0, 12) + '...</span>' : data;",
-                                         "}"))
-                                  )
-                )
-              )
-
-
+# extract DE results
+biofilm_res <- get_results(efit = b_efit, 
+                           mat = biofilm_de, 
+                           p_val = 0.01, 
+                           lfc = 0, 
+                           type = "individual")[[1]]
 ```
 
+# Results
 
-# Comparison to previous data
-
-TEXT
-
-```{r biofilmComp}
-z_list_b <- zarnowski %>% 
-  filter(Biofilm_NTS > 0) %>% 
-  mutate(gn = match_id(UP_accession, uniprot, "UP_accession", "CGD_gene_name")) %>% 
-  pull(gn)
-
-b_ev_list <- match_id(rownames(b_ev), uniprot, "UP_accession", "CGD_gene_name", concat = FALSE)
-
-c1 <- plot_venn(list("mylist" = b_ev_list, "Zarn" = z_list_b), 
-                 use_uniprot = FALSE, type = "plot")
-
-c1 <- as_ggplot(c1) + 
-  theme(plot.margin = unit(c(0,2,0,2), "lines"))
-
-plot(c1)
-
-```
-
-TEXT
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## DAY286 biofilm EV versus WCL
 
