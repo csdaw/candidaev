@@ -162,6 +162,7 @@ et al. (2019).
 # for results to be reproducible in seperate documents
 # need to use set.seed AND need to perform same number of 
 # 'random' draws in the same order as manuscript.Rmd
+
 # DAY286 yeast
 yeast_lfq <- yeast %>% 
   filter(Reverse != "+", 
@@ -288,7 +289,7 @@ be explored using:
 plot_frequency2(atcc_lfq)
 
 # explore protein quantification in individual samples
-plot_numbers2(atcc_lfq)
+plot_numbers2(atcc_lfq, atcc_exp)
 ```
 The proteins in this data set 
 are not quantified in every biological replicate of every strain. 
@@ -446,7 +447,6 @@ atccFilt3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
                   indicates the log2 fold change between samples."
 ```
 
-
 ## LFQ intensity normalisation
 
 Next, the LFQ intensity data is normalised using `r Biocpkg("limma")`.
@@ -462,7 +462,6 @@ each sample is visualised using:
 # explore effect of normalisation on intensity distributions
 plot_normalization2(atcc_exp, atcc_filt, atcc_norm)
 ```
-
 
 ```{r atccNorm2, fig.cap=atccNorm2_cap, fig.height=7}
 plot_normalization2(atcc_exp, 

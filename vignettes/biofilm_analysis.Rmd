@@ -132,82 +132,343 @@ repository with the data set identifier y and DOI x.
 
 ## Setup
 
-Text.
+The packages required for the analyses are loaded and a specific 
+seed is set for the steps requiring random number generation (imputation 
+and clustering).
 
-```{r biofilmInit}
-biofilm <- biofilm %>% 
-  filter(Reverse != "+", Potential.contaminant != "+", 
-         Only.identified.by.site != "+", Unique.peptides >= 2)
+```{r setup, echo=TRUE, warning=FALSE, message=FALSE}
+# load packages
+library(candidaev)
+library(dplyr)
+library(ggplot2)
 
-biofilm_lfq <- convert_lfq(biofilm, biofilm_exp)
-
-b1a <- plot_frequency2(biofilm_lfq)
-
-b1b <- plot_numbers2(biofilm_lfq, biofilm_exp) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-ggarrange(b1a, b1b, 
-          labels = c("A", "B"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
-knitr::kable(summarise_lfq(biofilm_lfq), 
-             caption = "A table caption", 
-             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
-                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
-                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
-             digits = 1)
-
+# set seed for imputation, kmeans, MDS plot
+set.seed(1)
 ```
 
-Text.
+To reproduce the results exactly as they are in Dawson et al. (2019), the 
+following code block is run to perform a specific number of draws from 
+a random distribution before performing the analysis of the `biofilm` data. 
+Otherwise, the results will be extremely similar but not identical to Dawson 
+et al. (2019).
 
-Text.
+```{r randomDraws, echo=TRUE}
+# for results to be reproducible in seperate documents
+# need to use set.seed AND need to perform same number of 
+# 'random' draws in the same order as manuscript.Rmd
 
-```{r, biofilmFilt}
+# DAY286 yeast
+yeast_lfq <- yeast %>% 
+  filter(Reverse != "+", 
+         Potential.contaminant != "+", 
+         Unique.peptides >= 2) %>% 
+  convert_lfq(., yeast_exp)
+
+yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_1")]
+
+yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
+                          pat1 = "EV", val1 = 1, 
+                          pat2 = "W", val2 = 1)
+
+yeast_norm2 <- limma::normalizeCyclicLoess(yeast_filt2)
+
+yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
+                         pat1 = "EV", val1 = 3, 
+                         pat2 = "W", val2 = 3)
+
+yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=", 
+                         pat1 = "EV", val1 = 2, 
+                         pat2 = "W", val2 = 2)
+
+yeast_imp <- impute_QRILC(yeast_both) # first set of random draws
+```
+
+## Exploring the `biofilm` data set
+
+As above, the _C. albicans_ DAY286 biofilm LC-MS/MS data set is provided as a 
+data.frame called `biofilm` in this package. 
+It has `r nrow(biofilm)` rows each of which corresponds to a single protein 
+group[^2], and `r ncol(biofilm)` columns. 
+A key describing most of these columns can be found in the 
+[MaxQuant documentation](http://www.coxdocs.org/doku.php?id=maxquant:table:proteingrouptable). 
+The `LFQ.intensity` columns hold the protein quantification data that is 
+used for the following analyses.
+
+[^2]: Each protein group comprises the group of proteins that could be 
+reconstructed from a set of peptides by MaxQuant. In most cases this will be 
+a single protein but sometimes there will be two or more proteins that 
+could not be distinguished by the set of peptides.
+
+```{r bColumns, echo=TRUE}
+colnames(biofilm)
+```
+
+`biofilm_exp` is another data.frame provided in this package. It 
+describes the experimental design underlying the `biofilm` data set. 
+The primary function `biofilm_exp` is to provide info for labelling 
+and grouping data in some of the plotting functions from 
+the **Bioconductor** package `r Biocpkg("DEP")`, which have been 
+modified for use in this package. `biofilm_exp` supplies sample 
+information (biological replicate, strain) for each 
+`LFQ.intensity` column in the `biofilm` data.frame.
+
+It has the following structure. Notice that each row in the `label` 
+column of `biofilm_exp` is exactly the same as the names of the 
+`LFQ.intensity` columns of `biofilm`.
+
+```{r bexpTable}
+knitr::kable(biofilm_exp, 
+             caption = "Experimental design for this vignette.")
+```
+
+## Data preparation
+
+First, the `biofilm` proteinGroups data.frame is filtered to remove reverse 
+proteins, contaminant proteins, and proteins identified by less than 2 unique 
+peptides.
+
+```{r bInit, echo=TRUE}
+# filter out reverse, contaminant proteins, proteins with <2 unique peptides
+# extract LFQ intensity columns and UniProt accessions 
+# log2 transform LFQ intensities
+biofilm_lfq <- biofilm %>% 
+  filter(Reverse != "+", 
+         Potential.contaminant != "+", 
+         Unique.peptides >= 2) %>% 
+  convert_lfq(., biofilm_exp)
+```
+
+Then the data.frame is converted into a compact format using the `convert_lfq` 
+function which performs the following:
+
+1. Ensures the names of the `LFQ.intensity` columns in `biofilm` exactly match 
+   those in the `label` column of the experimental design, `biofilm_exp`.
+   
+2. Returns a matrix containing only: the UniProt accession(s) and LFQ 
+   intensities of each protein across the 10 samples. 
+   
+3. Log<sub>2</sub> transforms the LFQ intensities.
+
+--------------------------------------------------------------------------------
+
+The resulting matrix `biofilm_lfq` still has `r nrow(biofilm_lfq)` rows but 
+only `r ncol(biofilm_lfq)` columns, one for each LC-MS/MS sample. The total
+number of proteins quantified (i.e. have a non-`NA` LFQ intensity) in each
+sample can be explored using:
+```{r, echo=TRUE, eval=FALSE}
+# explore quantification across all 12 samples
+plot_frequency2(biofilm_lfq)
+
+# explore protein quantification in individual samples
+plot_numbers2(biofilm_lfq, biofilm_exp)
+```
+The proteins in this data set 
+are not quantified in every biological replicate of every strain. 
+If fact in Figure \@ref(fig:bInit2)A shows that most of the proteins are 
+only quantified in a single sample. Figure \@ref(fig:bInit2)B shows the 
+total number of proteins quantified in each sample.
+
+```{r bInit2, fig.cap=bInit2_cap, fig.wide=TRUE}
+freq1 <- plot_frequency2(biofilm_lfq) + 
+  scale_y_continuous(limits = c(0,450), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(plot.title = element_text(size = 16))
+
+numb1 <- plot_numbers2(biofilm_lfq, biofilm_exp) + 
+  theme(plot.title = element_text(size = 16),
+        axis.text.x = element_text(angle = 0), 
+        legend.position = "right", 
+        legend.text = element_text(size = 12), 
+        legend.box.margin = margin(t = 0, r = 0, b = 0, l = -15, unit = "pt")) +  
+  scale_y_continuous(limits = c(0, 1550), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_discrete(labels = c(rep(1:5, 2))) + 
+  labs(title = "Proteins per biological replicate") + 
+  xlab("Biological replicate") + 
+  guides(fill = guide_legend(nrow = 4, byrow = TRUE))
+
+ggpubr::ggarrange(freq1, numb1,
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  font.label = list(size = 24, color = "black"), 
+                  widths = c(1, 1.4), 
+                  vjust = 1)
+
+bInit2_cap <- "Protein quantification distributions. (A) Cumulative 
+               number of proteins quantified in 1-10 samples. (B) Total number 
+               of proteins quantified in each biological replicate sample."
+```
+
+The percentage of non-valid (`NA`) values and other useful statistics for 
+each sample is shown using:
+```{r, echo=TRUE, eval=FALSE}
+# generate summary table from LFQ data
+sum_table(biofilm_lfq)
+```
+Table \@ref(tab:bInit3) shows that biological replicate 3 of both EV and WCL 
+has the highest percentage of missing values compared to the other replicates. 
+
+```{r bInit3}
+knitr::kable(sum_table(biofilm_lfq), 
+             caption = "Descriptive statistics for each LC-MS/MS sample.", 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
+             digits = 1)
+```
+
+## Protein filtering (replicate quantification)
+
+Prior to normalisation and imputation, proteins with too many missing values 
+across the 10 samples are removed. Only those with at least 4/5 valid values 
+in 1 of the 2 conditions are retained.
+
+This filtration is performed using `filter_na2`.
+
+```{r, bFilt}
 # filter for proteins identified in min 4/5 reps of EV or WCL
 biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=", 
                            pat1 = "EV", val1 = 1, 
                            pat2 = "W", val2 = 1)
-
-b2a <- plot_frequency2(biofilm_filt)
-
-b2b <- plot_numbers2(biofilm_filt, biofilm_exp) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-b2c <- plot_mds(biofilm_filt)
-
-ggarrange(ggarrange(b2a, b2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
-                    font.label = list(size = 24, color = "black")), 
-          b2c, 
-          labels = c("", "C"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
 ```
 
-Text.
+The initial `r nrow(biofilm_lfq)` proteins has been reduced to 
+`r nrow(biofilm_filt)`. Now the majority of proteins are quantified in all 10 
+samples. The overall pattern of proteins in each sample remains similar 
+though.
 
-```{r, biofilmNorm}
-biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
+```{r bFilt2, fig.cap=bFilt2_cap, fig.wide=TRUE}
+freq2 <- plot_frequency2(biofilm_filt) + 
+  scale_y_continuous(limits = c(0,400), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(plot.title = element_text(size = 16))
 
-b3a <- plot_normalization2(biofilm_exp, biofilm_filt, biofilm_norm)
+numb2 <- plot_numbers2(biofilm_filt, biofilm_exp) + 
+  theme(plot.title = element_text(size = 16),
+        axis.text.x = element_text(angle = 0), 
+        legend.position = "right", 
+        legend.text = element_text(size = 12), 
+        legend.box.margin = margin(t = 0, r = 0, b = 0, l = -15, unit = "pt")) +  
+  scale_y_continuous(limits = c(0, 1000), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_discrete(labels = c(rep(1:5, 2))) + 
+  labs(title = "Proteins per biological replicate") + 
+  xlab("Biological replicate") + 
+  guides(fill = guide_legend(nrow = 4, byrow = TRUE))
 
-b3b <- plot_mds(biofilm_norm)
+ggpubr::ggarrange(freq2, numb2,
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  font.label = list(size = 24, color = "black"), 
+                  widths = c(1, 1.4), 
+                  vjust = 1)
 
-b3c <- plot_dendro(biofilm_norm)
-
-ggarrange(b3a, 
-          ggarrange(b3b, b3c, labels = c("B", "C"), ncol = 1, nrow = 2, font.label = list(size = 24, color = "black")), 
-          labels = c("A", ""), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
+bFilt2_cap <- "Protein quantification distributions after filtration. 
+               (A) Cumulative number of proteins quantified in 1-10 samples. 
+               (B) Total number of proteins quantified in each biological 
+               replicate sample."
 ```
 
-Text.
+A multidimensional scaling plot can be drawn via:
+```{r, echo=TRUE, eval=FALSE}
+# need labels for the MDS plot
+mds_labels <- c(rep("EV", 5), 
+                rep("WCL", 5))
+
+# generate MDS plot
+plot_mds(biofilm_filt, mat_labels = mds_labels, 
+         shape_size = 4)
+```
+It shows that the WCL samples generally cluster closer together than 
+the EV samples do to each other, indicating they have a smaller 
+log<sub>2</sub> fold change between them.
+
+
+```{r bFilt3, fig.cap=bFilt3_cap, fig.small=TRUE}
+mds1_labels <- c(rep("EV", 5), 
+                 rep("WCL", 5))
+
+plot_mds(biofilm_filt, mat_labels = mds1_labels, 
+         shape_size = 4) + 
+  scale_y_continuous(limits = c(-1, 1), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_continuous(limits = c(-2.5, 2), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(legend.position = "bottom", 
+        legend.title = element_blank()) + 
+  scale_fill_manual(values = c("orange", "red")) + 
+  xlab("Dimension 1") + 
+  ylab("Dimension 2")
+
+bFilt3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
+               biological replicate sample with the first 2 dimensions 
+               plotted. Pairwise distance between samples approximately 
+               indicates the log2 fold change between samples."
+```
+
+## LFQ intensity normalisation
+
+Next, the LFQ intensity data is normalised using `r Biocpkg("limma")`.
+
+```{r bNorm, echo=TRUE}
+# normalise LFQ intensities
+biofilm_norm <- limma::normalizeCyclicLoess(biofilm_filt)
+```
+
+The effect of the normalisation on the distribution of LFQ intensities for 
+each sample is visualised using: 
+```{r, echo=TRUE, eval=FALSE}
+# explore effect of normalisation on intensity distributions
+plot_normalization2(biofilm_exp, biofilm_filt, biofilm_norm)
+```
+
+```{r, bNorm2, fi.cap=bNorm2_cap, fig.height=7}
+plot_normalization2(biofilm_exp, 
+                    facet_labels = c(biofilm_filt = "Before normalisation", 
+                                     biofilm_norm = "After normalisation"), 
+                    biofilm_filt, biofilm_norm) + 
+  scale_x_discrete(labels = c(rep(1:5, 2))) + 
+  xlab("Biological replicate") + 
+  theme(plot.margin = margin(t = 0, l = 1.5, r = 1.5, b = 0, unit = "inches"))
+  
+
+bNorm2_cap <- "Distribution of protein LFQ intensities for each sample. Shown
+               before and after normalisation."
+```
+
+The MDS plot still shows that the WCL cluster closer together than the EV 
+samples do to each other. Additionally, the first dimension (which is the 
+leading factor causing the LFQ intensities differences between samples) 
+separates the samples according to the primary condition of interest; EV 
+versus WCL.
+
+```{r bNorm3, fig.cap=bNorm3_cap, fig.small=TRUE}
+mds2_labels <- c(rep("EV", 5), 
+                rep("WCL", 5))
+
+plot_mds(biofilm_norm, mat_labels = mds2_labels, 
+         shape_size = 4) + 
+  scale_y_continuous(limits = c(-1, 1), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_continuous(limits = c(-1.5, 1.5), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(legend.position = "bottom", 
+        legend.title = element_blank()) + 
+  scale_fill_manual(values = c("orange", "red")) + 
+  xlab("Dimension 1") + 
+  ylab("Dimension 2")
+
+bNorm3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
+               biological replicate sample after normalisation, with the 
+               first 2 dimensions plotted. Pairwise distance between samples 
+               approximately 
+               indicates the log2 fold change between samples."
+```
+
 
 
 ```{r biofilmVenn}
