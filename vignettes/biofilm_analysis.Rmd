@@ -465,35 +465,81 @@ plot_mds(biofilm_norm, mat_labels = mds2_labels,
 bNorm3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
                biological replicate sample after normalisation, with the 
                first 2 dimensions plotted. Pairwise distance between samples 
-               approximately 
-               indicates the log2 fold change between samples."
+               approximately indicates the log2 fold change between samples."
 ```
 
+## Biofilm EV versus WCL protein comparison
 
+Lists of proteins quantified in at least 1/5 biological replicates of each 
+condition are generated using:
 
-```{r biofilmVenn}
+```{r bVennData, echo=TRUE}
 # filter for proteins identified in min 1/5 reps of EV
-b_ev <- filter_na(biofilm_norm, op = "<=", 
-                  pat = "EV", val = 4)
+b_ev <- filter_na(biofilm_norm, 
+                  op = "<=", 
+                  pat = "EV", 
+                  val = 4)
 
 # filter for proteins identified in min 1/5 reps of WCL
-b_wcl <- filter_na(biofilm_norm, op = "<=", 
-                   pat = "W", val = 4)
-
-b4 <- plot_venn(list("EV" = b_ev, "WCL" = b_wcl), 
-                 use_uniprot = TRUE, type = "plot")
-
-b4 <- as_ggplot(b4) + 
-  theme(plot.margin = unit(c(0,2,0,2), "lines"))
-
-plot(b4)
-
+b_wcl <- filter_na(biofilm_norm, 
+                   op = "<=", 
+                   pat = "W", 
+                   val = 4)
 ```
 
-Text
+These are then compared via a Venn diagram. As per section 2.4, every protein 
+that appears in the Venn diagram has been quantified in at least 4/5 
+replicates of EV or WCL.
+```{r, echo=TRUE, eval=FALSE}
+# define a comparison list for a Venn diagram
+venn_comp <- list("EV" = rownames(b_ev), 
+                  "WCL" = rownames(b_wcl))
 
-```{r biofilmTop10}
-# get top 10 most abundant protein exclusive to biofilm EVs
+# plot the Venn diagram
+venn <- plot_venn(venn_comp, 
+                  type = "plot")
+
+grid::grid.draw(venn)
+```
+Of `r nrow(biofilm_norm)` proteins, 658 (77.1%) are quantified by at least 1/5 
+biological replicates of both EV and WCL **and** at least 4/5 replicates of 
+either EV or WCL. 
+
+```{r bVenn, fig.cap=venn_cap}
+# define comparison list for Venn diagram
+venn1_comp <- list("EV" = rownames(b_ev), 
+                   "WCL" = rownames(b_wcl))
+
+# define ggplot2 default colour palette function
+gg_colour <- function(n) {
+  hues <- seq(15, 375, length = n + 1)
+  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
+# plot Venn diagram
+venn1 <- plot_venn(venn1_comp, 
+                   use_uniprot = FALSE, 
+                   type = "plot", 
+                   fontfamily = "sans", 
+                   cat.fontfamily = "sans", 
+                   cex = 1.9, 
+                   cat.cex = 1.2, 
+                   fill = gg_colour(2), 
+                   alpha = c(rep(0.6, 2)))
+
+# draw Venn diagram
+grid::grid.draw(venn1)
+
+venn_cap <- "Venn diagram of proteins quantified in each condition. 
+             Proteins in this plot are quantified in at least 4/5 replicates 
+             of either EV or WCL."
+```
+
+Next, the most abundant proteins that are only detected in DAY286 biofilm 
+EVs and not in the WCL can be identified.
+
+```{r bTop10Data, echo=TRUE}
+# get top 10 most abundant proteins exclusive to biofilm EVs
 # in descending order of abundance
 biofilm_top10 <- b_ev %>% 
   tibble::as_tibble(rownames = "id") %>% 
@@ -502,78 +548,169 @@ biofilm_top10 <- b_ev %>%
   mutate(mean = rowMeans(select(., contains("EV")), na.rm = TRUE)) %>% 
   top_n(n = 10, wt = mean) %>% 
   arrange(desc(mean)) %>% 
-  mutate(protein_name = match_id(id, uniprot, "UP_accession", "CGD_gene_name"), 
-         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+  match_id_multi(., "id", uniprot, "UP_accession", 
+                 new = c("CGD_gene_name", 
+                         "CGD_description")) %>% 
+  select(CGD_gene_name, CGD_description, everything(), -id)
+```
 
+```{r bTop10}
 knitr::kable(biofilm_top10, 
-             caption = "This is a table caption", 
+             caption = "Top 10 most abundant DAY286 biofilm EV proteins. They 
+                        are not detected in DAY286 biofilm WCL.", 
+             col.names = c("Name", "Function", "EV1 LFQ", 
+                           "EV2 LFQ", "EV3 LFQ", "EV4 LFQ", 
+                           "EV5 LFQ", "Mean LFQ"), 
              digits = 1)
-  
-
 ```
 
-Text.
+## Imputation of missing values
 
-```{r biofilmSum}
+Missing values in the data will be imputed prior to the 
+differential abundance analysis. Before imputation the percentage of missing 
+values in each sample is explored again with `sum_table(biofilm_norm)`.
+
+```{r bSum}
 # explore percentage missing values in each sample
-knitr::kable(summarise_lfq(biofilm_norm), 
+knitr::kable(sum_table(biofilm_norm), 
              caption = "A table caption", 
-             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
-                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
-                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
              digits = 1)
-
 ```
 
-TEXT.
+The percentage of missing values ranges from 11.3% up to 34.6% which is 
+quite high, typical of label-free quantitative proteomics data[^3]. The 
+pattern of missing values across the data is visualised using:
 
-TEXT.
+[^3]: Lazar, C., Gatto, L., Ferro, M., Bruley, C., Burger, T. (2016). 
+Accounting for the Multiple Natures of Missing Values in Label-Free 
+Quantitative Proteomics Data Sets to Compare Imputation Strategies. 
+_Journal of Proteome Research, 15_(4), 1116-1125. 
+[doi:10.1021/acs.jproteome.5b00981](https://doi.org/10.1021/acs.jproteome.5b00981)
 
-```{r biofilmSum2, cache=TRUE}
+```{r, echo=TRUE, eval=FALSE}
+# visualise missing values using a heatmap
+plot_missval2(biofilm_norm)
+```
+
+```{r bMissVal, fig.cap=missval_cap, fig.height=8}
+plot_missval2(biofilm_norm)
+
+missval_cap <- "Pattern of missing LFQ intensity values."
+```
+
+There are large chunks of data missing in either all of 
+the WCL samples or all of the EV samples. To minimise the percentage of 
+missing values in each sample, these proteins are removed prior to 
+imputation and hence are not imputed.
+```{r bExcl, echo=TRUE}
 # should not impute with so many missing values
-# filter for proteins with 4-5 NA values in EV or WCL
-biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=", 
-                         pat1 = "EV", val1 = 4, 
-                         pat2 = "W", val2 = 4)
-
-# filter for proteins with min 3 valid values in EV and WCL
-biofilm_both <- filter_na2(biofilm_norm, logic = "and", op = "<=", 
-                         pat1 = "EV", val1 = 3, 
-                         pat2 = "W", val2 = 3)
-
-knitr::kable(summarise_lfq(biofilm_both), 
-             caption = "A table caption", 
-             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
-                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
-                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
-             digits = 1)
-
-b5a <- grid::grid.grabExpr(plot_missval2(biofilm_both))
-
-b5b <- grid::grid.grabExpr(plot_detect2(biofilm_both))
-
-ggarrange(b5a, b5b, 
-          labels = c("A", "B"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, colour = "black"))
-
+# select proteins with 4/5 or 5/5 missing values in EV or WCL
+# these will not be imputed
+biofilm_excl <- filter_na2(biofilm_norm, 
+                           logic = "or", 
+                           op = ">=", 
+                           pat1 = "EV", 
+                           val1 = 4, 
+                           pat2 = "W", 
+                           val2 = 4)
 ```
 
-TEXT. 
+Only proteins quantified in at least 2/5 replicates of both EV and WCL will be 
+retained for imputation.
 
-```{r biofilmImpute}
+```{r bBoth, echo=TRUE}
+# filter for proteins with at least 2 valid values in EV and WCL
+biofilm_both <- filter_na2(biofilm_norm, 
+                           logic = "and", 
+                           op = "<=", 
+                           pat1 = "EV", 
+                           val1 = 3, 
+                           pat2 = "W", 
+                           val2 = 3)
+```
+
+`r nrow(biofilm_excl)` proteins which have 4/5 or 5/5 missing values in EV or 
+WCL are removed (`biofilm_excl`). 
+Conversely, `r nrow(biofilm_both)` proteins are kept to have missing values 
+imputed (`biofilm_both`). The percentage of missing values across each sample 
+in `biofilm_both` now ranges from 2.2% to 17.3%. 
+
+```{r bSum2}
+knitr::kable(sum_table(biofilm_both), 
+             caption = "A table caption", 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
+             digits = 1)
+```
+
+The pattern of missing values in `biofilm_both` seems to be biased to certain 
+samples, especially EV replicates 1, 3, and 4 and WCL replicate 3. Therefore, 
+these proteins may be missing not at random (MNAR). 
+
+```{r bMissVal2, fig.cap=missval2_cap , fig.height=8}
+plot_missval2(biofilm_both)
+
+missval2_cap <- "Pattern of missing LFQ intensity values."
+```
+
+The LFQ intensity distributions and cumulative fraction of proteins with and 
+without missing values can be plotted with: 
+
+```{r, echo=TRUE, eval=FALSE}
+# detect intensity differences for proteins with missing values
+plot_detect2(biofilm_both)
+```
+
+```{r bSum3, fig.cap=detect_cap, fig.wide=TRUE}
+plot_detect2(biofilm_both)
+
+detect_cap <- "LFQ intensities of proteins with and without missing values."
+```
+
+These plots show that missing values are biased to proteins with lower 
+average intensities, and are likely MNAR. Hence, a left-censored imputation 
+method is used for imputation of missing values. 
+
+```{r, echo=TRUE, eval=FALSE}
+# impute missing values with QRILC method
+biofilm_imp <- impute_QRILC(biofilm_both)
+```
+
+The effect of imputation on the distribution of protein intensities is 
+visualised with:
+
+```{r, echo=TRUE, eval=FALSE}
+plot_imputation2(biofilm_exp, 
+                 facet_labels = c(biofilm_both = "Before imputation", 
+                                  biofilm_imp = "After imputation"), 
+                 biofilm_both, 
+                 biofilm_imp)
+```
+
+```{r bImpute, fig.cap=imp_cap, fig.wide=TRUE}
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 
 # use left censored imputation method
 biofilm_imp <- impute_QRILC(biofilm_both)
 
-plot_imputation2(biofilm_exp, biofilm_both, biofilm_imp)
+plot_imputation2(biofilm_exp, 
+                 facet_labels = c(biofilm_both = "Before imputation", 
+                                  biofilm_imp = "After imputation"), 
+                 biofilm_both, biofilm_imp)
 
+imp_cap <- "LFQ intensity distribution before and after imputation."
 ```
 
-TEXT.
+## Differential abundance analysis with _limma_
 
 ```{r biofilmDE}
 # recombine imputed proteins and non-imputed proteins in matrix

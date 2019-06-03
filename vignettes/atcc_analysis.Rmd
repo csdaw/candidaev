@@ -507,7 +507,6 @@ atccNorm3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
                   indicates the log2 fold change between samples."
 ```
 
-
 ## ATCC strain protein comparison
 
 Lists of proteins quantified in at least 1/3 biological replicates of each 
@@ -539,7 +538,9 @@ atcc9_w <- filter_na(atcc_norm,
                      val = 2)
 ```
 
-These are then compared using a Venn diagram.
+These are then compared via a Venn diagram. As per section 2.4, every protein 
+that appears in the Venn diagram has been quantified in at least 2/3 replicates 
+of one condition. 
 ```{r, echo=TRUE, eval=FALSE}
 # define a comparison list for a Venn diagram
 venn_comp <- list("A10231_EV" = rownames(atcc1_ev), 
@@ -553,8 +554,9 @@ venn <- plot_venn(venn_comp,
                   
 grid::grid.draw(venn)
 ```
-Of the `r nrow(atcc_norm)` proteins quantified in at least 2/3 replicates of 
-1 out of 4 conditions, 641 (41.7%) are quantified in all 4 conditions. 
+Of `r nrow(atcc_norm)` proteins, 641 (41.7%) are quantified in at least 1/3 
+replicates from all 4 conditions **and** are quantified in at least 2/3 
+replicates of 1 condition.
 
 ```{r atccVenn, fig.cap=venn_cap}
 # define comparison list for Venn diagram
@@ -585,14 +587,14 @@ grid::grid.draw(venn1)
 
 venn_cap <- "Venn diagram of proteins quantified in each condition. 
              Proteins in this plot are quantified in at least 2/3 replicates 
-             of at least condition."
+             of at least 1 condition."
 ```
 
 Next, the most abundant proteins that are only detected in ATCC10231 EVs and 
 not in ATCC10231 WCL can be identified.
 
 ```{r atcc1Top10Data, echo=TRUE}
-# get top 10 most abundant protein exclusive to 10231 EVs
+# get top 10 most abundant proteins exclusive to 10231 EVs
 # in descending order of abundance
 atcc1_top10 <- atcc1_ev %>% 
   tibble::as_tibble(rownames = "id") %>% 
@@ -686,7 +688,8 @@ There are large chunks of data missing in either all of
 the WCL samples or all of the EV samples. To minimise the percentage of 
 missing values in each sample, these proteins are removed prior to 
 imputation and hence are not imputed.
-```{r, echo=TRUE}
+
+```{r atccExcl, echo=TRUE}
 # should not impute with so many missing values
 # filter for exclusive to 10231 EV or WCL or 90028 EV or WCL
 # these will not be imputed
@@ -701,7 +704,8 @@ atcc_excl <- filter_na4(atcc_norm,
 
 Only proteins quantified in at least 1/3 replicates from all 4 conditions 
 are retained for imputation.
-```{r, echo=TRUE}
+
+```{r atccBoth, echo=TRUE}
 # filter for proteins with min 1 valid value in all 4 sample types
 atcc_both <- filter_na4(atcc_norm, 
                         logic = "and", 
@@ -781,8 +785,9 @@ plot_imputation2(atcc_exp,
 # use left censored imputation method
 atcc_imp <- impute_QRILC(atcc_both)
 
-plot_imputation2(atcc_exp, facet_labels = c(atcc_both = "Before imputation", 
-                                            atcc_imp = "After imputation"),  
+plot_imputation2(atcc_exp, 
+                 facet_labels = c(atcc_both = "Before imputation", 
+                                  atcc_imp = "After imputation"),  
                  atcc_both, atcc_imp)
 
 imp_cap <- "LFQ intensity distribution before and after imputation."
