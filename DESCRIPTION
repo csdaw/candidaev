@@ -14,9 +14,10 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/csdaw/candidaev
 BugReports: https://github.com/csdaw/candidaev/issues
+biocViews:
 Imports: 
-    bookdown,
-    assertthat,
+    assertthat, 
+    broom, 
     circlize,
     ComplexHeatmap,
     cluster,
@@ -25,26 +26,28 @@ Imports:
     ggplot2,
     ggrepel,
     gridExtra,
+    impute, 
     imputeLCMD,
+    limma, 
+    magrittr, 
+    pcaMethods,
     purrr,
     RColorBrewer,
+    rlang, 
+    stats, 
     stringr,
     tibble,
     tidyr,
     VennDiagram,
-    stats,
-    magrittr,
-    rlang,
-    limma,
-    broom
 Suggests: 
+    BiocStyle, 
+    bookdown, 
+    DT, 
+    ggpubr, 
+    kableExtra, 
     knitr,
     rmarkdown,
-    BiocStyle,
-    kableExtra,
-    ggpubr,
     stringi,
-    DT,
     writexl
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
