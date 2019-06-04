@@ -272,7 +272,7 @@ ggpubr::ggarrange(freq1, numb1,
                   widths = c(1, 1.4), 
                   vjust = 1)
 
-bInit2_cap <- "Protein quantification distributions. (A) Cumulative 
+yInit2_cap <- "Protein quantification distributions. (A) Cumulative 
                number of proteins quantified in 1-6 samples. (B) Total number 
                of proteins quantified in each biological replicate sample."
 ```
@@ -317,13 +317,13 @@ yeast_filt2 <- filter_na2(yeast_lfq2,
 ```
 
 The initial `r nrow(yeast_lfq2)` proteins has been reduced to 
-`r nrow(yeast_filt2)`. Now the majority of proteins are quantified in all 6 
+`r nrow(yeast_filt2)`. Now majority of proteins are quantified in 3/6 or 6/6 
 samples. The overall pattern of proteins in each sample remains similar 
 though.
 
 ```{r yFilt2, fig.cap=yFilt2_cap, fig.wide=TRUE}
 freq2 <- plot_frequency2(yeast_filt2) + 
-  scale_y_continuous(limits = c(0,300), 
+  scale_y_continuous(limits = c(0,400), 
                      expand = expand_scale(mult = c(0, 0))) + 
   theme(plot.title = element_text(size = 16))
 
@@ -494,7 +494,7 @@ Of `r nrow(yeast_norm2)` proteins, 494 (51.7%) are quantified by at least 1/3
 biological replicates of both EV and WCL **and** at least 2/3 replicates of 
 either EV or WCL. 
 
-```{r yVenn}
+```{r yVenn, fig.cap=venn_cap, fig.small=TRUE}
 # define comparison list for Venn diagram
 venn1_comp <- list("EV" = rownames(y_ev), 
                    "WCL" = rownames(y_wcl))
@@ -766,3 +766,178 @@ yeast_res <- get_results(efit = y_efit,
 ```
 
 # Results
+
+## DAY286 yeast EV versus WCL
+
+Differential abundance comparison of proteins in DAY286 yeast EVs versus WCL.
+
+```{r yResData, include=FALSE}
+yeast_res_short <- yeast_res %>% 
+  select(CGD_gene_name, Protein_name, logFC, 
+         contains("_mean"), adj.P.Val, group) %>% 
+  mutate_at(.vars = vars(logFC, contains("_mean")), 
+            .funs = list(~round(., digits = 2))) %>% 
+  mutate(adj.P.Val = signif(adj.P.Val, digits = 3), 
+         group = as.factor(group))
+
+# caption for volcano plot below
+vol_cap <- "Volcano plot for proteins quantified in EV and WCL."
+```
+
+```{r yRes}
+js1 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 40 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 40) + 
+              '...</span>' : data;",
+              "}")
+
+js2 <- DT::JS("function(data, type, row, meta) {",
+              "return type === 'display' && data.length > 12 ?",
+              "'<span title=\"' + data + '\">' + data.substr(0, 12) + 
+              '...</span>' : data;",
+              "}")
+
+DT::datatable(yeast_res_short, 
+              rownames = FALSE, 
+              colnames = c("Gene" = "CGD_gene_name", 
+                           "Protein" = "Protein_name", 
+                           "p.adj" = "adj.P.Val"), 
+              filter = list(position = "bottom", clear = FALSE, plain = TRUE), 
+              class = "display compact", 
+              options = list(
+                autowidth = TRUE, 
+                columnDefs = list(list(width = "40%", targets = 1), 
+                                  list(width = "10%", targets = c(0, 2:6)), 
+                                  list(targets = 1, 
+                                       render = js1), 
+                                  list(targets = 0, 
+                                       render = js2)
+                )
+              )
+)
+```
+
+## Volcano plot
+
+The result table is used to construct a volcano plots for DAY286 yeast. 
+The `plot_volcano` function requires a data.frame input (`yeast_res`) 
+and specification of the column names that contain the data to be plotted 
+(`adj.P.Val` and `logFC`). The `group` column in `yeast_res` is used to 
+separate the data into three groups that have different colours.
+
+```{r yVolcano, fig.cap=vol_cap, echo=TRUE}
+plot_volcano(yeast_res, 
+             p_val = adj.P.Val, 
+             log2fc = logFC, 
+             group = group, 
+             use_labels = TRUE, 
+             label_fun = ifelse(logFC >= 6, CGD_gene_name, ""), 
+             point_size = 2, 
+             label_size = 4, 
+             legend_params = c("right", 14, 14), 
+             axis_params = c("black", 16, 14), 
+             x_lim = c(-10, 12), 
+             y_lim = c(0, 6)) + 
+  scale_colour_manual(values = c("#D55E00",
+                                 "#999999",
+                                 "#0072B2"), 
+                      labels = c("EV enriched", 
+                                 "Not significant", 
+                                 "WCL enriched")) + 
+  theme(legend.title = element_blank())
+```
+
+## Log<sub>2</sub> LFQ intensity heatmap
+
+The `yeast_res` data.frame is used to construct heatmaps based on the 
+proteins that are significantly different across all both sample groups; 
+EV and WCL.
+
+There are two type of heatmaps: one for plotting log<sub>2</sub> LFQ intensity 
+data and one for plotting log<sub>2</sub> fold change data. To plot an LFQ 
+intensity heatmap, a numeric matrix must be used as the input.
+
+In this case the `yeast_res` data.frame is subset to remove all columns 
+except a column with identifiers (e.g. UniProt accessions), 
+log2FC data columns, and a logical significance column. Then the data.frame is 
+filtered for significant proteins, the UniProt accession column is converted to 
+rownames, the significance column is dropped, and the data.frame is converted 
+to a matrix.
+
+```{r lfqHeatmapData, echo=TRUE}
+# get data for log2 LFQ intensity heatmap
+yeast_htmp <- yeast_res %>% 
+  select(UP_accession, 
+         matches("EV_[0-9]"), 
+         matches("WCL_[0-9]"), 
+         significant) %>% 
+  filter(significant == TRUE) %>% 
+  tibble::column_to_rownames(var = "UP_accession") %>% 
+  select(-significant) %>% 
+  as.matrix()
+```
+
+The heatmap is plotted with: 
+
+```{r, echo=TRUE, eval=FALSE}
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_height = unit(10, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    at = seq(-5, 5, 1))
+
+plot_heatmap(yeast_htmp, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "gower", 
+             split_type = "cutree", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = FALSE, 
+             split_order = c(4, 3, 1, 2, 5), 
+             colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
+             heatmap_legend_param = htmp_params)
+```
+
+```{r lfqHeatmap, fig.cap=htmp_cap, fig.height=8}
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_height = unit(10, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    at = seq(-5, 5, 1))
+
+plot_heatmap(yeast_htmp, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "gower", 
+             split_type = "cutree", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = FALSE, 
+             split_order = c(4, 3, 1, 2, 5), 
+             colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
+             heatmap_legend_param = htmp_params)
+
+htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been 
+             centred around 0."
+```
+
+# Session information {-}
+
+The system on which this document was compiled was running 
+pandoc v`r rmarkdown::pandoc_version()`. Here is output of 
+`sessionInfo()`.
+
+```{r sessionInfo}
+sessionInfo()
+```
