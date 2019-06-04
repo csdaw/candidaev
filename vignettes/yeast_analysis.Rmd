@@ -87,21 +87,25 @@ using UbIA-MS. _Nature Protocols, 13_(3), 530-550.
 
 Extracellular vesicles (EVs) were isolated using differential 
 ultracentrifugation from _C. albicans_ liquid cultures 
-grown using the lab strain DAY286 (n = 4). 
+grown using the lab strain DAY286 (n = 3). 
 Additionally, cells from these liquid cultures were separated and lysed to 
 generate whole cell lysates (WCL). Each EV biological replicate was paired 
 with a WCL replicate as they were derived from the same liquid culture.
 
 Samples analysed in this vignette:
 
-* DAY286 Yeast EV1
-* DAY286 Yeast EV2
-* DAY286 Yeast EV3
-* DAY286 Yeast EV4
-* DAY286 Yeast WCL1
-* DAY286 Yeast WCL2
-* DAY286 Yeast WCL3
-* DAY286 Yeast WCL4
+* DAY286 Yeast EV2 (C6.EV)
+* DAY286 Yeast EV3 (C7.EV)
+* DAY286 Yeast EV4 (C8.EV)
+* DAY286 Yeast WCL2 (C6.WCL)
+* DAY286 Yeast WCL3 (C7.WCL)
+* DAY286 Yeast WCL4 (C8.WCL)
+
+The samples not analysed in this vignette (due to a different EV isolation 
+protocol being used) include:
+
+* DAY286 Yeast EV1 (C3.EV)
+* DAY286 Yeast WCL1 (C3.WCL)
 
 These samples were electrophoresed and the SDS-PAGE gel slices were 
 reduced, alkylated, and digested with trypsin. The resulting peptides were 
@@ -131,241 +135,564 @@ repository with the data set identifier y and DOI x.
 
 ## Setup
 
-Text.
+The packages required for the analyses are loaded and a specific 
+seed is set for the steps requiring random number generation (imputation 
+and clustering).
 
-```{r yeastInit}
-yeast <- yeast %>% 
-  filter(Reverse != "+", Potential.contaminant != "+", 
-         Only.identified.by.site != "+", Unique.peptides >= 2)
+```{r setup, echo=TRUE, warning=FALSE, message=FALSE}
+# load packages
+library(candidaev)
+library(dplyr)
+library(ggplot2)
 
-yeast_lfq <- convert_lfq(yeast, yeast_exp)
-
-y1a <- plot_frequency2(yeast_lfq)
-
-y1b <- plot_numbers2(yeast_lfq, yeast_exp) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-ggarrange(y1a, y1b, 
-          labels = c("A", "B"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
-knitr::kable(summarise_lfq(yeast_lfq), 
-             caption = "A table caption", 
-             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
-                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
-                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
-             digits = 1)
-
+# set seed for imputation, kmeans, MDS plot
+set.seed(1)
 ```
 
-Text.
+## Exploring the `yeast` data set
 
-```{r yeastFilt}
-# filter for proteins identified in min 3/4 reps of EV or WCL
-yeast_filt <- filter_na2(yeast_lfq, logic = "or", 
-                         op = "<=", 
-                         pat1 = "EV", val1 = 1, 
-                         pat2 = "W", val2 = 1)
+As above, the _C. albicans_ DAY286 yeast LC-MS/MS data set is provided as a 
+data.frame called `yeast` in this package. 
+It has `r nrow(yeast)` rows each of which corresponds to a single protein 
+group[^2], and `r ncol(yeast)` columns. 
+A key describing most of these columns can be found in the 
+[MaxQuant documentation](http://www.coxdocs.org/doku.php?id=maxquant:table:proteingrouptable). 
+The `LFQ.intensity` columns hold the protein quantification data that is 
+used for the following analyses.
 
-y2a <- plot_frequency2(yeast_filt)
+[^2]: Each protein group comprises the group of proteins that could be 
+reconstructed from a set of peptides by MaxQuant. In most cases this will be 
+a single protein but sometimes there will be two or more proteins that 
+could not be distinguished by the set of peptides.
 
-y2b <- plot_numbers2(yeast_filt, yeast_exp) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-y2c_labels <- c(rep("EV", 4), rep("WCL", 4))
-
-y2c <- plot_mds(yeast_filt, y2c_labels)
-
-ggarrange(ggarrange(y2a, y2b, labels = c("A", "B"), ncol = 1, nrow = 2, 
-                    font.label = list(size = 24, color = "black")), 
-          y2c, 
-          labels = c("", "C"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
+```{r yColumns, echo=TRUE}
+colnames(yeast)
 ```
 
-Text.
+`yeast_exp` is another data.frame provided in this package. It 
+describes the experimental design underlying the `yeast` data set. 
+The primary function `yeast_exp` is to provide info for labelling 
+and grouping data in some of the plotting functions from 
+the **Bioconductor** package `r Biocpkg("DEP")`, which have been 
+modified for use in this package. `yeast_exp` supplies sample 
+information (biological replicate, strain) for each 
+`LFQ.intensity` column in the `yeast` data.frame.
 
-```{r yeastNorm}
-yeast_norm <- normalizeCyclicLoess(yeast_filt)
+It has the following structure. Notice that each row in the `label` 
+column of `yeast_exp` is exactly the same as the names of the 
+`LFQ.intensity` columns of `yeast`.
 
-y3a <- plot_normalization2(yeast_exp, yeast_filt, yeast_norm)
-
-y3b_labels <- c(rep("EV", 4), rep("WCL", 4))
-
-y3b <- plot_mds(yeast_norm, y3b_labels)
-
-y3c <- plot_dendro(yeast_norm)
-
-ggarrange(y3a, 
-          ggarrange(y3b, y3c, labels = c("B", "C"), ncol = 1, nrow = 2, font.label = list(size = 24, color = "black")), 
-          labels = c("A", ""), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
+```{r yExpTable}
+knitr::kable(yeast_exp, 
+             caption = "Experimental design for this vignette.")
 ```
 
-Text.
+## Data preparation
 
-```{r yeastFilt2}
-# drop EV_1 and WCL_1
+First, the `yeast` proteinGroups data.frame is filtered to remove reverse 
+proteins, contaminant proteins, and proteins identified by less than 2 unique 
+peptides.
+
+```{r yInit, echo=TRUE}
+# filter out reverse, contaminant proteins, proteins with <2 unique peptides
+# extract LFQ intensity columns and UniProt accessions 
+# log2 transform LFQ intensities
+yeast_lfq <- yeast %>% 
+  filter(Reverse != "+", 
+         Potential.contaminant != "+", 
+         Unique.peptides >= 2) %>% 
+  convert_lfq(., yeast_exp)
+```
+
+Then the data.frame is converted into a compact format using the `convert_lfq` 
+function which performs the following:
+
+1. Ensures the names of the `LFQ.intensity` columns in `yeast` exactly match 
+   those in the `label` column of the experimental design, `yeast_exp`.
+   
+2. Returns a matrix containing only: the UniProt accession(s) and LFQ 
+   intensities of each protein across the 8 samples. 
+   
+3. Log<sub>2</sub> transforms the LFQ intensities.
+
+--------------------------------------------------------------------------------
+
+Next, the EV1 sample is dropped because the EVs were not isolated 
+with the same protocol as the other samples and are hence not equivalent 
+biological replicates. The WCL1 sample is dropped to keep the experimental 
+design balanced.
+
+```{r yDrop, echo=TRUE}
 yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_1")]
+```
 
+The resulting matrix `yeast_lfq2` still has `r nrow(yeast_lfq2)` rows but 
+only `r ncol(yeast_lfq2)` columns, one for each LC-MS/MS sample. The total
+number of proteins quantified (i.e. have a non-`NA` LFQ intensity) in each
+sample can be explored using:
+
+```{r, echo=TRUE, eval=FALSE}
+# explore quantification across all 6 samples
+plot_frequency2(yeast_lfq2)
+
+# explore protein quantification in individual samples
+plot_numbers2(yeast_lfq2, yeast_exp)
+```
+
+The proteins in this data set 
+are not quantified in every biological replicate of every strain. 
+If fact in Figure \@ref(fig:yInit2)A shows that most of the proteins are 
+only quantified in a single sample. Figure \@ref(fig:yInit2)B shows the 
+total number of proteins quantified in each sample.
+
+```{r yInit2, fig.cap=yInit2_cap, fig.wide=TRUE}
+freq1 <- plot_frequency2(yeast_lfq2) + 
+  scale_y_continuous(limits = c(0,500), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(plot.title = element_text(size = 16))
+
+numb1 <- plot_numbers2(yeast_lfq2, yeast_exp) + 
+  theme(plot.title = element_text(size = 16),
+        axis.text.x = element_text(angle = 0), 
+        legend.position = "right", 
+        legend.text = element_text(size = 12), 
+        legend.box.margin = margin(t = 0, r = 0, b = 0, l = -15, unit = "pt")) +  
+  scale_y_continuous(limits = c(0, 1750), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_discrete(labels = c(rep(2:4, 2))) + 
+  labs(title = "Proteins per biological replicate") + 
+  xlab("Biological replicate") + 
+  guides(fill = guide_legend(nrow = 4, byrow = TRUE))
+
+ggpubr::ggarrange(freq1, numb1,
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  font.label = list(size = 24, color = "black"), 
+                  widths = c(1, 1.4), 
+                  vjust = 1)
+
+bInit2_cap <- "Protein quantification distributions. (A) Cumulative 
+               number of proteins quantified in 1-6 samples. (B) Total number 
+               of proteins quantified in each biological replicate sample."
+```
+
+The percentage of non-valid (`NA`) values and other useful statistics for 
+each sample is shown using:
+
+```{r, echo=TRUE, eval=FALSE}
+# generate summary table from LFQ data
+sum_table(yeast_lfq2)
+```
+
+Table \@ref(tab:yInit3) shows that biological replicate 2 of both EV and WCL 
+has the highest percentage of missing values compared to the other replicates. 
+
+```{r yInit3}
+knitr::kable(sum_table(yeast_lfq2), 
+             caption = "Descriptive statistics for each LC-MS/MS sample.", 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
+             digits = 1)
+```
+
+## Protein filtering (replicate quantification)
+
+Prior to normalisation and imputation, proteins with too many missing values 
+across the 6 samples are removed. Only those with at least 2/3 valid values 
+in 1 of the 2 conditions are retained.
+
+This filtration is performed using `filter_na2`.
+
+```{r yFilt}
 # filter for proteins identified in min 2/3 reps of EV or WCL
-yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
+yeast_filt2 <- filter_na2(yeast_lfq2, 
+                          logic = "or", 
+                          op = "<=", 
                           pat1 = "EV", val1 = 1, 
                           pat2 = "W", val2 = 1)
-
-# create plots
-y4a <- plot_frequency2(yeast_filt2)
-
-y4b <- plot_numbers2(yeast_filt2, yeast_exp) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-y4c_labels <- c(rep("EV", 3), rep("WCL", 3))
-
-y4c <- plot_mds(yeast_filt2, y4c_labels)
-
-ggarrange(ggarrange(y4a, y4b, labels = c("A", "B"), ncol = 1, nrow = 2, 
-                    font.label = list(size = 24, color = "black")), 
-          y4c, 
-          labels = c("", "C"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
-
-
 ```
 
-Text.
+The initial `r nrow(yeast_lfq2)` proteins has been reduced to 
+`r nrow(yeast_filt2)`. Now the majority of proteins are quantified in all 6 
+samples. The overall pattern of proteins in each sample remains similar 
+though.
 
-```{r yeastNorm2}
-yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
+```{r yFilt2, fig.cap=yFilt2_cap, fig.wide=TRUE}
+freq2 <- plot_frequency2(yeast_filt2) + 
+  scale_y_continuous(limits = c(0,300), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(plot.title = element_text(size = 16))
 
-y5a <- plot_normalization2(yeast_exp, yeast_filt2, yeast_norm2)
+numb2 <- plot_numbers2(yeast_filt2, yeast_exp) + 
+  theme(plot.title = element_text(size = 16),
+        axis.text.x = element_text(angle = 0), 
+        legend.position = "right", 
+        legend.text = element_text(size = 12), 
+        legend.box.margin = margin(t = 0, r = 0, b = 0, l = -15, unit = "pt")) +  
+  scale_y_continuous(limits = c(0, 1000), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_discrete(labels = c(rep(2:4, 2))) + 
+  labs(title = "Proteins per biological replicate") + 
+  xlab("Biological replicate") + 
+  guides(fill = guide_legend(nrow = 4, byrow = TRUE))
 
-y5b_labels <- c(rep("EV", 3), rep("WCL", 3))
+ggpubr::ggarrange(freq2, numb2,
+                  labels = c("A", "B"), 
+                  ncol = 2, 
+                  nrow = 1, 
+                  font.label = list(size = 24, color = "black"), 
+                  widths = c(1, 1.4), 
+                  vjust = 1)
 
-y5b <- plot_mds(yeast_norm2, y5b_labels)
-
-y5c <- plot_dendro(yeast_norm2)
-
-ggarrange(y5a, 
-          ggarrange(y5b, y5c, labels = c("B", "C"), ncol = 1, nrow = 2, 
-                    font.label = list(size = 24, color = "black")), 
-          labels = c("A", ""), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, color = "black"))
-
+yFilt2_cap <- "Protein quantification distributions after filtration. 
+               (A) Cumulative number of proteins quantified in 1-6 samples. 
+               (B) Total number of proteins quantified in each biological 
+               replicate sample."
 ```
 
-```{r yeastVenn}
-# filter for proteins identified in min 1/3 reps of EV
-y_ev <- filter_na(yeast_norm2, op = "<=", 
-                  pat = "EV", val = 2)
+A multidimensional scaling plot can be drawn via:
 
-# filter for proteins identified in min 1/3 reps of WCL
-y_wcl <- filter_na(yeast_norm2, op = "<=", 
-                   pat = "W", val = 2)
+```{r, echo=TRUE, eval=FALSE}
+# need labels for the MDS plot
+mds_labels <- c(rep("EV", 3), 
+                rep("WCL", 3))
 
-y6 <- plot_venn(list("EV" = y_ev, "WCL" = y_wcl), 
-                 use_uniprot = TRUE, type = "plot")
-
-y6 <- as_ggplot(y6) + 
-  theme(plot.margin = unit(c(0,2,0,2), "lines"))
-
-plot(y6)
-
+# generate MDS plot
+plot_mds(yeast_filt2, mat_labels = mds_labels, 
+         shape_size = 4)
 ```
 
-Text
+It shows that the EV samples generally cluster closer together than 
+the WCL samples do to each other, indicating they have a smaller 
+log<sub>2</sub> fold change between them.
 
-```{r yeastTop10}
+```{r bFilt3, fig.cap=bFilt3_cap, fig.small=TRUE}
+mds1_labels <- c(rep("EV", 3), 
+                 rep("WCL", 3))
+
+plot_mds(yeast_filt2, mat_labels = mds1_labels, 
+         shape_size = 4) + 
+  scale_y_continuous(limits = c(-1.5, 2), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_continuous(limits = c(-1, 3), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(legend.position = "bottom", 
+        legend.title = element_blank()) + 
+  scale_fill_manual(values = c("orange", "red")) + 
+  xlab("Dimension 1") + 
+  ylab("Dimension 2")
+
+bFilt3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
+               biological replicate sample with the first 2 dimensions 
+               plotted. Pairwise distance between samples approximately 
+               indicates the log2 fold change between samples."
+```
+
+## LFQ intensity normalisation
+
+Next, the LFQ intensity data is normalised using `r Biocpkg("limma")`.
+
+```{r yNorm, echo=TRUE}
+# normalise LFQ intensities
+yeast_norm2 <- limma::normalizeCyclicLoess(yeast_filt2)
+```
+
+The effect of the normalisation on the distribution of LFQ intensities for 
+each sample is visualised using: 
+
+```{r, echo=TRUE, eval=FALSE}
+# explore effect of normalisation on intensity distributions
+plot_normalization2(yeast_exp,
+                    facet_labels = c(yeast_filt2 = "Before normalisation", 
+                                     yeast_norm2 = "After normalisation"), 
+                    yeast_filt2, 
+                    yeast_norm2)
+```
+
+```{r, yNorm2, fig.cap=bNorm2_cap, fig.height=7}
+plot_normalization2(yeast_exp, 
+                    facet_labels = c(yeast_filt2 = "Before normalisation", 
+                                     yeast_norm2 = "After normalisation"), 
+                    yeast_filt2, yeast_norm2) + 
+  scale_x_discrete(labels = c(rep(2:4, 2))) + 
+  xlab("Biological replicate") + 
+  theme(plot.margin = margin(t = 0, l = 1.5, r = 1.5, b = 0, unit = "inches"))
+  
+
+bNorm2_cap <- "Distribution of protein LFQ intensities for each sample. Shown
+               before and after normalisation."
+```
+
+The MDS plot now shows that the EV samples and WCL samples cluster separately 
+from each other. The first dimension (which is the 
+leading factor causing the LFQ intensities differences between samples) 
+separates the samples according to the primary condition of interest; EV 
+versus WCL.
+
+```{r yNorm3, fig.cap=yNorm3_cap, fig.small=TRUE}
+mds2_labels <- c(rep("EV", 3), 
+                rep("WCL", 3))
+
+plot_mds(yeast_norm2, mat_labels = mds2_labels, 
+         shape_size = 4) + 
+  scale_y_continuous(limits = c(-0.5, 0.5), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  scale_x_continuous(limits = c(-1.25, 1.25), 
+                     expand = expand_scale(mult = c(0, 0))) + 
+  theme(legend.position = "bottom", 
+        legend.title = element_blank()) + 
+  scale_fill_manual(values = c("orange", "red")) + 
+  xlab("Dimension 1") + 
+  ylab("Dimension 2")
+
+yNorm3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
+               biological replicate sample after normalisation, with the 
+               first 2 dimensions plotted. Pairwise distance between samples 
+               approximately indicates the log2 fold change between samples."
+```
+
+## Yeast EV versus WCL protein comparison
+
+Lists of proteins quantified in at least 1/3 biological replicates of each 
+condition are generated using:
+
+```{r yVennData, echo=TRUE}
+# filter for proteins quantified in min 1/3 reps of EV
+y_ev <- filter_na(yeast_norm2, 
+                  op = "<=", 
+                  pat = "EV", 
+                  val = 2)
+
+# filter for proteins quantified in min 1/3 reps of WCL
+y_wcl <- filter_na(yeast_norm2, 
+                   op = "<=", 
+                   pat = "W", 
+                   val = 2)
+```
+
+These are then compared via a Venn diagram. As per section 2.4, every protein 
+that appears in the Venn diagram has been quantified in at least 2/3 
+replicates of EV or WCL.
+
+```{r, echo=TRUE, eval=FALSE}
+# define a comparison list for a Venn diagram
+venn_comp <- list("EV" = rownames(y_ev), 
+                  "WCL" = rownames(y_wcl))
+
+# plot the Venn diagram
+venn <- plot_venn(venn_comp, 
+                  type = "plot")
+
+grid::grid.draw(venn)
+```
+
+Of `r nrow(yeast_norm2)` proteins, 494 (51.7%) are quantified by at least 1/3 
+biological replicates of both EV and WCL **and** at least 2/3 replicates of 
+either EV or WCL. 
+
+```{r yVenn}
+# define comparison list for Venn diagram
+venn1_comp <- list("EV" = rownames(y_ev), 
+                   "WCL" = rownames(y_wcl))
+
+# define ggplot2 default colour palette function
+gg_colour <- function(n) {
+  hues <- seq(15, 375, length = n + 1)
+  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
+# plot Venn diagram
+venn1 <- plot_venn(venn1_comp, 
+                   use_uniprot = FALSE, 
+                   type = "plot", 
+                   fontfamily = "sans", 
+                   cat.fontfamily = "sans", 
+                   cex = 1.9, 
+                   cat.cex = 1.2, 
+                   fill = gg_colour(2), 
+                   alpha = c(rep(0.6, 2)))
+
+# draw Venn diagram
+grid::grid.draw(venn1)
+
+venn_cap <- "Venn diagram of proteins quantified in each condition. 
+             Proteins in this plot are quantified in at least 2/3 replicates 
+             of either EV or WCL."
+```
+
+Next, the most abundant proteins that are only detected in DAY286 yeast 
+EVs and not in the WCL can be identified.
+
+```{r yTop10Data}
 # get top 10 most abundant protein exclusive to yeast EVs
 # in descending order of abundance
 yeast_top10 <- y_ev %>% 
   tibble::as_tibble(rownames = "id") %>% 
   filter_na(., op = "==", pat = "W", val = 3) %>% 
   select(-contains("W")) %>% 
-  mutate(mean = rowMeans(select(., contains("EV")))) %>% 
+  mutate(mean = rowMeans(select(., contains("EV")), na.rm = TRUE)) %>% 
   top_n(n = 10, wt = mean) %>% 
   arrange(desc(mean)) %>% 
-  mutate(protein_name = match_id(id, uniprot, "UP_accession", "CGD_gene_name"), 
-         GO_CC = match_id(id, uniprot, "UP_accession", "GO_CC"))
+  match_id_multi(., "id", uniprot, "UP_accession", 
+                 new = c("CGD_gene_name", 
+                         "CGD_description")) %>% 
+  select(CGD_gene_name, CGD_description, everything(), -id)
+```
 
+```{r yTop10}
 knitr::kable(yeast_top10, 
-             caption = "This is a table caption", 
+             caption = "Top 10 most abundant DAY286 yeast EV proteins. They 
+                        are not detected in DAY286 yeast WCL.", 
+             col.names = c("Name", "Function", "EV2 LFQ", 
+                           "EV3 LFQ", "EV4 LFQ", "Mean LFQ"), 
              digits = 1)
-  
-
 ```
 
-Text.
+## Imputation of missing values
 
-```{r yeastSum}
+Missing values in the data will be imputed prior to the 
+differential abundance analysis. Before imputation the percentage of missing 
+values in each sample is explored again with `sum_table(yeast_norm2)`.
+
+```{r ySum}
 # explore percentage missing values in each sample
-knitr::kable(summarise_lfq(yeast_norm2), 
-             caption = "A table caption", 
-             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
-                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
-                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
+knitr::kable(sum_table(yeast_norm2), 
+             caption = "Descriptive statistics for each LC-MS/MS sample.", 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
              digits = 1)
-
 ```
 
-TEXT.
+The percentage of missing values ranges from 21.9% up to 49.4% which is 
+quite high, typical of label-free quantitative proteomics data[^3]. The 
+pattern of missing values across the data is visualised using:
 
-```{r yeastSum2}
+[^3]: Lazar, C., Gatto, L., Ferro, M., Bruley, C., Burger, T. (2016). 
+Accounting for the Multiple Natures of Missing Values in Label-Free 
+Quantitative Proteomics Data Sets to Compare Imputation Strategies. 
+_Journal of Proteome Research, 15_(4), 1116-1125. 
+[doi:10.1021/acs.jproteome.5b00981](https://doi.org/10.1021/acs.jproteome.5b00981)
 
+```{r, echo=TRUE, eval=FALSE}
+# visualise missing values using a heatmap
+plot_missval2(yeast_norm2)
+```
+
+```{r yMissVal, fig.cap=missval_cap, fig.height=8}
+plot_missval2(yeast_norm2)
+
+missval_cap <- "Pattern of missing LFQ intensity values."
+```
+
+There are large chunks of data missing in either all of 
+the WCL samples or all of the EV samples. To minimise the percentage of 
+missing values in each sample, these proteins are removed prior to 
+imputation and hence are not imputed.
+
+```{r yExcl, echo=TRUE}
 # should not impute with so many missing values
-yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
+# select proteins with 3/3 missing values in EV or WCL
+# these will not be imputed
+yeast_excl <- filter_na2(yeast_norm2, 
+                         logic = "or", 
+                         op = "==", 
                          pat1 = "EV", val1 = 3, 
                          pat2 = "W", val2 = 3)
-
-yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=", 
-                         pat1 = "EV", val1 = 2, 
-                         pat2 = "W", val2 = 2)
-
-knitr::kable(summarise_lfq(yeast_both), 
-             caption = "A table caption", 
-             col.names = c("Sample", "Mean LFQ intensity", "Median LFQ intensity", 
-                           "SD", "CV", "Min LFQ intensity", "Max LFQ intensity", 
-                           "Range", "Number of proteins", "Number of NA", "Percent NA"), 
-             digits = 1)
-
-y7a <- grid::grid.grabExpr(plot_missval2(yeast_both))
-
-y7b <- grid::grid.grabExpr(plot_detect2(yeast_both))
-
-ggarrange(y7a, y7b, 
-          labels = c("A", "B"), 
-          ncol = 2, 
-          nrow = 1, 
-          font.label = list(size = 24, colour = "black"))
-
 ```
 
-TEXT. 
+Only proteins quantified in at least 1/3 replicates of both EV and WCL will be 
+retained for imputation.
 
-```{r yeastImpute, fig.width=4, fig.height=4}
+```{r yBoth, echo=TRUE}
+# filter for proteins with at least 1 valid value in EV and WCL
+yeast_both <- filter_na2(yeast_norm2, 
+                         logic = "and", 
+                         op = "<=", 
+                         pat1 = "EV", val1 = 2, 
+                         pat2 = "W", val2 = 2)
+```
+
+`r nrow(yeast_excl)` proteins which have 3/3 missing values in EV or 
+WCL are removed (`yeast_excl`). 
+Conversely, `r nrow(yeast_both)` proteins are kept to have missing values 
+imputed (`yeast_both`). The percentage of missing values across each sample 
+in `yeast_both` now ranges from 2.2% to 31.4%. 
+
+```{r ySum2}
+knitr::kable(sum_table(yeast_both), 
+             caption = "Descriptive statistics for each LC-MS/MS sample.", 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
+             digits = 1)
+```
+
+The pattern of missing values in `yeast_both` seems to be biased to certain 
+samples, especially WCL replicate 2. Therefore, 
+these proteins may be missing not at random (MNAR). 
+
+```{r yMissVal2, fig.cap=missval2_cap , fig.height=8}
+plot_missval2(yeast_both)
+
+missval2_cap <- "Pattern of missing LFQ intensity values."
+```
+
+The LFQ intensity distributions and cumulative fraction of proteins with and 
+without missing values can be plotted with: 
+
+```{r, echo=TRUE, eval=FALSE}
+# detect intensity differences for proteins with missing values
+plot_detect2(yeast_both)
+```
+
+```{r bSum3, fig.cap=detect_cap, fig.wide=TRUE}
+plot_detect2(yeast_both)
+
+detect_cap <- "LFQ intensities of proteins with and without missing values."
+```
+
+These plots show that missing values are biased to proteins with lower 
+average intensities, and are likely MNAR. Hence, a left-censored imputation 
+method is used for imputation of missing values. 
+
+```{r, echo=TRUE, eval=FALSE}
+# impute missing values with QRILC method
+yeast_imp <- impute_QRILC(yeast_both)
+```
+
+```{r, echo=TRUE, eval=FALSE}
+plot_imputation2(yeast_exp, 
+                 facet_labels = c(yeast_both = "Before imputation", 
+                                  yeast_imp = "After imputation"), 
+                 yeast_both, 
+                 yeast_imp)
+```
+
+```{r yImpute, fig.cap=imp_cap, fig.wide=TRUE}
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 
 # use left censored imputation method
 yeast_imp <- impute_QRILC(yeast_both)
 
-plot_imputation2(yeast_exp, yeast_both, yeast_imp) + 
-  theme_bw(base_size = 12)
+plot_imputation2(yeast_exp, 
+                 facet_labels = c(yeast_both = "Before imputation", 
+                                  yeast_imp = "After imputation"), 
+                 yeast_both, yeast_imp)
 
+imp_cap <- "LFQ intensity distribution before and after imputation."
 ```
 
-TEXT.
+## Differential abundance analysis with _limma_
 
 ```{r yeastDE}
 # recombine imputed proteins and non-imputed proteins in matrix

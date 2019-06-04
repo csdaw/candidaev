@@ -94,16 +94,16 @@ derived from the same biofilm.
 
 Samples analysed in this vignette:
 
-* DAY286 Biofilm EV1
-* DAY286 Biofilm EV2
-* DAY286 Biofilm EV3
-* DAY286 Biofilm EV4
-* DAY286 Biofilm EV5
-* DAY286 Biofilm WCL1 (W1)
-* DAY286 Biofilm WCL2 (W2)
-* DAY286 Biofilm WCL3 (W3)
-* DAY286 Biofilm WCL4 (W4)
-* DAY286 Biofilm WCL5 (W5)
+* DAY286 Biofilm EV1 (bEV3)
+* DAY286 Biofilm EV2 (bEV4)
+* DAY286 Biofilm EV3 (bEV5)
+* DAY286 Biofilm EV4 (bEV6)
+* DAY286 Biofilm EV5 (bEV7)
+* DAY286 Biofilm WCL1 (bW3)
+* DAY286 Biofilm WCL2 (bW4)
+* DAY286 Biofilm WCL3 (bW5)
+* DAY286 Biofilm WCL4 (bW6)
+* DAY286 Biofilm WCL5 (bW7)
 
 These samples were electrophoresed and the SDS-PAGE gel slices were 
 reduced, alkylated, and digested with trypsin. The resulting peptides were 
@@ -167,17 +167,23 @@ yeast_lfq <- yeast %>%
 
 yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_1")]
 
-yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
+yeast_filt2 <- filter_na2(yeast_lfq2, 
+                          logic = "or", 
+                          op = "<=", 
                           pat1 = "EV", val1 = 1, 
                           pat2 = "W", val2 = 1)
 
 yeast_norm2 <- limma::normalizeCyclicLoess(yeast_filt2)
 
-yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
+yeast_excl <- filter_na2(yeast_norm2, 
+                         logic = "or", 
+                         op = "==", 
                          pat1 = "EV", val1 = 3, 
                          pat2 = "W", val2 = 3)
 
-yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=", 
+yeast_both <- filter_na2(yeast_norm2, 
+                         logic = "and", 
+                         op = "<=", 
                          pat1 = "EV", val1 = 2, 
                          pat2 = "W", val2 = 2)
 
@@ -217,7 +223,7 @@ It has the following structure. Notice that each row in the `label`
 column of `biofilm_exp` is exactly the same as the names of the 
 `LFQ.intensity` columns of `biofilm`.
 
-```{r bexpTable}
+```{r bExpTable}
 knitr::kable(biofilm_exp, 
              caption = "Experimental design for this vignette.")
 ```
@@ -258,7 +264,7 @@ number of proteins quantified (i.e. have a non-`NA` LFQ intensity) in each
 sample can be explored using:
 
 ```{r, echo=TRUE, eval=FALSE}
-# explore quantification across all 12 samples
+# explore quantification across all 10 samples
 plot_frequency2(biofilm_lfq)
 
 # explore protein quantification in individual samples
@@ -334,8 +340,10 @@ in 1 of the 2 conditions are retained.
 This filtration is performed using `filter_na2`.
 
 ```{r, bFilt}
-# filter for proteins identified in min 4/5 reps of EV or WCL
-biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=", 
+# filter for proteins quantified in min 4/5 reps of EV or WCL
+biofilm_filt <- filter_na2(biofilm_lfq, 
+                           logic = "or", 
+                           op = "<=", 
                            pat1 = "EV", val1 = 1, 
                            pat2 = "W", val2 = 1)
 ```
@@ -430,7 +438,11 @@ each sample is visualised using:
 
 ```{r, echo=TRUE, eval=FALSE}
 # explore effect of normalisation on intensity distributions
-plot_normalization2(biofilm_exp, biofilm_filt, biofilm_norm)
+plot_normalization2(biofilm_exp,
+                    facet_labels = c(biofilm_filt = "Before normalisation", 
+                                     biofilm_norm = "After normalisation"), 
+                    biofilm_filt, 
+                    biofilm_norm)
 ```
 
 ```{r, bNorm2, fig.cap=bNorm2_cap, fig.height=7}
@@ -481,13 +493,13 @@ Lists of proteins quantified in at least 1/5 biological replicates of each
 condition are generated using:
 
 ```{r bVennData, echo=TRUE}
-# filter for proteins identified in min 1/5 reps of EV
+# filter for proteins quantified in min 1/5 reps of EV
 b_ev <- filter_na(biofilm_norm, 
                   op = "<=", 
                   pat = "EV", 
                   val = 4)
 
-# filter for proteins identified in min 1/5 reps of WCL
+# filter for proteins quantified in min 1/5 reps of WCL
 b_wcl <- filter_na(biofilm_norm, 
                    op = "<=", 
                    pat = "W", 
@@ -582,7 +594,7 @@ values in each sample is explored again with `sum_table(biofilm_norm)`.
 ```{r bSum}
 # explore percentage missing values in each sample
 knitr::kable(sum_table(biofilm_norm), 
-             caption = "A table caption", 
+             caption = "Descriptive statistics for each LC-MS/MS sample.", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -624,10 +636,8 @@ imputation and hence are not imputed.
 biofilm_excl <- filter_na2(biofilm_norm, 
                            logic = "or", 
                            op = ">=", 
-                           pat1 = "EV", 
-                           val1 = 4, 
-                           pat2 = "W", 
-                           val2 = 4)
+                           pat1 = "EV", val1 = 4, 
+                           pat2 = "W", val2 = 4)
 ```
 
 Only proteins quantified in at least 2/5 replicates of both EV and WCL will be 
@@ -638,10 +648,8 @@ retained for imputation.
 biofilm_both <- filter_na2(biofilm_norm, 
                            logic = "and", 
                            op = "<=", 
-                           pat1 = "EV", 
-                           val1 = 3, 
-                           pat2 = "W", 
-                           val2 = 3)
+                           pat1 = "EV", val1 = 3, 
+                           pat2 = "W", val2 = 3)
 ```
 
 `r nrow(biofilm_excl)` proteins which have 4/5 or 5/5 missing values in EV or 
@@ -652,7 +660,7 @@ in `biofilm_both` now ranges from 2.2% to 17.3%.
 
 ```{r bSum2}
 knitr::kable(sum_table(biofilm_both), 
-             caption = "A table caption", 
+             caption = "Descriptive statistics for each LC-MS/MS sample.", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 

@@ -25,13 +25,13 @@ grown as a biofilm (n = 5).
 There are 10 samples total in this data set:
 
 \itemize{
-\item DAY286 biofilm EV1, EV2, EV3, EV4, EV5
-\item DAY286 biofilm W1, W2, W3, W4, W5
+\item DAY286 biofilm bEV3, bEV4, bEV5, bEV6, bEV7
+\item DAY286 biofilm bW3, bW4, bW5, bW6, bW7
 }
 
 The EV and WCL biological replicates are paired as they are derived from
-the same biofilm, i.e. \code{EV1} EVs were isolated from the culture medium
-used to grow the biofilm from cells were lysed to obtain \code{W1} WCL.
+the same biofilm, i.e. \code{bEV3} EVs were isolated from the culture medium
+used to grow the biofilm from cells were lysed to obtain \code{bW3} WCL.
 
 See \href{https://doi.org}{Dawson et al. (2019)} for more information about the
 generation of this data set. The raw \code{proteinGroups.txt} file and the
