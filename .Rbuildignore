@@ -1,6 +1,8 @@
 ^data-raw$
 ^vignettes/README\.Rmd$
 ^vignettes/README\.md$
+^manuscript/README\.Rmd$
+^manuscript/README\.md$
 ^R/README\.md$
 ^R/README\.Rmd$
 ^LICENSE\.md$
