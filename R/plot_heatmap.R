@@ -172,7 +172,7 @@
 #'                      title_position = "lefttop-rot",
 #'                      title_gp = grid::gpar(colour = "black", fontsize = 8),
 #'                      labels_gp = grid::gpar(colour = "black", fontsize = 8),
-#'                      at = seq(-10, 10, 2)))
+#'                      at = seq(-10, 10, 2))
 #'
 #' plot_heatmap(htmp_data2,
 #'              plot = TRUE,
