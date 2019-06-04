@@ -1,5 +1,5 @@
 ---
-title: "Vignette title"
+title: "DAY286 biofilm analysis"
 author: 
 - name: Charlotte Dawson
   affiliation: Department of Biochemistry and Genetics, 
@@ -26,7 +26,7 @@ package: candidaev
 abstract: | 
   This is the abstract.
 vignette: > 
-  %\VignetteIndexEntry{Vignette title}
+  %\VignetteIndexEntry{DAY286 biofilm analysis}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
