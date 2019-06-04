@@ -142,7 +142,7 @@
 #'                              direction = "vertical",
 #'                              legend_width = grid::unit(5, "cm"),
 #'                              title_position = "lefttop-rot",
-#'                              at = seq(-10, 10, 2)))
+#'                              at = seq(-10, 10, 2))
 #'
 #' plot_heatmap(htmp_data,
 #'              plot = TRUE,

@@ -27,7 +27,7 @@ abstract: |
   This is the abstract.
 vignette: > 
   %\VignetteIndexEntry{ATCC analysis}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{rmarkdown::render}
   \usepackage[utf8]{inputenc}
 ---
 
