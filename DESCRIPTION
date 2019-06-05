@@ -14,6 +14,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/csdaw/candidaev
 BugReports: https://github.com/csdaw/candidaev/issues
+Remotes: nguyens7/tidyNano
 biocViews:
 Imports: 
     assertthat, 
@@ -48,6 +49,7 @@ Suggests:
     knitr,
     rmarkdown,
     stringi,
+    tidyNano
     writexl
 VignetteBuilder: rmarkdown
 RoxygenNote: 6.1.1
