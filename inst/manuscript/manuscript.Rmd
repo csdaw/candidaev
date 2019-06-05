@@ -14,11 +14,6 @@ output:
       number_sections: yes
       toc: no
       keep_tex: no
-    bookdown::word_document2:
-      pandoc_args:
-        '--lua-filter=components/pagebreak.lua'
-      reference_docx: "components/draft_template.docx"
-      fig_caption: yes
 bibliography: "components/references.bib" 
 csl: "components/molecular-and-cellular-proteomics.csl"
 link-citations: yes
