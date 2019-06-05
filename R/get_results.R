@@ -105,6 +105,8 @@
 #' # see results table for A9_EV versus A9_W contrast
 #' result_a9 <- result_list[[2]]
 #'
+#' @importFrom rlang :=
+#'
 #' @export
 get_results <- function(efit, mat, p_val = 0.01, lfc = 0, type = c("individual", "overall")) {
   if(type == "overall") {
