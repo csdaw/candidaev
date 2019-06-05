@@ -3,6 +3,10 @@
 ^vignettes/README\.md$
 ^manuscript/README\.Rmd$
 ^manuscript/README\.md$
+^manuscript/supplement_files$
+^.*\.pdf$
+^.*\.svg$
+^.*\.docx$
 ^R/README\.md$
 ^R/README\.Rmd$
 ^LICENSE\.md$
