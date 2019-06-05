@@ -49,7 +49,7 @@ Suggests:
     knitr,
     rmarkdown,
     stringi,
-    tidyNano
+    tidyNano, 
     writexl
 VignetteBuilder: rmarkdown
 RoxygenNote: 6.1.1
