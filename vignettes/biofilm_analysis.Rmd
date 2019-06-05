@@ -24,7 +24,8 @@ output:
     df_print: kable
 package: candidaev
 abstract: | 
-  This is the abstract.
+  Analysis of LC-MS/MS data obtained for _Candida albicans_ (strain = 
+  DAY286) extracellular vesicles and biofilm whole cell lysate.
 vignette: > 
   %\VignetteIndexEntry{DAY286 biofilm analysis}
   %\VignetteEngine{rmarkdown::render}

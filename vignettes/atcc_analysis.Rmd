@@ -24,7 +24,8 @@ output:
     df_print: kable
 package: candidaev
 abstract: | 
-  This is the abstract.
+  Analysis of LC-MS/MS data obtained for _Candida albicans_ (strains = 
+  ATCC90028, ATCC10231) extracellular vesicles and yeast whole cell lysate.
 vignette: > 
   %\VignetteIndexEntry{ATCC analysis}
   %\VignetteEngine{rmarkdown::render}
