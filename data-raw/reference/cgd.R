@@ -3,7 +3,6 @@ library(dplyr)
 
 # source fill_blank function
 source("R/fill_blank.R")
-source("R/match_id.R")
 source("R/match_id_multi.R")
 
 # read input .tab file
