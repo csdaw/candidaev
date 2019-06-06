@@ -87,11 +87,11 @@
 #'
 #' @export
 match_id_multi <- function(df, id, ref, match, new, as_list = FALSE, ...) {
-  new_columns <- lapply(new, function(x) match_id(id = df[[id]],
-                                                  ref = ref,
-                                                  match = match,
-                                                  new = x,
-                                                  ...))
+  new_columns <- lapply(new, function(x) candidaev::match_id(id = df[[id]],
+                                                             ref = ref,
+                                                             match = match,
+                                                             new = x,
+                                                             ...))
 
   names(new_columns) <- new
 

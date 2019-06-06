@@ -3,6 +3,7 @@ library(dplyr)
 
 # source fill_blank function
 source("R/fill_blank.R")
+source("R/match_id.R")
 source("R/match_id_multi.R")
 
 # read input .tab file
@@ -66,7 +67,7 @@ go <- go %>%
 # add CGD GO terms to cgd table
 cgd <- match_id_multi(df = cgd,
                       id = "Systematic_name",
-                      ref = test,
+                      ref = go,
                       match = "Systematic_name",
                       new = c("BP_CGD", "CC_CGD", "MF_CGD")) %>%
   mutate_at(.vars = vars(BP_CGD, CC_CGD, MF_CGD),
