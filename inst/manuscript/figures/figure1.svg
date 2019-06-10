@@ -15,9 +15,9 @@
    viewBox="0 0 127 139.70001"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="figure1.svg"
-   inkscape:export-filename="C:\Users\Charlotte\Documents\candidaev\vignettes\figures\figure1.png"
+   inkscape:export-filename="C:\Rprojects\candidaev\inst\manuscript\figures\figure1.png"
    inkscape:export-xdpi="500"
    inkscape:export-ydpi="500">
   <defs
@@ -456,8 +456,8 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="48.539506"
-     inkscape:cy="471.05641"
+     inkscape:cx="306.80019"
+     inkscape:cy="67.86266"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -472,10 +472,10 @@
      inkscape:snap-bbox-midpoints="false"
      inkscape:snap-grids="true"
      inkscape:object-paths="true"
-     inkscape:window-width="2520"
-     inkscape:window-height="1496"
-     inkscape:window-x="2869"
-     inkscape:window-y="-11"
+     inkscape:window-width="1839"
+     inkscape:window-height="1051"
+     inkscape:window-x="72"
+     inkscape:window-y="-9"
      inkscape:window-maximized="1"
      inkscape:snap-smooth-nodes="false"
      inkscape:snap-midpoints="true"
@@ -1973,7 +1973,7 @@
          sodipodi:role="line"
          x="65.882904"
          y="269.52225"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.26458332">MISEV2018 category 1a, 2a, 2b</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.26458332">MISEV2018 category 1 and 2</tspan></text>
     <text
        id="text8715"
        y="266.79099"
@@ -2006,7 +2006,7 @@
          y="283.85452"
          x="65.882904"
          sodipodi:role="line"
-         id="tspan8725">MISEV2018 category 4a, 4b, 4d</tspan></text>
+         id="tspan8725">MISEV2018 category 3 or 4</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0.02645833px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
