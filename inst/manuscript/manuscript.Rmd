@@ -442,9 +442,9 @@ marker_longlist <- marker_longlist %>%
          VDM = c("Y", rep("",3), rep("Y", 2), "", "Y", rep("", 8), rep("Y", 2), 
                  rep("", 4), rep("Y", 3), rep("", 2), rep("Y", 2), rep("", 5), 
                  "Y", rep("", 7), "Y"), 
-         pack_row = c(5, rep(1,3), rep(5,2), 1, 2, rep(1,3), rep(1,3), 4, 2, 
-                      rep(5,2), 1, rep(2,2), 4, 1, rep(5,2), 1, rep(5,3), 1, 
-                      4, rep(1,3), 5, 1, 1, 3, 1, 3, 2, 3, 5)) %>% 
+         pack_row = c(4, rep(1,3), rep(4,2), 1, 2, rep(1,3), rep(1,3), 3, 2, 
+                      rep(4,2), 1, rep(2,2), 3, 1, rep(4,2), 1, rep(4,3), 1, 
+                      3, rep(1,3), 4, 1, 1, 2, 1, 2, 2, 2, 4)) %>% 
   arrange(pack_row)
 
 # fix number of TM domains for CDR1;CDR2
@@ -500,8 +500,7 @@ knitr::kable(marker_longlist[ ,-10],
                      " " = 2), escape = FALSE) %>% 
   kable_styling(font_size = 8) %>% 
   pack_rows("Plasma membrane", 1, 20) %>% 
-  pack_rows("Golgi, ER, secretory pathway", 21, 25) %>% 
-  pack_rows("Vacuole", 26, 28) %>% 
+  pack_rows("Golgi, ER, vacuole", 21, 28) %>% 
   pack_rows("Mitochondria", 29, 31) %>% 
   pack_rows("Cell wall, cell surface", 32, 43) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence 
