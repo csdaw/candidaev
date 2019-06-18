@@ -5,38 +5,53 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
+knitr::opts_chunk$set(collapse = TRUE,
+                      comment = "#>")
 ```
 
 # candidaev
 
+![GitHub last commit](https://img.shields.io/github/last-commit/csdaw/candidaev.svg?style=popout)
+
+
 This repository contains the research compendium for our paper:
 
-> Authors, (YYYY). _Title of paper_. Name of journal/book <https://doi.org/xxx/xxx>
+> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson, M. A., 
+Bleackley, M. R. (2019) Sur7 family proteins are putative markers for
+_Candida albicans_ extracellular vesicles. Mol. Cell. Proteomics, submitted.
 
-The compendium includes all the data, code, and text associated with the publication.
-It is structured as an R package to facilitate reproducilibity and distribution.
-The principles and motivations behind using research compendiums for academic 
-research is detailed in [Marwick et al. (2018)](https://doi.org/10.1080/00031305.2017.1375986).
+It has been permanently archived at Zenodo with the DOI shown above.
+
+The compendium includes all the data, code, and text associated with the 
+publication. It is structured as an R package to facilitate reproducilibity and 
+distribution. The principles and motivations behind using research compendiums 
+for academic research is detailed in 
+[Marwick et al. (2018)](https://doi.org/10.1080/00031305.2017.1375986). 
 
 The R package [rrtools](https://github.com/benmarwick/rrtools) was used in the 
 production of this compendium.
 
+### Citation
 
+Please cite this compendium as:
+
+> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson, M. A., 
+Bleackley, M. R. (2019) Research compendium for: _Sur7 family proteins are_
+_putative markers for_ Candida albicans _extracellular vesicles_, 2019. 
+Version x.x.x. Zenodo. URL.
 
 ### Contents
 
 ```
     .
-    ├── /R                   # Script files containing reused functions
-    ├── /analysis            # Full analysis report and scripts
-    ├── /data                # Raw, cleaned, external, and results data
-    ├── /manuscript          # Final manuscript and associated files
+    ├── /R                   # Script files for functions and included data
+    ├── /data-raw            # Raw data used (but not modified) in analyses
+    ├── /data                # Data tables installed with package
+    ├── /inst/manuscript     # Final submitted manuscript and supplemental files
+    ├── /man                 # Auto-generated documentation for functions and included data
+    ├── /vignettes           # Detailed examples of how analyses were performed
     ├── .Rbuildignore        # List of files and directories to ignore during R package build
+    ├── .gitattributes       # List of files for github/linguist to ignore
     ├── .gitignore           # List of files to ignore during git commit
     ├── DESCRIPTION          # Research compendium metadata
     ├── LICENSE.md           # MIT License for code
@@ -47,25 +62,35 @@ production of this compendium.
 
 ```
 
-### How to cite
+### Accessing the compendium
 
-Please cite this compendium as:
+#### 1. Downloading directly from GitHub
+You can download the compendium as a zip from from this URL: 
+<https://github.com/csdaw/candidaev/archive/master.zip>. 
+Note that the contents of `/data-raw` is not installed when the package is 
+installed but instructions for downloaded just these files is provided
+[here](https://github.com/csdaw/candidaev/tree/master/data-raw).
 
-> Authors, (`r format(Sys.Date(), "%Y")`). _Compendium of R code and data for 'Title of paper'_. Accessed `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
+#### 2. Cloning via `git`
 
-### How to download or install
+#### 3. Installing the package using R and `devtools`
 
-You can download the compendium as a zip from from this URL: <https://github.com/csdaw/candidaev/archive/master.zip>
-
-Or you can install this compendium as an R package `candidaev` from GitHub with:
-```{r gh-installation, eval = FALSE}
+This research compendium can be installed as an R package `candidaev` from 
+GitHub using `devtools`:
+```{r gh-install, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("csdaw/candidaev")
 ```
-### Licenses
 
-**Text and figures :**  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+### Using the `candidaev` package
 
-**Code :** See the [DESCRIPTION](DESCRIPTION) file
+### R session information
 
-**Data :** [CC-0](http://creativecommons.org/publicdomain/zero/1.0/) attribution requested in reuse
+The system on which this document was compiled was running 
+pandoc v`r rmarkdown::pandoc_version()`. Here is output of 
+`sessionInfo()`.
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
+
