@@ -101,7 +101,7 @@ yeast_lfq <- yeast %>%
   convert_lfq(., yeast_exp)
 
 # drop EV_1 and WCL_1 samples
-yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_1")]
+yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_0", "WCL_0")]
 
 # filter for proteins quantified in min 2/3 reps of EV or WCL
 yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=", 
