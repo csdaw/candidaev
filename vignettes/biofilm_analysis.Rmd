@@ -166,7 +166,7 @@ yeast_lfq <- yeast %>%
          Unique.peptides >= 2) %>% 
   convert_lfq(., yeast_exp)
 
-yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_1")]
+yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_0", "WCL_0")]
 
 yeast_filt2 <- filter_na2(yeast_lfq2, 
                           logic = "or", 

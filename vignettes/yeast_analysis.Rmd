@@ -95,18 +95,18 @@ with a WCL replicate as they were derived from the same liquid culture.
 
 Samples analysed in this vignette:
 
-* DAY286 Yeast EV2 (C6.EV)
-* DAY286 Yeast EV3 (C7.EV)
-* DAY286 Yeast EV4 (C8.EV)
-* DAY286 Yeast WCL2 (C6.WCL)
-* DAY286 Yeast WCL3 (C7.WCL)
-* DAY286 Yeast WCL4 (C8.WCL)
+* DAY286 Yeast EV1 (C6.EV)
+* DAY286 Yeast EV2 (C7.EV)
+* DAY286 Yeast EV3 (C8.EV)
+* DAY286 Yeast WCL1 (C6.WCL)
+* DAY286 Yeast WCL2 (C7.WCL)
+* DAY286 Yeast WCL3 (C8.WCL)
 
 The samples not analysed in this vignette (due to a different EV isolation 
 protocol being used) include:
 
-* DAY286 Yeast EV1 (C3.EV)
-* DAY286 Yeast WCL1 (C3.WCL)
+* DAY286 Yeast EV0 (C3.EV)
+* DAY286 Yeast WCL0 (C3.WCL)
 
 These samples were electrophoresed and the SDS-PAGE gel slices were 
 reduced, alkylated, and digested with trypsin. The resulting peptides were 
@@ -218,13 +218,13 @@ function which performs the following:
 
 --------------------------------------------------------------------------------
 
-Next, the EV1 sample is dropped because the EVs were not isolated 
+Next, the EV0 sample is dropped because the EVs were not isolated 
 with the same protocol as the other samples and are hence not equivalent 
-biological replicates. The WCL1 sample is dropped to keep the experimental 
+biological replicates. The WCL0 sample is dropped to keep the experimental 
 design balanced.
 
 ```{r yDrop, echo=TRUE}
-yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_1", "WCL_1")]
+yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_0", "WCL_0")]
 ```
 
 The resulting matrix `yeast_lfq2` still has `r nrow(yeast_lfq2)` rows but 
