@@ -20,6 +20,8 @@ make_s1 <- function(df) {
            Score,
            matches("^Unique.peptides.EV"),
            matches("^Unique.peptides.W"),
+           matches("Sequence.coverage.EV"),
+           matches("Sequence.coverage.W"),
            matches("LFQ.intensity.EV"),
            matches("LFQ.intensity.W"),
            matches("MS.MS.count.EV"),
@@ -28,6 +30,10 @@ make_s1 <- function(df) {
                                    uniprot,
                                    "UP_accession",
                                    "CGD_gene_name"),
+           Feature.name = match_id(Majority.protein.IDs,
+                                   uniprot,
+                                   "UP_accession",
+                                   "CGD_feature_name"),
            Function = match_id(Majority.protein.IDs,
                                uniprot,
                                "UP_accession",
@@ -41,10 +47,11 @@ make_s1 <- function(df) {
                                          match_id(First.protein,
                                                   uniprot,
                                                   "UP_accession",
-                                                  "Mass_(Da)",
-                                                  concat = FALSE)))/1000) %>%
+                                                  "Mass_(kDa)",
+                                                  concat = FALSE)))) %>%
     select(Majority.protein.IDs,
            CGDID,
+           Feature.name,
            Protein.name,
            Function,
            "Mass.(kDa)",
@@ -68,6 +75,7 @@ s1_a <- yeast %>%
   rename_all(list(~ stringr::str_replace_all(., "C7.WCL", "W2"))) %>%
   rename_all(list(~ stringr::str_replace_all(., "C8.WCL", "W3"))) %>%
   make_s1(.)
+s1_a[215, 4] <- "EVP1"
 
 #### ATCC90028 ####
 s1_b <- atcc %>%
@@ -76,10 +84,11 @@ s1_b <- atcc %>%
                pat2 = "LFQ.*A1_W", 1,
                pat3 = "LFQ.*A9_EV", 1,
                pat4 = "LFQ.*A9_W", 1) %>%
+  filter_zero(., op = "<=", pat = "LFQ.intensity.A9", val = 5) %>%
   select(-contains("A1")) %>%
   rename_all(list(~ stringr::str_replace_all(., "A9_", ""))) %>%
-  make_s1(.) %>%
-  filter_val(., op = ">=", pat = "LFQ", val = 1)
+  make_s1(.)
+s1_b[358, 4] <- "EVP1"
 
 #### ATCC10231 ####
 s1_c <- atcc %>%
@@ -88,10 +97,11 @@ s1_c <- atcc %>%
               pat2 = "LFQ.*A1_W", 1,
               pat3 = "LFQ.*A9_EV", 1,
               pat4 = "LFQ.*A9_W", 1) %>%
+  filter_zero(., op = "<=", pat = "LFQ.intensity.A1", val = 5) %>%
   select(-contains("A9")) %>%
   rename_all(list(~ stringr::str_replace_all(., "A1_", ""))) %>%
-  make_s1() %>%
-  filter_zero(., op = "<=", pat = "LFQ", val = 5)
+  make_s1()
+s1_c[318, 4] <- "EVP1"
 
 #### DAY286 biofilm ####
 s1_d <- biofilm %>%
@@ -105,10 +115,11 @@ s1_d <- biofilm %>%
   rename_all(list(~ stringr::str_replace_all(., "(?<=EV|W)6", "4"))) %>%
   rename_all(list(~ stringr::str_replace_all(., "(?<=EV|W)7", "5"))) %>%
   make_s1(.)
+s1_d[200, 4] <- "EVP1"
 
 #### export ####
 s1_sheets <- list("DAY286 yeast" = s1_a,
                   "ATCC90028" = s1_b,
                   "ATCC10231" = s1_c,
                   "DAY286 biofilm" = s1_d)
-writexl::write_xlsx(s1_sheets, "manuscript/supplement_files/sfile_S1.xlsx")
+writexl::write_xlsx(s1_sheets, "inst/manuscript/supplement_files/sfile_S1.xlsx")
