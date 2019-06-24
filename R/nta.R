@@ -41,6 +41,7 @@
 #'
 #' @format An object of class \code{data.frame} with 42,000 observations (rows) and 7 variables (columns).
 #'
-#' @source Dawson, C. S., Bleackley, M. R., Garcia-Ceron, D., & Anderson, M. A. (2019).
-#' Title. \emph{Journal vol}(issue), 000-000. doi:
+#' @source Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson, M. A.,
+#' Bleackley, M. R. (2019) Sur7 family proteins are putative markers for
+#' \emph{Candida albicans} extracellular vesicles. Mol. Cell. Proteomics, submitted.
 "nta"
