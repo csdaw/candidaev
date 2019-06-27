@@ -91,11 +91,14 @@ s2_a <- yeast_res %>%
          CGDID = match_id(UP_accession, uniprot,
                           "UP_accession", "CGDID"),
          Function = match_id(UP_accession, uniprot,
-                             "UP_accession", "CGD_description")) %>%
-  select(UP_accession, CGDID, CGD_gene_name, Function, everything(),
-         -Protein_name)
+                             "UP_accession", "CGD_description"),
+         Feature_name = match_id(UP_accession, uniprot,
+                                 "UP_accession", "CGD_feature_name")) %>%
+  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
+         everything(), -Protein_name)
 colnames(s2_a) <- c("Accession",
                     "CGDID",
+                    "Feature name",
                     "Protein name",
                     "Function",
                     "Log2(LFQ) EV1",
@@ -113,6 +116,7 @@ colnames(s2_a) <- c("Accession",
                     "B",
                     "Significant",
                     "Group")
+s2_a[102, 4] <- "EVP1"
 
 #### DAY286 biofilm ####
 # filter out reverse, contaminant proteins, proteins with <2 unique peptides
@@ -189,11 +193,14 @@ s2_d <- biofilm_res %>%
          CGDID = match_id(UP_accession, uniprot,
                           "UP_accession", "CGDID"),
          Function = match_id(UP_accession, uniprot,
-                             "UP_accession", "CGD_description")) %>%
-  select(UP_accession, CGDID, CGD_gene_name, Function, everything(),
-         -Protein_name)
+                             "UP_accession", "CGD_description"),
+         Feature_name = match_id(UP_accession, uniprot,
+                                 "UP_accession", "CGD_feature_name")) %>%
+  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
+         everything(), -Protein_name)
 colnames(s2_d) <- c("Accession",
                     "CGDID",
+                    "Feature name",
                     "Protein name",
                     "Function",
                     "Log2(LFQ) EV1",
@@ -215,6 +222,7 @@ colnames(s2_d) <- c("Accession",
                     "B",
                     "Significant",
                     "Group")
+s2_d[67, 4] <- "EVP1"
 
 #### ATCC90028 ###
 # filter out reverse, contaminant proteins, proteins with <2 unique peptides
@@ -319,11 +327,14 @@ s2_b <- a9_res %>%
          CGDID = match_id(UP_accession, uniprot,
                           "UP_accession", "CGDID"),
          Function = match_id(UP_accession, uniprot,
-                             "UP_accession", "CGD_description")) %>%
-  select(UP_accession, CGDID, CGD_gene_name, Function, everything(),
-         -Protein_name)
+                             "UP_accession", "CGD_description"),
+         Feature_name = match_id(UP_accession, uniprot,
+                                 "UP_accession", "CGD_feature_name")) %>%
+  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
+         everything(), -Protein_name)
 colnames(s2_b) <- c("Accession",
                     "CGDID",
+                    "Feature name",
                     "Protein name",
                     "Function",
                     "Log2(LFQ) EV1",
@@ -341,6 +352,7 @@ colnames(s2_b) <- c("Accession",
                     "B",
                     "Significant",
                     "Group")
+s2_b[216, 4] <- "EVP1"
 
 #### ATCC10231 ####
 # extract results for ATCC10231
@@ -359,11 +371,14 @@ s2_c <- a1_res %>%
          CGDID = match_id(UP_accession, uniprot,
                           "UP_accession", "CGDID"),
          Function = match_id(UP_accession, uniprot,
-                             "UP_accession", "CGD_description")) %>%
-  select(UP_accession, CGDID, CGD_gene_name, Function, everything(),
-         -Protein_name)
+                             "UP_accession", "CGD_description"),
+         Feature_name = match_id(UP_accession, uniprot,
+                                 "UP_accession", "CGD_feature_name")) %>%
+  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
+         everything(), -Protein_name)
 colnames(s2_c) <- c("Accession",
                     "CGDID",
+                    "Feature name",
                     "Protein name",
                     "Function",
                     "Log2(LFQ) EV1",
@@ -381,6 +396,7 @@ colnames(s2_c) <- c("Accession",
                     "B",
                     "Significant",
                     "Group")
+s2_c[176, 4] <- "EVP1"
 
 
 
@@ -389,13 +405,13 @@ s2_sheets <- list("DAY286 yeast" = s2_a,
                   "ATCC90028" = s2_b,
                   "ATCC10231" = s2_c,
                   "DAY286 biofilm" = s2_d)
-writexl::write_xlsx(s2_sheets, "manuscript/supplement_files/sfile_S2.xlsx")
+writexl::write_xlsx(s2_sheets, "inst/manuscript/supplement_files/sfile_S2.xlsx")
 
 #### Supplemental File S4 ####
 # Venn diagram partition protein lists
 
-#### Figure 5A ####
-# figure 5a EV venn
+#### Figure 4A ####
+# figure 4a EV venn
 s4_a_comp <- list("DAY Y" = rownames(y_ev),
                   "ATCC90028" = rownames(atcc9_ev),
                   "ATCC10231" = rownames(atcc1_ev),
@@ -411,8 +427,8 @@ s4_a <- plot_venn(vlist = s4_a_comp, use_uniprot = FALSE, type = "df") %>%
          ..set.., ..count.., Proteins, -..values..) %>%
   rename("Set" = ..set.., "Count" = ..count..)
 
-#### Figure 5B ####
-# figure 5b WCL venn
+#### Figure 4B ####
+# figure 4b WCL venn
 s4_b_comp <- list("DAY Y" = rownames(y_wcl),
                   "ATCC90028" = rownames(atcc9_w),
                   "ATCC10231" = rownames(atcc1_w),
@@ -427,8 +443,8 @@ s4_b <- plot_venn(vlist = s4_b_comp, use_uniprot = FALSE, type = "df") %>%
          ..set.., ..count.., Proteins, -..values..) %>%
   rename("Set" = ..set.., "Count" = ..count..)
 
-#### Figure 7A ####
-# figure 7a EV marker venn
+#### Figure 6A ####
+# figure 6a EV marker venn
 s4_c_comp <- list("DAY Y" = yeast_res %>%
                     filter(group == "EV up" | group == "EV ex") %>%
                     pull(CGD_gene_name),
@@ -449,8 +465,8 @@ s4_c <- plot_venn(vlist = s4_c_comp, use_uniprot = FALSE, type = "df") %>%
          ..set.., ..count.., Proteins, -..values..) %>%
   rename("Set" = ..set.., "Count" = ..count..)
 
-#### Figure 7B ####
-# figure 7b WCL marker venn
+#### Figure 6B ####
+# figure 6b WCL marker venn
 s4_d_comp <- list("DAY Y" = yeast_res %>%
                     filter(group == "WCL up" | group == "WCL ex") %>%
                     pull(CGD_gene_name),
@@ -472,14 +488,14 @@ s4_d <- plot_venn(vlist = s4_d_comp, use_uniprot = FALSE, type = "df") %>%
   rename("Set" = ..set.., "Count" = ..count..)
 
 #### export ####
-s4_sheets <- list("Figure 5A" = s4_a,
-                  "Figure 5B" = s4_b,
-                  "Figure 7A" = s4_c,
-                  "Figure 7B" = s4_d)
-writexl::write_xlsx(s4_sheets, "manuscript/supplement_files/sfile_S4.xlsx")
+s4_sheets <- list("Figure 4A" = s4_a,
+                  "Figure 4B" = s4_b,
+                  "Figure 6A" = s4_c,
+                  "Figure 6B" = s4_d)
+writexl::write_xlsx(s4_sheets, "inst/manuscript/supplement_files/sfile_S4.xlsx")
 
 #### Supplemental File S5 ####
-# Figure 6 protein clusters
+# Figure 5 protein clusters
 s5_comp <- s4_a_comp
 
 s5_overlap <- plot_venn(vlist = s5_comp, use_uniprot = FALSE, type = "df") %>%
@@ -535,16 +551,20 @@ s5 <- plot_heatmap(mt = s5_table_filt,
   bind_rows(s5_table_excl) %>%
   mutate(Accession = match_id(id, uniprot, "CGD_gene_name", "UP_accession"),
          CGDID = match_id(id, uniprot, "CGD_gene_name", "CGDID"),
-         Function = match_id(id, uniprot, "CGD_gene_name", "
-                             CGD_description")) %>%
-  select(Accession, CGDID, id, Function,
+         Function = match_id(id, uniprot,
+                             "CGD_gene_name", "CGD_description"),
+         Feature_name = match_id(id, uniprot,
+                                 "CGD_gene_name", "CGD_feature_name")) %>%
+  select(Accession, CGDID, Feature_name, id, Function,
          y_lfc, a9_lfc, a1_lfc, b_lfc, cluster) %>%
   rename("Protein name" = id,
+         "Feature name" = Feature_name,
          "DAY286 yeast log2FC" = y_lfc,
          "ATCC90028 log2FC" = a9_lfc,
          "ATCC10231 log2FC" = a1_lfc,
          "DAY286 biofilm log2FC" = b_lfc,
          "Cluster" = cluster)
+s5[397, 4] <- "EVP1"
 
 #### export ####
-writexl::write_xlsx(s5, "manuscript/supplement_files/sfile_S5.xlsx")
+writexl::write_xlsx(s5, "inst/manuscript/supplement_files/sfile_S5.xlsx")

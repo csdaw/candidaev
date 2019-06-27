@@ -5,100 +5,126 @@
 requireNamespace("writexl", quietly = TRUE)
 
 # load packages
+library(dplyr)
 library(candidaev)
+
+# define function to rename FungiFun2 columns
+rnm_cols <- function(df) {
+  df <- df %>%
+    rename("GO ID" = GO.ID,
+           "GO term" = GO.term,
+           "GO domain" = GO.type,
+           "Proteins found" = Prot.found,
+           "p-values" = p.val,
+           "Adjusted p-value" = adj.p.val,
+           "N protein found" = N.prot.found,
+           "N protein GO term" = N.prot.cat,
+           "GO term coverage ratio" = Cat.ratio,
+           "Input coverage ratio" = Input.ratio)
+}
 
 #### Figure 4 ####
 ## import FungiFun2 results ##
-s3_a <- process_fungifun("manuscript/figures/f4_GO_DAY_Y.csv") %>%
-  mutate(Proteins_found = gsub("CaO19.4937", "CHS3", Proteins_found),
-         Proteins_found = gsub("CaO19.3767", "PEP1", Proteins_found))
+s3_a <- process_fungifun("inst/manuscript/figures/f3_GO_DAY_Y.csv") %>%
+  mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found),
+         Prot.found = gsub("CaO19.3767", "PEP1", Prot.found)) %>%
+    rnm_cols()
 
-s3_b <- process_fungifun("manuscript/figures/f4_GO_ATCC90028.csv") %>%
-  mutate(Proteins_found = stringi::stri_replace_all_regex(.$Proteins_found,
-                                                          c("CaO19.4937",
-                                                            "CaO19.3767",
-                                                            "CaO19.1816",
-                                                            "CaO19.6594",
-                                                            "CaO19.9017",
-                                                            "CaO19.2347",
-                                                            "CaO19.3803",
-                                                            "CaO19.1995",
-                                                            "CaO19.4255",
-                                                            "CaO19.2651",
-                                                            "CaO19.8937"),
-                                                          c("CHS3", "PEP1",
-                                                            "ALS3", "PLB3",
-                                                            "PLB4.5", "MNN2",
-                                                            "MNN22", "MNN24",
-                                                            "ECM331", "CAM1-1",
-                                                            "FCY21"),
-                                                          vectorize_all = FALSE))
+s3_b <- process_fungifun("inst/manuscript/figures/f3_GO_ATCC90028.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.4937",
+                                                        "CaO19.3767",
+                                                        "CaO19.1816",
+                                                        "CaO19.6594",
+                                                        "CaO19.9017",
+                                                        "CaO19.2347",
+                                                        "CaO19.3803",
+                                                        "CaO19.1995",
+                                                        "CaO19.4255",
+                                                        "CaO19.2651",
+                                                        "CaO19.8937"),
+                                                      c("CHS3", "PEP1",
+                                                        "ALS3", "PLB3",
+                                                        "PLB4.5", "MNN2",
+                                                        "MNN22", "MNN24",
+                                                        "ECM331", "CAM1-1",
+                                                        "FCY21"),
+                                                      vectorize_all = FALSE)) %>%
+  rnm_cols()
 
-s3_c <- process_fungifun("manuscript/figures/f4_GO_ATCC10231.csv") %>%
-  mutate(Proteins_found = stringi::stri_replace_all_regex(.$Proteins_found,
-                                                          c("CaO19.4937",
-                                                            "CaO19.3767",
-                                                            "CaO19.1816",
-                                                            "CaO19.6594",
-                                                            "CaO19.9017",
-                                                            "CaO19.2347",
-                                                            "CaO19.3803",
-                                                            "CaO19.1995",
-                                                            "CaO19.4255",
-                                                            "CaO19.2651"),
-                                                          c("CHS3", "PEP1",
-                                                            "ALS3", "PLB3",
-                                                            "PLB4.5", "MNN2",
-                                                            "MNN22", "MNN24",
-                                                            "ECM331", "CAM1-1"),
-                                                          vectorize_all = FALSE))
+s3_c <- process_fungifun("inst/manuscript/figures/f3_GO_ATCC10231.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.4937",
+                                                        "CaO19.3767",
+                                                        "CaO19.1816",
+                                                        "CaO19.6594",
+                                                        "CaO19.9017",
+                                                        "CaO19.2347",
+                                                        "CaO19.3803",
+                                                        "CaO19.1995",
+                                                        "CaO19.4255",
+                                                        "CaO19.2651"),
+                                                      c("CHS3", "PEP1",
+                                                        "ALS3", "PLB3",
+                                                        "PLB4.5", "MNN2",
+                                                        "MNN22", "MNN24",
+                                                        "ECM331", "CAM1-1"),
+                                                      vectorize_all = FALSE)) %>%
+  rnm_cols()
 
-s3_d <- process_fungifun("manuscript/figures/f4_GO_DAY_B.csv") %>%
-  mutate(Proteins_found = stringi::stri_replace_all_regex(.$Proteins_found,
-                                                          c("CaO19.4937",
-                                                            "CaO19.3767",
-                                                            "CaO19.1816",
-                                                            "CaO19.6594",
-                                                            "CaO19.9017"),
-                                                          c("CHS3", "PEP1",
-                                                            "ALS3", "PLB3",
-                                                            "PLB4.5"),
-                                                          vectorize_all = FALSE))
+s3_d <- process_fungifun("inst/manuscript/figures/f3_GO_DAY_B.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.4937",
+                                                        "CaO19.3767",
+                                                        "CaO19.1816",
+                                                        "CaO19.6594",
+                                                        "CaO19.9017"),
+                                                      c("CHS3", "PEP1",
+                                                        "ALS3", "PLB3",
+                                                        "PLB4.5"),
+                                                      vectorize_all = FALSE)) %>%
+  rnm_cols()
 
 #### Figure 5 ####
 ## import FungiFun2 results
-s3_e <- process_fungifun("manuscript/figures/f6_GO_clust1.csv") %>%
-  mutate(Proteins_found = gsub("CaO19.4937", "CHS3", Proteins_found))
+s3_e <- process_fungifun("inst/manuscript/figures/f5_GO_clust1.csv") %>%
+  mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found)) %>%
+  rnm_cols()
 
-s3_f <- process_fungifun("manuscript/figures/f6_GO_clust2.csv") %>%
-  mutate(Proteins_found = gsub("CaO19.3767", "PEP1", Proteins_found))
+s3_f <- process_fungifun("inst/manuscript/figures/f5_GO_clust2.csv") %>%
+  mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found)) %>%
+  rnm_cols()
 
-s3_g <- process_fungifun("manuscript/figures/f6_GO_clust3.csv")
+s3_g <- process_fungifun("inst/manuscript/figures/f5_GO_clust3.csv") %>%
+  rnm_cols()
 
-s3_h <- process_fungifun("manuscript/figures/f6_GO_clust4.csv")
+s3_h <- process_fungifun("inst/manuscript/figures/f5_GO_clust4.csv") %>%
+  rnm_cols()
 
-s3_i <- process_fungifun("manuscript/figures/f6_GO_clust5.csv") %>%
-  mutate(Proteins_found = stringi::stri_replace_all_regex(.$Proteins_found,
-                                                          c("CaO19.5746",
-                                                            "CaO19.7481",
-                                                            "CaO19.3002",
-                                                            "CaO19.7417"),
-                                                          c("ALA1", "MDH1",
-                                                            "RPS1", "TSA1"),
-                                                          vectorize_all = FALSE))
+s3_i <- process_fungifun("inst/manuscript/figures/f5_GO_clust5.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.5746",
+                                                        "CaO19.7481",
+                                                        "CaO19.3002",
+                                                        "CaO19.7417"),
+                                                      c("ALA1", "MDH1",
+                                                        "RPS1", "TSA1"),
+                                                      vectorize_all = FALSE)) %>%
+  rnm_cols()
 
-s3_j <- process_fungifun("manuscript/figures/f6_GO_clust6.csv")
+s3_j <- process_fungifun("inst/manuscript/figures/f5_GO_clust6.csv") %>%
+  rnm_cols()
 
 
 #### export ####
-s3_sheets <- list("DAY286 yeast" = s3_a,
-                  "ATCC90028" = s3_b,
-                  "ATCC10231" = s3_c,
-                  "DAY286 biofilm" = s3_d,
-                  "Cluster 1" = s3_e,
-                  "Cluster 2" = s3_f,
-                  "Cluster 3" = s3_g,
-                  "Cluster 4" = s3_h,
-                  "Cluster 5" = s3_i,
-                  "Cluster 6" = s3_j)
-writexl::write_xlsx(s3_sheets, "manuscript/supplement_files/sfile_S3.xlsx")
+s3_sheets <- list("Fig 3a DAY286 y" = s3_a,
+                  "Fig 3b ATCC90028" = s3_b,
+                  "Fig 3c ATCC10231" = s3_c,
+                  "Fig 3d DAY286 b" = s3_d,
+                  "Fig 5 Cluster 1" = s3_e,
+                  "Fig 5 Cluster 2" = s3_f,
+                  "Fig 5 Cluster 3" = s3_g,
+                  "Fig 5 Cluster 4" = s3_h,
+                  "Fig 5 Cluster 5" = s3_i,
+                  "Fig 5 Cluster 6" = s3_j)
+writexl::write_xlsx(s3_sheets, "inst/manuscript/supplement_files/sfile_S3.xlsx")
