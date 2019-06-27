@@ -1,12 +1,18 @@
 ---
 title: | 
-   **Defining protein markers for *Candida albicans* extracellular vesicles**
+   **Protein markers for *Candida albicans* EVs include claudin-like Sur7 
+   family proteins and GTPases**
 author: | 
-   *Charlotte Dawson^a^, Mark Bleackley^a^, Donovan Garcia Ceron^a^, 
-   Marilyn Anderson^a^*
+   | Charlotte Dawson^a^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
+     Pierre Faou^b^,
+   | Marilyn Anderson^a^, Mark Bleackley^a^
 date: | 
-   *^a^Department of Biochemistry and Genetics, La Trobe Institute for 
-   Molecular Science, La Trobe University, Victoria, 3086, Australia*
+   | *^a^Department of Biochemistry and Genetics, La Trobe Institute for 
+     Molecular Science, La Trobe University, 
+     Melbourne, 3086, Victoria, Australia*
+   | *^b^La Trobe Comprehensive Proteomics Platform, La Trobe Institute for 
+     Molecular Science, La Trobe University, Melbourne, 
+     3086, Victoria, Australia*
 output: 
     bookdown::pdf_document2:
       latex_engine: xelatex
@@ -34,7 +40,7 @@ header-includes:
   - \usepackage{fancyhdr}
   - \usepackage{lipsum}
   - \pagestyle{fancy}
-  - \fancyhead[L]{This is the running title it is rather long}
+  - \fancyhead[L]{Defining \textit{Candida albicans} EV protein markers}
   - \setlength{\headheight}{15pt}
   - \usepackage{float}
   - \let\origfigure\figure
@@ -52,9 +58,9 @@ header-includes:
   - \usepackage{threeparttable}
 ---
 
-**Running title:** Running title goes here
+**Corresponding author:** Mark Bleackley, m.bleackley@latrobe.edu.au
 
-**Corresponding author:**
+**Running title:** Defining _Candida albicans_ EV protein markers
 
 \newpage
 
@@ -334,19 +340,41 @@ a9_res <- get_results(efit = atcc_efit,
 
 \beginsupplement
 
-```{r figureS1, fig.cap=fS1_cap, fig.height=5, fig.width=5}
-fS1_cap <- c("\\textbf{Size distribution of \\textit{C. albicans} EVs as 
+
+```{r figureS1, fig.cap=f1_cap, fig.width=5.45, fig.height=6}
+# construct figure 1
+fs1_cap <- "\\textbf{Schematic of the workflow used for the isolation and 
+           proteomic analysis of \\textit{C. albicans} EVs and the selection 
+           of EV protein markers.} Steps 1 to 6 were performed for each of the 
+           four strains examined in this study: DAY286 yeast, ATCC90028 yeast, 
+           ATCC10231 yeast, and DAY286 biofilm. The results from the four 
+           seperate analyses were combined (step 7) to identify proteins which 
+           commonly appeared as EV marker candidates. The MISEV2018 criteria 
+           for protein content-based EV characterisation and other 
+           considerations were used to select the best \\textit{C. albicans} 
+           EV marker proteins."
+
+fs1 <- png::readPNG("figures/figure1.png")
+
+# draw figure S1
+ggplot() + 
+  background_image(fs1)
+```
+
+
+```{r figureS2, fig.cap=fS2_cap, fig.height=5, fig.width=5}
+fS2_cap <- c("\\textbf{Size distribution of \\textit{C. albicans} EVs as 
               determined by nanoparticle tracking analysis (NTA).} A line plot 
               for each EV biological replicate from each strain is shown. Each 
               line plots represents the average of three technical replicates 
               and the dashed grey lines indicate 100 nm.")
 
-figS1_labels <- c("ATCC10231", 
+figS2_labels <- c("ATCC10231", 
                   "ATCC90028", 
                   "DAY286 biofilm", 
                   "DAY286 yeast")
 
-names(figS1_labels) <- c("ATCC10231", 
+names(figS2_labels) <- c("ATCC10231", 
                          "ATCC90028", 
                          "Biofilm", 
                          "DAY286")
