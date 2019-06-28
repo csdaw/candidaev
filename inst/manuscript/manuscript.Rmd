@@ -119,12 +119,12 @@ yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=",
 # normalise LFQ intensities
 yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
 
-# filter for proteins identified in min 1/3 reps of EV
+# filter for proteins quantified in min 1/3 reps of EV
 # define 'EV proteins'
 y_ev <- filter_na(yeast_norm2, op = "<=", 
                   pat = "EV", val = 2)
 
-# filter for proteins identified in min 1/3 reps of WCL
+# filter for proteins quantified in min 1/3 reps of WCL
 # define 'WCL proteins'
 y_wcl <- filter_na(yeast_norm2, op = "<=", 
                    pat = "W", val = 2)
@@ -188,12 +188,12 @@ biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=",
 # normalise LFQ intensities
 biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
 
-# filter for proteins identified in min 1/5 reps of EV
+# filter for proteins quantified in min 1/5 reps of EV
 # define 'EV proteins'
 b_ev <- filter_na(biofilm_norm, op = "<=", 
                   pat = "EV", val = 4)
 
-# filter for proteins identified in min 1/5 reps of WCL
+# filter for proteins quantified in min 1/5 reps of WCL
 # define 'WCL proteins'
 b_wcl <- filter_na(biofilm_norm, op = "<=", 
                    pat = "W", val = 4)
@@ -239,7 +239,7 @@ biofilm_res <- get_results(efit = b_efit,
                            type = "individual")[[1]]
 ```
 
-```{r atcc, include=FALSE}
+```{r atccBoth, include=FALSE}
 # filter out reverse, contaminant proteins, proteins with <2 unique peptides
 # extract LFQ intensity columns and UniProt accessions 
 # log2 transform LFQ intensities
@@ -259,85 +259,120 @@ atcc_filt <- filter_na4(atcc_lfq, "or", "<=",
 
 # normalise LFQ intensities
 atcc_norm <- normalizeCyclicLoess(atcc_filt)
+```
 
-# filter for proteins identified in min 1/3 reps of 10231 EV
-# define 'ATCC10231 EV proteins'
-atcc1_ev <- filter_na(atcc_norm, op = "<=", 
-                      pat = "A10231_EV", val = 2)
+```{r atcc1, include=FALSE}
+# filter for proteins quantified in min 2/3 reps of EV or WCL
+a1_norm <- filter_na2(atcc_norm, logic = "or", op = "<=", 
+                      pat1 = "A10231_EV", val1 = 1, 
+                      pat2 = "A10231_W", val2 = 1)
+a1_norm <- a1_norm[, -c(7:12)]
 
-# filter for proteins identified in min 1/3 reps of 10231 WCL
-# define 'ATCC10231 WCL proteins'
-atcc1_w <- filter_na(atcc_norm, op = "<=", 
-                     pat = "A10231_W", val = 2)
+# filter for proteins quantified in min 1/3 reps of EV
+# define 'EV proteins'
+a1_ev <- filter_na(a1_norm, op = "<=", pat = "EV", val = 2)
 
-# filter for proteins identified in min 1/3 reps of 90028 EV
-# define 'ATCC90028 EV proteins'
-atcc9_ev <- filter_na(atcc_norm, op = "<=", 
-                      pat = "A90028_EV", val = 2)
-
-# filter for proteins identified in min 1/3 reps of 90028 WCL
-# define 'ATCC90028 WCL proteins'
-atcc9_w <- filter_na(atcc_norm, op = "<=", 
-                      pat = "A90028_W", val = 2)
+# filter for proteins quantified in min 1/3 reps of WCL
+# define 'WCL proteins'
+a1_wcl <- filter_na(a1_norm, op = "<=", pat = "W", val = 2)
 
 # can't impute with so many missing values
-# filter for exclusive to 10231 EV or WCL or 90028 EV or WCL (don't impute)
-atcc_excl <- filter_na4(atcc_norm, logic = "or", op = "==", 
-                        pat1 = "A10231_EV", val1 = 3, 
-                        pat2 = "A10231_W", val2 = 3, 
-                        pat3 = "A90028_EV", val3 = 3, 
-                        pat4 = "A90028_W", val4 = 3)
+# separate EV/WCL exclusive proteins (don't impute) from
+# EV/WCL common proteins (impute)
+a1_excl <- filter_na2(a1_norm, logic = "or", op = "==",
+                      pat1 = "EV", val1 = 3,
+                      pat2 = "W", val2 = 3)
 
-# filter for proteins with min 1 valid value in all 4 sample types (impute)
-atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=", 
-                        pat1 = "A10231_EV", val1 = 2, 
-                        pat2 = "A10231_W", val2 = 2, 
-                        pat3 = "A90028_EV", val3 = 2, 
-                        pat4 = "A90028_W", val4 = 2)
+a1_both <- filter_na2(a1_norm, logic = "and", op = "<=",
+                      pat1 = "EV", val1 = 2,
+                      pat2 = "W", val2 = 2)
 
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 # use left censored imputation method
-atcc_imp <- impute_QRILC(atcc_both)
+a1_imp <- impute_QRILC(a1_both)
 
 # recombine imputed proteins and non-imputed proteins in matrix
-atcc_de <- rbind(atcc_excl, atcc_imp)
-colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de), 
-                                                     c("A10231_", "A90028_"), 
-                                                     c("A1_", "A9_"), 
-                                                     vectorize_all = FALSE)
+a1_de <- rbind(a1_excl, a1_imp)
+colnames(a1_de) <- gsub("A10231", "A1", colnames(a1_de))
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-atcc_samp <- data.frame(T = rep(c("A1_EV", "A1_WCL", 
-                                  "A9_EV", "A9_WCL"), each = 3))
+a1_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
 
-atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
-colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+a1_design <- stats::model.matrix(~ 0 + T, data = a1_samp)
+colnames(a1_design) <- c("A1_EV", "A1_W")
 
 # define sample comparisons of interest
-atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
+a1_contrasts <- c("A1_EV - A1_W")
 
-# make all pair-wise comparisons for specified contrasts
+# make all pair-wise comparisons between EV and WCL
 # and perform limma::eBayes()
-atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
+a1_efit <- limma_eBayes(a1_de, design = a1_design, contrasts = a1_contrasts)
 
-# extract overall results
-atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de, 
-                            p_val = 0.01, lfc = 0, type = "overall")
-
-# extract results for ATCC strains
-a1_res <- get_results(efit = atcc_efit, 
-                      mat = atcc_de, 
-                      p_val = 0.01, 
-                      lfc = 0, 
+# extract DE results
+a1_res <- get_results(efit = a1_efit,
+                      mat = a1_de,
+                      p_val = 0.01,
+                      lfc = 0,
                       type = "individual")[[1]]
+```
 
-a9_res <- get_results(efit = atcc_efit, 
-                      mat = atcc_de, 
-                      p_val = 0.01, 
-                      lfc = 0, 
-                      type = "individual")[[2]]
+```{r atcc9, include=FALSE}
+# filter for proteins quantified in min 2/3 reps of EV or WCL
+a9_norm <- filter_na2(atcc_norm, logic = "or", op = "<=",
+                      pat1 = "A90028_EV", val1 = 1,
+                      pat2 = "A90028_W", val2 = 1)
+a9_norm <- a9_norm[, -c(1:6)]
+
+# filter for proteins quantified in min 1/3 reps of EV
+# define 'EV proteins'
+a9_ev <- filter_na(a9_norm, op = "<=", pat = "EV", val = 2)
+
+# filter for proteins quantified in min 1/3 reps of WCL
+# define 'WCL proteins'
+a9_wcl <- filter_na(a9_norm, op = "<=", pat = "W", val = 2)
+
+# can't impute with so many missing values
+# separate EV/WCL exclusive proteins (don't impute) from
+# EV/WCL common proteins (impute)
+a9_excl <- filter_na2(a9_norm, logic = "or", op = "==",
+                      pat1 = "EV", val1 = 3,
+                      pat2 = "W", val2 = 3)
+
+a9_both <- filter_na2(a9_norm, logic = "and", op = "<=",
+                      pat1 = "EV", val1 = 2,
+                      pat2 = "W", val2 = 2)
+
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+# use left censored imputation method
+a9_imp <- impute_QRILC(a9_both)
+
+# recombine imputed proteins and non-imputed proteins in matrix
+a9_de <- rbind(a9_excl, a9_imp)
+colnames(a9_de) <- gsub("A90028", "A9", colnames(a9_de))
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+a9_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+
+a9_design <- stats::model.matrix(~ 0 + T, data = a9_samp)
+colnames(a9_design) <- c("A9_EV", "A9_W")
+
+# define sample comparisons of interest
+a9_contrasts <- c("A9_EV - A9_W")
+
+# make all pair-wise comparisons between EV and WCL
+# and perform limma::eBayes()
+a9_efit <- limma_eBayes(a9_de, design = a9_design, contrasts = a9_contrasts)
+
+# extract DE results
+a9_res <- get_results(efit = a9_efit,
+                      mat = a9_de,
+                      p_val = 0.01,
+                      lfc = 0,
+                      type = "individual")[[1]]
 ```
 
 
@@ -445,25 +480,28 @@ marker_longlist <- marker_candidates %>%
 # add proper protein functions to table 1
 # also add vesicle depleted supernatant info and 
 # group proteins according to localisation
-marker_longlist <- marker_longlist %>% 
+marker_longlist2 <- marker_longlist %>% 
   mutate(Function = function_desc1, 
-         VDM = c("Y", rep("",3), rep("Y", 2), "", "Y", rep("", 8), rep("Y", 2), 
-                 rep("", 4), rep("Y", 3), rep("", 2), rep("Y", 2), rep("", 5), 
-                 "Y", rep("", 7), "Y"), 
-         pack_row = c(4, rep(1,3), rep(4,2), 1, 2, rep(1,3), rep(1,3), 3, 2, 
-                      rep(4,2), 1, rep(2,2), 3, 1, rep(4,2), 1, rep(4,3), 1, 
-                      3, rep(1,3), 4, 1, 1, 2, 1, 2, 2, 2, 4)) %>% 
-  arrange(pack_row)
+         pack_row = c(4, rep(1, 3), rep(4, 2), 1, 2, rep(1, 6), 3, rep(4, 2),
+                      1, rep(2, 3), 1, rep(4, 2), 1, rep(4, 3), 1, 3, 
+                      rep(1, 3), 4, 1, 2, 1, 2, 4)) %>% 
+  arrange(pack_row) %>% 
+  mutate(VDS = c(rep("", 11), "Y", rep("", 7), "Y", rep("", 7), 
+                 rep("Y", 7), "", rep("Y", 4)))
 
 # fix number of TM domains for CDR1;CDR2
-marker_longlist[2, 7] <- "12;12" 
+marker_longlist2[2, 7] <- "12;12" 
 
 # UniProt says SUR7 has 3 TM domains and a signal peptide
 # much of literature says SUR7 has 4 TM domains
 # TOPCONS2 predicts SUR7 has 4 TM domains and no signal peptide
 # fix SUR7 entries
-marker_longlist[19, 7] <- "4"
-marker_longlist[19, 8] <- ""
+marker_longlist2[18, 7] <- "4"
+marker_longlist2[18, 8] <- ""
+
+# Change name of orf19.6741 to Evp1
+marker_longlist2[12, 1] <- paste0("EVP1",
+                                  footnote_marker_alphabet(4))
 ```
 
 <!-- assign markdown references for table caption -->
@@ -495,31 +533,33 @@ tab1_cap <- "\\textbf{Candidate positive protein markers for
              criteria depicted in supplemental Figure S1."
 
 # draw table 1
-knitr::kable(marker_longlist[ ,-10],
+knitr::kable(marker_longlist2[ ,-9],
              caption = tab1_cap, 
              format = "latex", 
              booktabs = TRUE, 
              longtable = TRUE, 
              linesep = "", 
              escape = FALSE)  %>% 
-  row_spec(row = c(1, 5, 6, 11, 12, 15:20, 22:27, 39), underline = TRUE) %>% 
+  row_spec(row = c(1, 5, 11, 12, 15:19, 21:25, 35), underline = TRUE) %>% 
   add_header_above(c(" " = 2, 
                      "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, 
                      " " = 2), escape = FALSE) %>% 
   kable_styling(font_size = 8) %>% 
-  pack_rows("Plasma membrane", 1, 20) %>% 
-  pack_rows("Golgi, ER, vacuole", 21, 28) %>% 
-  pack_rows("Mitochondria", 29, 31) %>% 
-  pack_rows("Cell wall, cell surface", 32, 43) %>% 
+  pack_rows("Plasma membrane", 1, 19) %>% 
+  pack_rows("Golgi, ER, vacuole", 20, 25) %>% 
+  pack_rows("Mitochondria", 26, 27) %>% 
+  pack_rows("Cell wall, cell surface", 28, 39) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence 
                          similarity with \\\\textit{S. cerevisiae} ortholog as 
                          annotated in the Candida Genome Database 
-                        (ref:footnote1)", 
+                        (ref:footnote1).", 
                         "Protein localisation was predicted using DeepLoc-1.0 
-                        (ref:footnote2)", 
+                        (ref:footnote2).", 
                         "Presence of transmembrane domains and absense of a 
                         signal peptide was predicted using TOPCONS2 
-                        (ref:footnote3)"), 
+                        (ref:footnote3).",
+                        "The name Evp1 for the protein encoded by orf19.6741 
+                        was proposed in the present study."), 
            escape = FALSE, 
            threeparttable = TRUE)
 ```
@@ -714,7 +754,7 @@ f2b1 <- plot_volcano(data = yeast_res,
 
 ```{r figure2A9, include=FALSE}
 # compare ATCC90028 EV WCL proteins
-f2a2 <- plot_venn(list("EV" = atcc9_ev, "WCL" = atcc9_w), 
+f2a2 <- plot_venn(list("EV" = a9_ev, "WCL" = a9_wcl), 
                   use_uniprot = TRUE, type = "plot", 
                   fontfamily = "sans",
                   cex = 0.8,
@@ -743,15 +783,15 @@ f2b2 <- plot_volcano(data = a9_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (99)", "WCL enriched (130)", 
-                                 "Not significant (744)"),
+  scale_colour_manual(labels = c("EV enriched (86)", "WCL enriched (122)", 
+                                 "Not significant (761)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC90028')", parse = TRUE) + 
-  annotate("text", x = 3.5, y = 7, label = "bold('99')", 
+  annotate("text", x = 3.5, y = 7, label = "bold('86')", 
            parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('130')", 
+  annotate("text", x = -3.5, y = 7, label = "bold('122')", 
            parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('744')", 
+  annotate("text", x = 0, y = 6, label = "bold('761')", 
            parse = TRUE, colour = unname(ev_pal[1]))
 ```
 
@@ -759,7 +799,7 @@ f2b2 <- plot_volcano(data = a9_res,
 
 ```{r figure2A1, include=FALSE}
 # compare ATCC10231 EV WCL proteins
-f2a3 <- plot_venn(list("EV" = atcc1_ev, "WCL" = atcc1_w), 
+f2a3 <- plot_venn(list("EV" = a1_ev, "WCL" = a1_wcl), 
                   use_uniprot = TRUE, type = "plot", 
                   fontfamily = "sans", 
                   cex = 0.8,
@@ -788,15 +828,15 @@ f2b3 <- plot_volcano(data = a1_res,
                      y_lim = c(0, 8), 
                      legend_params = c("left", 11, 8), 
                      axis_params = c("black", 10)) + 
-  scale_colour_manual(labels = c("EV enriched (108)", "WCL enriched (142)", 
-                                 "Not significant (435)"),
+  scale_colour_manual(labels = c("EV enriched (55)", "WCL enriched (52)", 
+                                 "Not significant (567)"),
                       values = unname(ev_pal[c(2,3,1)])) + 
   annotate("text", x = 8, y = 0.5, label = "bold('ATCC10231')", parse = TRUE) + 
-  annotate("text", x = 3.5, y = 7, label = "bold('106')", 
+  annotate("text", x = 3.5, y = 7, label = "bold('55')", 
            parse = TRUE, colour = unname(ev_pal[2])) + 
-  annotate("text", x = -3.5, y = 7, label = "bold('134')", 
+  annotate("text", x = -3.5, y = 7, label = "bold('52')", 
            parse = TRUE, colour = unname(ev_pal[3])) + 
-  annotate("text", x = 0, y = 6, label = "bold('445')", 
+  annotate("text", x = 0, y = 6, label = "bold('567')", 
            parse = TRUE, colour = unname(ev_pal[1]))
 ```
 
@@ -902,6 +942,7 @@ f3_y_go <- marker_comp[1] %>%
   unlist() %>% 
   gsub("CHS3", "CaO19.4937", .) %>% 
   gsub("PEP1", "CaO19.3767", .)
+# paste into FungiFun2 and download results .csv
 
 # get list of DAY286 biofilm EV proteins exclusive and sig. enriched
 # substitute protein names that don't work with FungiFun2
@@ -915,6 +956,7 @@ f3_b_go <- marker_comp[2] %>%
                                   c("CaO19.4937", "CaO19.3767", "CaO19.1816",
                                     "CaO19.6594", "CaO19.9017"), 
                                   vectorize_all = FALSE)
+# paste into FungiFun2 and download results .csv
 
 # get list of ATCC90028 EV proteins exclusive and sig. enriched
 # substitute protein names that don't work with FungiFun2
@@ -933,6 +975,7 @@ f3_a9_go <- marker_comp[3] %>%
                                     "CaO19.2651", "CaO19.8937"), 
                                   vectorize_all = FALSE)
 f3_a9_go <- f3_a9_go[!f3_a9_go %in% c("orf19.7397.1", "orf19.7398")]
+# paste into FungiFun2 and download results .csv
 
 # get list of ATCC10231 EV proteins exclusive and sig. enriched
 # substitute protein names that don't work with FungiFun2
@@ -950,6 +993,7 @@ f3_a1_go <- marker_comp[4] %>%
                                     "CaO19.3803", "CaO19.1995", "CaO19.4255", 
                                     "CaO19.2651"), 
                                   vectorize_all = FALSE)
+# paste into FungiFun2 and download results .csv
 ```
 
 ```{r figure4Plots, include=FALSE}
@@ -972,10 +1016,10 @@ f3_y <- plot_go_bar(f3_y_go_table, c(1:4, 49,52:53,55, 77,79:81), f3_pal) +
 f3_b <- plot_go_bar(f3_b_go_table, c(1:4, 69,71:73, 96:97, 100, 102), f3_pal) + 
   annotate("text", x = 12, y = 60, label = "bold('DAY286 B')", parse = TRUE)
 
-f3_a9 <- plot_go_bar(f3_a9_go_table, c(1:4, 35,37:38,42, 55:56,58:59), f3_pal) + 
+f3_a9 <- plot_go_bar(f3_a9_go_table, c(1:3,6, 27,29,32:33, 46,49,51:52), f3_pal) + 
   annotate("text", x = 12, y = 70, label = "bold('ATCC90028')", parse = TRUE)
 
-f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:4, 63,65:67, 88:91), f3_pal) + 
+f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:4, 62,64:66, 86:89), f3_pal) + 
   annotate("text", x = 12, y = 70, label = "bold('ATCC10231')", parse = TRUE)
 ```
 
@@ -1009,8 +1053,8 @@ f3_cap <- "\\textbf{Functional enrichment analyses of the significantly
 # figure 4a EV venn
 f4a_comp <- list("DAY Y" = rownames(y_ev), 
                  "DAY B" = rownames(b_ev),
-                 "ATCC90028" = rownames(atcc9_ev), 
-                 "ATCC10231" = rownames(atcc1_ev))
+                 "ATCC90028" = rownames(a9_ev), 
+                 "ATCC10231" = rownames(a1_ev))
 f4a_comp <- lapply(f4a_comp, function(x) match_id(x, ref = uniprot, 
                                                   match = "UP_accession", 
                                                   new = "CGD_gene_name"))
@@ -1028,15 +1072,15 @@ f4a <- as_ggplot(f4a_venn) +
 
 f4a_overlap <- plot_venn(vlist = f4a_comp, 
                          use_uniprot = FALSE, type = "df") %>% 
-  filter(..count.. == 403) %>% 
+  filter(..count.. == 396) %>% 
   pull(..values..) %>% 
   unlist()
 
 # figure 4b WCL venn
 f4b_comp <- list("DAY Y" = rownames(y_wcl), 
                  "DAY B" = rownames(b_wcl),
-                 "ATCC90028" = rownames(atcc9_w), 
-                 "ATCC10231" = rownames(atcc1_w))
+                 "ATCC90028" = rownames(a9_wcl), 
+                 "ATCC10231" = rownames(a1_wcl))
 f4b_comp <- lapply(f4b_comp, function(x) match_id(x, ref = uniprot, 
                                                   match = "UP_accession", 
                                                   new = "CGD_gene_name"))
@@ -1053,11 +1097,26 @@ f4b <- as_ggplot(f4b_venn) +
   theme(plot.margin = unit(c(0,2,0,2), "lines"))
 
 # MDS data table
-mds_data <- cbind(atcc_de, 
-                  biofilm_de[match(rownames(atcc_de), rownames(biofilm_de)), ])
+mds_a9 <- a9_de %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "id")
 
-mds_data <- cbind(mds_data, 
-                  yeast_de[match(rownames(mds_data), rownames(yeast_de)), ])
+mds_a1 <- a1_de %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "id")
+
+mds_biofilm <- biofilm_de%>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "id")
+
+mds_yeast <- yeast_de%>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "id")
+
+mds_data <- full_join(mds_a9, mds_a1, by = "id") %>% 
+  full_join(., mds_biofilm, by = "id") %>% 
+  full_join(., mds_yeast, by = "id") %>% 
+  tibble::column_to_rownames(var = "id")
 
 colnames(mds_data)[13:28] <- c("B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5", 
                                "B_W1", "B_W2", "B_W3", "B_W4", "B_W5", 
@@ -1074,7 +1133,7 @@ f4c <- plot_mds(mds_data, mat_labels = mds_labels,
                 shape_size = 3, dim.plot = c(1,2)) + 
   scale_x_continuous(limits = c(-1.5, 2.5), 
                      expand = c(0,0)) + 
-  scale_y_continuous(limits = c(-1.5, 2.5), 
+  scale_y_continuous(limits = c(-2.5, 1.5), 
                      expand = c(0,0)) + 
   scale_fill_manual(breaks = c("Y", "A9", "A1", "B"), 
                     values = st_pal[c(3, 2, 4, 1)], 
@@ -1095,7 +1154,7 @@ f4d <- plot_mds(mds_data, mat_labels = mds_labels,
                 shape_size = 3, dim.plot = c(3,2)) + 
   scale_x_continuous(limits = c(-1.5, 2.5), 
                      expand = c(0,0)) + 
-  scale_y_continuous(limits = c(-1.5, 2.5), 
+  scale_y_continuous(limits = c(-2.5, 1.5), 
                      expand = c(0,0)) + 
   scale_fill_manual(breaks = c("Y", "A9", "A1", "B"), 
                     values = st_pal[c(3, 2, 4, 1)], 
@@ -1206,7 +1265,7 @@ f5_htmp <- plot_heatmap(mt = f5_table_filt,
                         split_type = "cutree", 
                         k = 5, 
                         cluster_split = FALSE, 
-                        split_order = c(3, 1, 4, 2, 5), 
+                        split_order = c(2, 5, 1, 4, 3), 
                         colour_lims = c(-4, 4),
                         column_labels = c("ATCC90028", "ATCC10231", 
                                           "DAY286 Y", "DAY286 B"), 
@@ -1219,7 +1278,7 @@ f5_htmp <- plot_heatmap(mt = f5_table_filt,
 
 # save heatmap as pdf file for editing in inkscape
 # not run in rmarkdown but manually in console
-# pdf(file = "figures/figure5_htmp.pdf", width = 1.7, height = 4)
+# pdf(file = "inst/manuscript/figures/figure5_htmp.pdf", width = 1.7, height = 4)
 # ComplexHeatmap::draw(f5_htmp, heatmap_legend_side = "bottom")
 # dev.off()
 ```
@@ -1235,24 +1294,24 @@ f5_clusters <- plot_heatmap(mt = f5_table_filt,
                             k = 5, 
                             cluster_split = FALSE) %>% 
   mutate(cluster = recode(cluster, 
-                          "1" = 2, "2" = 4, "3" = 1, "4" = 3, "5" = 5)) %>% 
+                          "1" = 4, "2" = 1, "3" = 5, "4" = 2, "5" = 3)) %>% 
   arrange(cluster)
 
 # extract identifiers from each cluster
 f5_clust1 <- f5_clusters %>% 
   filter(cluster == 1) %>% 
-  mutate(id = gsub("CHS3", "CaO19.4937", id)) %>% 
-  pull(id)
-
-f5_clust2 <- f5_clusters %>% 
-  filter(cluster == 2) %>% 
   mutate(id = gsub("PEP1", "CaO19.3767", id)) %>% 
   pull(id) %>% 
   stringr::str_extract_all(., "[^;]+") %>% 
   unlist()
+
+f5_clust2 <- f5_clusters %>% 
+  filter(cluster == 2) %>% 
+  pull(id)
   
 f5_clust3 <- f5_clusters %>% 
   filter(cluster == 3) %>% 
+  mutate(id = gsub("CHS3", "CaO19.4937", id)) %>% 
   pull(id)
 
 f5_clust4 <- f5_clusters %>% 
@@ -1278,13 +1337,13 @@ f5_clust6 <- sort(rownames(f5_table_excl))
 
 # import FungiFun2 results
 f5_go1 <- process_fungifun("figures/f5_GO_clust1.csv") %>% 
-  mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found))
-
-# issue with PEP1, ambiguous ID in FungiFun, used CaO19.3767 as identifier
-f5_go2 <- process_fungifun("figures/f5_GO_clust2.csv") %>% 
   mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found))
 
-f5_go3 <- process_fungifun("figures/f5_GO_clust3.csv")
+# issue with PEP1, ambiguous ID in FungiFun, used CaO19.3767 as identifier
+f5_go2 <- process_fungifun("figures/f5_GO_clust2.csv")
+
+f5_go3 <- process_fungifun("figures/f5_GO_clust3.csv") %>% 
+  mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found))
 
 # issue with CHS3, ambiguous ID in FungiFun, used CaO19.4937 as identifier
 f5_go4 <- process_fungifun("figures/f5_GO_clust4.csv")
@@ -1310,7 +1369,7 @@ ggplot() +
 
 f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across 
            different \\textit{C. albicans} strains.} Heatmap of proteins 
-           (n = 403) identified in all four EV samples (venn overlap in Figure 
+           (n = 396) identified in all four EV samples (venn overlap in Figure 
            \\@ref(fig:figure4)A). Each column represents a 
            \\textit{C. albicans} strain and each row represents a protein. The 
            colours indicate the log\\textsubscript{2}(FC) of the protein for 
@@ -1325,7 +1384,8 @@ f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across
            [@priebe2015]. A selection of significantly enriched GO terms are 
            presented in the table inset. Lists of the proteins identified in 
            each cluster are shown and are also available in supplemental 
-           File S5."
+           File S5. \\textsuperscript{a} indicates where all proteins from 
+           each protein group in the cluster were used for the GO analysis."
 ```
 
 \newpage
@@ -1385,11 +1445,11 @@ f6_cap <- "\\textbf{Identification of common signficantly enriched or exclusive
            \\textit{C. albicans} EV and WCL proteins.} Proteins identified as 
            significantly enriched or exclusive to EVs in Figure 
            \\@ref(fig:figure2) were compared to select those which were common 
-           to all 4 datasets. 43 proteins were identified as potential positive 
-           EV protein markers and 52 proteins as potential negative EV protein 
+           to all 4 datasets. 39 proteins were identified as potential positive 
+           EV protein markers and 40 proteins as potential negative EV protein 
            markers. The data tables underlying Figure 
            \\@ref(fig:figure6) are provided in supplemental File S4. Details of 
-           the 43 positive EV protein marker candidates and 52 negative 
+           the 39 positive EV protein marker candidates and 40 negative 
            candidates can be found in Table \\@ref(tab:table1) and supplemental 
            Table S2 respectively."
 ```
@@ -1416,7 +1476,8 @@ ggplot() +
 
 ```{r figure8, fig.cap=f8_cap, fig.width=7.2, fig.height=6}
 f8_cap <- "\\textbf{Predicted topology and palmitoylation sites of 
-           \\textit{C. albicans} MCC/eisosome proteins SUR7 and orf19.6741 
+           \\textit{C. albicans} MCC/eisosome proteins Sur7 and Evp1 
+           (orf19.6741) 
            compared to the human tetraspanin CD81.} The presence of 
            transmembrane (TM) domains and palmitoylation sites shown on the 
            left side of the figure were predicted using the online tools 
