@@ -1,9 +1,9 @@
 ^data-raw$
 ^vignettes/README\.Rmd$
 ^vignettes/README\.md$
-^manuscript/README\.Rmd$
-^manuscript/README\.md$
-^manuscript/supplement_files$
+^inst/manuscript/README\.Rmd$
+^inst/manuscript/README\.md$
+^inst/manuscript/supplement_files$
 ^.*\.pdf$
 ^.*\.svg$
 ^.*\.docx$
@@ -13,5 +13,3 @@
 ^candidaev\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
-^README-.*\.png$
-
