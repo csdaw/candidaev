@@ -175,7 +175,7 @@ yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_0", "WCL_0")]
 
 yeast_filt2 <- filter_na2(yeast_lfq2, 
                           logic = "or", 
-                          p = "<=", 
+                          op = "<=", 
                           pat1 = "EV", val1 = 1, 
                           pat2 = "W", val2 = 1)
 
@@ -533,63 +533,47 @@ atccNorm3_cap <- "Multidimensional scaling (MDS) plot. Shows each LC-MS/MS
 
 ## ATCC strain protein comparison
 
-Lists of proteins quantified in at least 1/3 biological replicates of each 
-condition are generated using:
+First, `atcc_norm` is split into two different matrices containing the 
+ATCC90028 data (`a9_norm`), and the ATCC10231 data (`a1_norm`).
 
-```{r atccVennData, echo=TRUE}
-# filter for proteins quantified in min 1/3 reps of 10231 EV
-atcc1_ev <- filter_na(atcc_norm, 
-                      op = "<=", 
-                      pat = "A10231_EV", 
-                      val = 2)
+```{r atccSplit, echo=TRUE}
+## ATCC90028 normalised LFQ data
+# filter for proteins quantified in min 2/3 reps of EV or WCL
+a9_norm <- filter_na2(atcc_norm, logic = "or", op = "<=",
+                      pat1 = "A90028_EV", val1 = 1,
+                      pat2 = "A90028_W", val2 = 1)
+# drop ATCC10231 columns
+a9_norm <- a9_norm[, -c(1:6)]
 
-# filter for proteins quantified in min 1/3 reps of 10231 WCL
-atcc1_w <- filter_na(atcc_norm, 
-                     op = "<=", 
-                     pat = "A10231_W", 
-                     val = 2)
+## ATCC10231 normalised LFQ data
+# filter for proteins quantified in min 2/3 reps of EV or WCL
+a1_norm <- filter_na2(atcc_norm, logic = "or", op = "<=", 
+                      pat1 = "A10231_EV", val1 = 1, 
+                      pat2 = "A10231_W", val2 = 1)
 
-# filter for proteins quantified in min 1/3 reps of 90028 EV
-atcc9_ev <- filter_na(atcc_norm, 
-                      op = "<=", 
-                      pat = "A90028_EV", 
-                      val = 2)
-
-# filter for proteins quantified in min 1/3 reps of 90028 WCL
-atcc9_w <- filter_na(atcc_norm, 
-                     op = "<=", 
-                     pat = "A90028_W", 
-                     val = 2)
+# drop ATCC90028 columns
+a1_norm <- a1_norm[, -c(7:12)]
 ```
 
-These are then compared via a Venn diagram. As per section 2.4, every protein 
-that appears in the Venn diagram has been quantified in at least 2/3 replicates 
-of one condition. 
+We can compare the distribution of proteins from `atcc_norm` in `a9_norm` and 
+`a1_norm` using a Venn diagram.
 
 ```{r, echo=TRUE, eval=FALSE}
 # define a comparison list for a Venn diagram
-venn_comp <- list("A10231_EV" = rownames(atcc1_ev), 
-                  "A10231_WCL" = rownames(atcc1_w), 
-                  "A90028_EV" = rownames(atcc9_ev), 
-                  "A90028_WCL" = rownames(atcc9_w))
-                  
+venn_comp <- list("ATCC90028" = rownames(a9_norm), 
+                  "ATCC10231" = rownames(a1_norm))
+
 # plot the Venn diagram
 venn <- plot_venn(venn_comp, 
-                  type = "plot")
-                  
+                  type = "df")
+
 grid::grid.draw(venn)
 ```
 
-Of `r nrow(atcc_norm)` proteins, 641 (41.7%) are quantified in at least 1/3 
-replicates from all 4 conditions **and** are quantified in at least 2/3 
-replicates of 1 condition.
-
-```{r atccVenn, fig.cap=venn_cap}
-# define comparison list for Venn diagram
-venn1_comp <- list("A10231_EV" = rownames(atcc1_ev), 
-                   "A10231_WCL" = rownames(atcc1_w), 
-                   "A90028_EV" = rownames(atcc9_ev), 
-                   "A90028_WCL" = rownames(atcc9_w))
+```{r atccVenn, fig.cap=venn_cap, fig.small=TRUE}
+# define a comparison list for a Venn diagram
+venn_comp <- list("A90028" = rownames(a9_norm), 
+                  "A10231" = rownames(a1_norm))
 
 # define ggplot2 default colour palette function
 gg_colour <- function(n) {
@@ -598,7 +582,78 @@ gg_colour <- function(n) {
 }
 
 # plot Venn diagram
-venn1 <- plot_venn(venn1_comp, 
+venn <- plot_venn(venn_comp, 
+                  use_uniprot = FALSE, 
+                  type = "plot", 
+                  fontfamily = "sans", 
+                  cat.fontfamily = "sans", 
+                  cex = 1.9, 
+                  cat.cex = 1.2, 
+                  fill = gg_colour(2), 
+                  alpha = c(rep(0.4, 2)))
+
+# draw Venn diagram
+grid::grid.draw(venn)
+
+venn_cap <- "Venn diagram of proteins quantified in both ATCC strains. 
+             Proteins in this plot are quantified in at least 2/3 replicates 
+             of EV or WCL from at least 1 strain."
+```
+
+Of the `r nrow(atcc_norm)` proteins in `atcc_norm`, 1153 (74.9%) proteins are
+quantified by at least 2/3 replicates of EV or WCL from **both** strains. The
+rest are quantified by at least 2/3 replicates of EV or WCL from **either** 
+ATCC90028 or ATCC10231.
+
+We can further compare these two strains by seeing how many proteins are 
+unique to EVs or WCLs from both/either strain. Lists of proteins quantified 
+in at least 1/3 biological replicates of each condition are generated using:
+
+```{r atccVenn2Data, echo=TRUE}
+## ATCC10231
+# filter for proteins quantified in min 1/3 reps of ATCC10231 EV
+# define 'EV proteins'
+a1_ev <- filter_na(a1_norm, op = "<=", pat = "EV", val = 2)
+
+# filter for proteins quantified in min 1/3 reps of ATCC10231 WCL
+# define 'WCL proteins'
+a1_wcl <- filter_na(a1_norm, op = "<=", pat = "W", val = 2)
+
+# ATCC90028
+# filter for proteins quantified in min 1/3 reps of ATCC90028 EV
+# define 'EV proteins'
+a9_ev <- filter_na(a9_norm, op = "<=", pat = "EV", val = 2)
+
+# filter for proteins quantified in min 1/3 reps of ATCC90028 WCL
+# define 'WCL proteins'
+a9_wcl <- filter_na(a9_norm, op = "<=", pat = "W", val = 2)
+```
+
+These are then compared via a Venn diagram. 
+
+```{r, echo=TRUE, eval=FALSE}
+# define a comparison list for a Venn diagram
+venn2_comp <- list("A10231_EV" = rownames(a1_ev), 
+                   "A10231_WCL" = rownames(a1_wcl), 
+                   "A90028_EV" = rownames(a9_ev), 
+                   "A90028_WCL" = rownames(a9_wcl))
+
+# plot the Venn diagram
+venn2 <- plot_venn(venn2_comp, 
+                   type = "plot")
+
+grid::grid.draw(venn2)
+```
+
+```{r atccVenn2, fig.cap=venn2_cap}
+# define comparison list for Venn diagram
+venn2_comp <- list("A10231_EV" = rownames(a1_ev), 
+                   "A10231_WCL" = rownames(a1_wcl), 
+                   "A90028_EV" = rownames(a9_ev), 
+                   "A90028_WCL" = rownames(a9_wcl))
+
+# plot Venn diagram
+venn2 <- plot_venn(venn2_comp, 
                    use_uniprot = FALSE, 
                    type = "plot", 
                    fontfamily = "sans", 
@@ -609,20 +664,27 @@ venn1 <- plot_venn(venn1_comp,
                    alpha = c(rep(0.4, 4)))
 
 # draw Venn diagram
-grid::grid.draw(venn1)
+grid::grid.draw(venn2)
 
-venn_cap <- "Venn diagram of proteins quantified in each condition. 
+venn2_cap <- "Venn diagram of proteins quantified in each condition. 
              Proteins in this plot are quantified in at least 2/3 replicates 
-             of at least 1 condition."
+             of at least 1 condition for at least 1 strain."
 ```
 
-Next, the most abundant proteins that are only detected in ATCC10231 EVs and 
+Of the `r nrow(a9_norm)` ATCC90028 proteins and `r nrow(a1_norm)` ATCC10231
+proteins, 631 (41.0%) are common to both EVs and WCLs from both strains. 
+Furthermore, there are 94 proteins only detected in EVs from both strains, and 
+160 proteins only detected in WCL.
+
+## Top 10 most abundance EV exclusive proteins
+
+The most abundant proteins that are only detected in ATCC10231 EVs and 
 not in ATCC10231 WCL can be identified.
 
-```{r atcc1Top10Data, echo=TRUE}
-# get top 10 most abundant proteins exclusive to 10231 EVs
+```{r a1Top10Data, echo=TRUE}
+# get top 10 most abundant proteins exclusive to ATCC10231 EVs
 # in descending order of abundance
-atcc1_top10 <- atcc1_ev %>% 
+a1_top10 <- a1_ev %>% 
   tibble::as_tibble(rownames = "id") %>% 
   filter_na(., op = "==", pat = "A10231_W", val = 3) %>% 
   select(id, contains("A10231_EV")) %>% 
@@ -635,8 +697,8 @@ atcc1_top10 <- atcc1_ev %>%
   select(CGD_gene_name, CGD_description, everything(), -id)
 ```
 
-```{r atcc1Top10}
-knitr::kable(atcc1_top10, 
+```{r a1Top10}
+knitr::kable(a1_top10, 
              caption = "Top 10 most abundant ATCC10231 EV proteins. They are 
                         not detected in ATCC10231 WCL.", 
              col.names = c("Name", "Function", "EV1 LFQ", 
@@ -647,8 +709,8 @@ knitr::kable(atcc1_top10,
 This is repeated for ATCC90028. The proteins MSB2, PLB4.5, orf19.6119, and 
 orf19.1054 are highly abundant and exclusive to EVs from both strains.
 
-```{r atcc9Top10Data, echo=TRUE}
-atcc9_top10 <- atcc9_ev %>% 
+```{r a9Top10Data, echo=TRUE}
+a9_top10 <- a9_ev %>% 
   tibble::as_tibble(rownames = "id") %>% 
   filter_na(., op = "==", pat = "A90028_W", val = 3) %>% 
   select(id, contains("A90028_EV")) %>% 
@@ -661,8 +723,8 @@ atcc9_top10 <- atcc9_ev %>%
   select(CGD_gene_name, CGD_description, everything(), -id)
 ```
 
-```{r atcc9Top10}
-knitr::kable(atcc9_top10, 
+```{r a9Top10}
+knitr::kable(a9_top10, 
              caption = "Top 10 most abundant ATCC90028 EV proteins. They are 
                         not detected in ATCC90028 WCL.", 
              col.names = c("Name", "Function", "EV1 LFQ", 
@@ -674,13 +736,24 @@ knitr::kable(atcc9_top10,
 
 Missing values in the data will be imputed prior to the 
 differential abundance analysis. Before imputation the percentage of missing 
-values in each sample is explored again with `sum_table(atcc_norm)`.
+values in each sample is explored again with `sum_table`.
 
 ```{r atccSum}
-# explore percentage missing values in each sample
-knitr::kable(sum_table(atcc_norm), 
-             caption = "Descriptive statistics for each LC-MS/MS sample. After 
-                        normalisation.", 
+# explore percentage missing values in each ATCC10231 sample
+knitr::kable(sum_table(a1_norm), 
+             caption = "Descriptive statistics for each ATCC10231 LC-MS/MS 
+                        sample. After normalisation.", 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
+             digits = 1)
+
+# explore percentage missing values in each ATCC90028 sample
+knitr::kable(sum_table(a9_norm), 
+             caption = "Descriptive statistics for each ATCC90028 LC-MS/MS 
+                        sample. After normalisation.", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -689,7 +762,7 @@ knitr::kable(sum_table(atcc_norm),
              digits = 1)
 ```
 
-The percentage of missing values ranges from 25.4% up to 64.7% which is 
+The percentage of missing values ranges from 17.5%-55.8% which is 
 quite high, typical of label-free quantitative proteomics data[^3]. The 
 pattern of missing values across the data is visualised using:
 
@@ -701,12 +774,16 @@ _Journal of Proteome Research, 15_(4), 1116-1125.
 
 ```{r, echo=TRUE, eval=FALSE}
 # visualise missing values using a heatmap
-plot_missval2(atcc_norm)
+plot_missval2(a1_norm)
+
+plot_missval2(a9_norm)
 ```
 
 ```{r atccMissVal, fig.cap=missval_cap, fig.height=8}
-plot_missval2(atcc_norm)
+# visualise missing values using a heatmap
+plot_missval2(a1_norm)
 
+plot_missval2(a9_norm)
 missval_cap <- "Pattern of missing LFQ intensity values."
 ```
 
@@ -719,39 +796,53 @@ imputation and hence are not imputed.
 # should not impute with so many missing values
 # filter for exclusive to 10231 EV or WCL or 90028 EV or WCL
 # these will not be imputed
-atcc_excl <- filter_na4(atcc_norm, 
-                        logic = "or", 
-                        op = "==", 
-                        pat1 = "A10231_EV", val1 = 3, 
-                        pat2 = "A10231_W", val2 = 3, 
-                        pat3 = "A90028_EV", val3 = 3, 
-                        pat4 = "A90028_W", val4 = 3)
+a1_excl <- filter_na2(a1_norm, logic = "or", op = "==",
+                      pat1 = "EV", val1 = 3,
+                      pat2 = "W", val2 = 3)
+
+a9_excl <- filter_na2(a9_norm, logic = "or", op = "==",
+                      pat1 = "EV", val1 = 3,
+                      pat2 = "W", val2 = 3)
 ```
 
-Only proteins quantified in at least 1/3 replicates from all 4 conditions 
+Only proteins quantified in at least 1/3 replicates from all both EV and WCL  
 are retained for imputation.
 
 ```{r atccBoth, echo=TRUE}
-# filter for proteins with min 1 valid value in all 4 sample types
-atcc_both <- filter_na4(atcc_norm, 
-                        logic = "and", 
-                        op = "<=", 
-                        pat1 = "A10231_EV", val1 = 2, 
-                        pat2 = "A10231_W", val2 = 2, 
-                        pat3 = "A90028_EV", val3 = 2, 
-                        pat4 = "A90028_W", val4 = 2)
+# filter for proteins with min 1 valid value in both EV and WCL
+a1_both <- filter_na2(a1_norm, logic = "and", op = "<=",
+                      pat1 = "EV", val1 = 2,
+                      pat2 = "W", val2 = 2)
+
+a9_both <- filter_na2(a9_norm, logic = "and", op = "<=",
+                      pat1 = "EV", val1 = 2,
+                      pat2 = "W", val2 = 2)
 ```
 
-`r nrow(atcc_excl)` proteins which are exclusive to either ATCC10231 EV, 
-ATCC10231 WCL, ATCC90028 EV, or ATCC90028 WCL are removed (`atcc_excl`). 
-Conversely, `r nrow(atcc_both)` proteins are kept to have missing values 
-imputed (`atcc_both`). The percentage of missing values across each sample 
-in `atcc_both` now ranges from 1.4% to 29.3%. 
+`r nrow(a1_excl)` proteins which are exclusive to either ATCC10231 EV or WCL 
+are set aside in `a1_excl` and `r nrow(a1_both)` proteins are kept to have 
+missing values imputed (`a1_both`). Similarly, `r nrow(a9_excl)` proteins 
+are exclusive to ATCC90028 EVs or WCL (`a9_excl`) and `r nrow(a9_both)` 
+are retained for 
+imputation (`a9_both`). The percentage of missing values across each sample 
+in `a1_both` and `a9_both` now ranges from 4.9% to 31.3%. 
 
 ```{r atccSum2}
-knitr::kable(sum_table(atcc_both), 
-             caption = "Descriptive statistics for each LC-MS/MS sample. Prior 
-                        to imputation.", 
+# explore percentage missing values in each ATCC10231 common proteins
+knitr::kable(sum_table(a1_both), 
+             caption = "Descriptive statistics for each ATCC10231 LC-MS/MS 
+                        sample. After normalisation.", 
+             col.names = c("Sample", "Mean LFQ intensity", 
+                           "Median LFQ intensity", "SD", "CV", 
+                           "Min LFQ intensity", "Max LFQ intensity", 
+                           "Range", "Number of proteins", "Number of NA", 
+                           "Percent NA"), 
+             digits = 1)
+
+# explore percentage missing values in each ATCC90028 common proteins
+knitr::kable(sum_table(a9_both), 
+             caption = "Descriptive statistics for each ATCC90028 LC-MS/MS 
+                        sample. After normalisation.", 
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -760,13 +851,15 @@ knitr::kable(sum_table(atcc_both),
              digits = 1)
 ```
 
-The pattern of missing values in `atcc_both` seems to be biased to certain 
-samples, especially ATCC10231 EV replicate 1. Therefore, these proteins may be 
-missing not at random (MNAR). 
+The patterns of missing values in `a1_both` and `a9_both` seem to be biased to 
+certain samples, especially EV replicate 1 from both strains. Therefore, these 
+proteins may be missing not at random (MNAR). 
 
 ```{r atccMissVal2, fig.cap=missval2_cap , fig.height=8}
-plot_missval2(atcc_both)
+# visualise missing values using a heatmap
+plot_missval2(a1_both)
 
+plot_missval2(a9_both)
 missval2_cap <- "Pattern of missing LFQ intensity values."
 ```
 
@@ -775,52 +868,61 @@ without missing values can be plotted with:
 
 ```{r, echo=TRUE, eval=FALSE}
 # detect intensity differences for proteins with missing values
-plot_detect2(atcc_both)
+plot_detect2(a1_both)
+
+plot_detect2(a9_both)
 ```
 
 ```{r atccSum3, fig.cap=detect_cap, fig.wide=TRUE}
-plot_detect2(atcc_both)
+# detect intensity differences for proteins with missing values
+plot_detect2(a1_both)
 
+plot_detect2(a9_both)
 detect_cap <- "LFQ intensities of proteins with and without missing values."
 ```
 
-These plots show that missing values are biased to proteins with lower 
-average intensities, and are likely MNAR. Hence, a left-censored imputation 
-method is used for imputation of missing values. 
+In both cases, these plots show that missing values are biased to proteins 
+with lower average intensities, and are likely MNAR. 
+Hence, a left-censored imputation method is used for imputation of 
+missing values. 
 
 ```{r, echo=TRUE, eval=FALSE}
 # impute missing values with QRILC method
-atcc_imp <- impute_QRILC(atcc_both)
+a1_imp <- impute_QRILC(a1_both)
+
+a9_imp <- impute_QRILC(a9_both)
 ```
 
 The effect of imputation on the distribution of protein intensities is 
 visualised with:
 
 ```{r, echo=TRUE, eval=FALSE}
-plot_imputation2(atcc_exp, 
-                 facet_labels = c(atcc_both = "Before imputation", 
-                                  atcc_imp = "After imputation"), 
-                 atcc_both, 
-                 atcc_imp)
+plot_imputation2(exd = atcc_exp, 
+                 facet_labels = c(a1_both = "ATCC10231 - Before imputation", 
+                                  a1_imp = "ATCC10231 - After imputation", 
+                                  a9_both = "ATCC90028 - Before imputation", 
+                                  a9_imp = "ATCC90028 - After imputation")
+                 a1_both, a1_imp, a9_both, a9_imp)
 ```
 
-```{r atccImpute, fig.cap=imp_cap, fig.wide=TRUE}
+```{r atccImpute, fig.cap=imp_cap, fig.height=7}
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 
 # use left censored imputation method
-atcc_imp <- impute_QRILC(atcc_both)
+a1_imp <- impute_QRILC(a1_both)
 
-plot_imputation2(atcc_exp, 
-                 facet_labels = c(atcc_both = "Before imputation", 
-                                  atcc_imp = "After imputation"),  
-                 atcc_both, atcc_imp)
+a9_imp <- impute_QRILC(a9_both)
+
+plot_imputation2(exd = atcc_exp, 
+                 facet_labels = c(a1_both = "ATCC10231 - Before imputation", 
+                                  a1_imp = "ATCC10231 - After imputation", 
+                                  a9_both = "ATCC90028 - Before imputation", 
+                                  a9_imp = "ATCC90028 - After imputation"), 
+                 a1_both, a1_imp, a9_both, a9_imp)
 
 imp_cap <- "LFQ intensity distribution before and after imputation."
 ```
-
-The changes to the distributions are minimal, but most noticable for ATCC10231 
-EV. ATCC10231 samples EV1 and EV2 had the most missing values to impute.
 
 ## Differential abundance analysis with _limma_
 
@@ -829,13 +931,13 @@ are recombined in the same matrix.
 
 ```{r atccDE, echo=TRUE}
 # combine matrices
-atcc_de <- rbind(atcc_excl, atcc_imp)
+a1_de <- rbind(a1_excl, a1_imp)
+colnames(a1_de) <- gsub("A10231_", "", colnames(a1_de))
+colnames(a1_de) <- gsub("W", "WCL", colnames(a1_de))
 
-# shorten column names
-colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de), 
-                                                     c("A10231_", "A90028_"), 
-                                                     c("A1_", "A9_"), 
-                                                     vectorize_all = FALSE)
+a9_de <- rbind(a9_excl, a9_imp)
+colnames(a9_de) <- gsub("A90028_", "", colnames(a9_de))
+colnames(a9_de) <- gsub("W", "WCL", colnames(a9_de))
 ```
 
 A design matrix is constructed for this proteomics experiment. This is 
@@ -848,11 +950,10 @@ for more information about constructing design matrices.
 ```{r atccDesign, echo=TRUE}
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL", 
-                                   "A9_EV", "A9_WCL"), each = 3)))
+atcc_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
 
 atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
-colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+colnames(atcc_design) <- c("EV", "WCL")
 ```
 
 ```{r atccDE2}
@@ -866,7 +967,7 @@ separated by ` - `.
 
 ```{r atccDE3, echo=TRUE}
 # specify comparisons of interest
-atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
+atcc_contrasts <- c("EV - WCL")
 ```
 
 Finally, the differential abundance analysis is performed using the 
@@ -875,53 +976,64 @@ Finally, the differential abundance analysis is performed using the
 
 To perform the analysis, the following objects are provided:
 
-* a numeric matrix of log<sub>2</sub> LFQ intensity data (`atcc_de`).
+* a numeric matrix of log<sub>2</sub> LFQ intensity data 
+  (`a1_de` or `a9_de`).
 * a numeric design matrix (`atcc_design`).
 * a character vector with the contrasts of interest (`atcc_contrasts`).
 
-The results from `limma_eBayes` are extracted using `get_results` 
-which allows the adjusted p-value cutoff and 
-log<sub>2</sub> fold change cutoff for significance to be specified. To get the 
-overall differences for all the samples included in the design matrix, 
-`type = "overall"` is used.
-
-```{r atccDE4, echo=TRUE, warning=FALSE}
-# make all pair-wise comparisons for specified contrasts
+```{r atccEfit, echo=TRUE, warning=FALSE}
+# make all pair-wise comparisons between EV and WCL
 # and perform limma::eBayes()
-atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
+a1_efit <- limma_eBayes(a1_de, 
+                        design = atcc_design, 
+                        contrasts = atcc_contrasts)
 
-# extract overall results
-atcc_overall <- get_results(efit = atcc_efit, 
-                            mat = atcc_de, 
-                            p_val = 0.01, 
-                            lfc = 0, 
-                            type = "overall")
+a9_efit <- limma_eBayes(a9_de, 
+                        design = atcc_design, 
+                        contrasts = atcc_contrasts)
 ```
 
-Alternatively, to obtain the log<sub>2</sub> fold changes and adjusted p-values 
-for each individual comparison specified then `type = "individual"` is used. 
+The results from `limma_eBayes` are extracted using `get_results` 
+which allows the adjusted p-value cutoff and 
+log<sub>2</sub> fold change cutoff for significance to be specified. 
+
+To obtain the log<sub>2</sub> fold changes and adjusted p-values 
+for each individual comparison specified, `type = "individual"` is used. 
 This outputs a list of data.frames, one for each contrast. They can be accessed 
-by subsetting the resulting list.
+by subsetting the resulting list. In this case there is only 1 comparison of 
+interest (`EV - WCL`), therefore the list of data.frames output will be of 
+`length = 1`.
 
 ```{r atccDE5, echo=TRUE}
 # extract results for individual comparisons defined in atcc_contrasts
-atcc_ind <- get_results(efit = atcc_efit, 
-                        mat = atcc_de, 
-                        p_val = 0.01, 
-                        lfc = 0, 
-                        type = "individual")
-
-a1_res <- get_results(efit = atcc_efit, 
-                      mat = atcc_de, 
+a1_res <- get_results(efit = a1_efit, 
+                      mat = a1_de, 
                       p_val = 0.01, 
                       lfc = 0, 
                       type = "individual")[[1]]
 
-a9_res <- get_results(efit = atcc_efit, 
-                      mat = atcc_de, 
+a9_res <- get_results(efit = a9_efit, 
+                      mat = a9_de, 
                       p_val = 0.01, 
                       lfc = 0, 
-                      type = "individual")[[2]]
+                      type = "individual")[[1]]
+```
+
+In this example there is only one comparison of interest, so we are 
+only interested in `type = individual`. However if there 
+were multiple comparisons of interest, to get the 
+overall differences for all the samples included in the design matrix and 
+for all comparisons of interest, one can 
+use `type = "overall"` for the result output.
+
+```{r atccDE6, echo=TRUE, eval=FALSE}
+# this example is not run in this vignette
+# extract overall results for a1_efit
+atcc_overall <- get_results(efit = a1_efit, 
+                            mat = a1_de, 
+                            p_val = 0.01, 
+                            lfc = 0, 
+                            type = "overall")
 ```
 
 # Results
@@ -1040,7 +1152,7 @@ a1_vol <- plot_volcano(a1_res,
                        legend_params = c("right", 14, 14), 
                        axis_params = c("black", 16, 14), 
                        x_lim = c(-10, 12), 
-                       y_lim = c(0, 8))
+                       y_lim = c(0, 6))
 ```
 
 ```{r a9Volcano, echo=TRUE}
@@ -1055,26 +1167,26 @@ a9_vol <- plot_volcano(a9_res,
                        legend_params = c("right", 14, 12), 
                        axis_params = c("black", 16, 14), 
                        x_lim = c(-10, 12), 
-                       y_lim = c(0, 8))
+                       y_lim = c(0, 6))
 ```
 
 ```{r atccVolcanoData, include=FALSE}
 a1_volcano <- a1_vol + 
   scale_colour_manual(values = c("#D55E00",
-                                 "#0072B2", 
-                                 "#999999"), 
+                                 "#999999",
+                                 "#0072B2"), 
                       labels = c("EV enriched", 
-                                 "WCL enriched", 
-                                 "Not significant")) + 
+                                 "Not significant", 
+                                 "WCL enriched")) + 
   theme(legend.title = element_blank())
 
 a9_volcano <- a9_vol + 
   scale_colour_manual(values = c("#D55E00",
-                                 "#0072B2", 
-                                 "#999999"), 
+                                 "#999999",
+                                 "#0072B2"), 
                       labels = c("EV enriched", 
-                                 "WCL enriched", 
-                                 "Not significant")) + 
+                                 "Not significant", 
+                                 "WCL enriched")) + 
   theme(legend.title = element_blank())
 ```
 
@@ -1096,35 +1208,53 @@ vol_cap <- "Volcano plots for proteins quantified in EV and WCL. (A) ATCC10231
 
 ## Log<sub>2</sub> LFQ intensity heatmap
 
-The `atcc_overall` data.frame is used to construct heatmaps based on the 
-proteins that are significantly different across all four sample groups; 
-ATCC90028 EV, WCL and ATCC10231 EV, WCL.
+The `a1_res` and `a9_res` data.frames are used to construct heatmaps based on 
+the proteins that are significantly different across all both sample groups; 
+EV and WCL.
 
 There are two type of heatmaps: one for plotting log<sub>2</sub> LFQ intensity 
 data and one for plotting log<sub>2</sub> fold change data. To plot an LFQ 
 intensity heatmap, a numeric matrix must be used as the input.
 
-In this case the `atcc_overall` data.frame is subset to remove all columns 
+In this case the `a1_res` data.frame is subset to remove all columns 
 except a column with identifiers (e.g. UniProt accessions), 
-log2FC data columns, and a logical significance column. Then the data.frame is 
+log2 LFQ intensity data columns, and a logical significance column. 
+Then the data.frame is 
 filtered for significant proteins, the UniProt accession column is converted to 
 rownames, the significance column is dropped, and the data.frame is converted 
-to a matrix.
+to a numeric matrix.
 
-```{r lfqHeatmapData, echo=TRUE}
-# get data for log2 LFQ intensity heatmap
-atcc_htmp <- atcc_overall %>% 
+For the `a9_res` data.frame, all columns are dropped except a column with 
+identifiers (e.g. UniProt accessions), 
+log2 LFQ intensity data columns, and the `EV_mean` column. Then the data.frame 
+is filtered for top 100 proteins with the **lowest** mean EV LFQ intensity. 
+Finally, the UniProt accession column is 
+converted to rownames, the `EV_mean` column is dropped, and the data.frame 
+is converted to a numeric matrix.
+```{r heatmapData, echo=TRUE}
+a1_htmp <- a1_res %>% 
   select(UP_accession, 
-         matches("A9_EV[0-9]"), matches("A1_EV[0-9]"), 
-         matches("A9_W[0-9]"), matches("A1_W[0-9]"),  
+         matches("EV[0-9]"), 
+         matches("WCL[0-9]"), 
          significant) %>% 
   filter(significant == TRUE) %>% 
   tibble::column_to_rownames(var = "UP_accession") %>% 
   select(-significant) %>% 
   as.matrix()
+
+a9_htmp <- a9_res %>% 
+  select(UP_accession, 
+         matches("EV[0-9]"), 
+         matches("WCL[0-9]"), 
+         EV_mean) %>% 
+  arrange(EV_mean) %>% 
+  top_n(-100) %>% 
+  tibble::column_to_rownames(var = "UP_accession") %>% 
+  select(-EV_mean) %>% 
+  as.matrix()
 ```
 
-The heatmap is plotted with: 
+The `a1_htmp` heatmap is plotted with: 
 
 ```{r, echo=TRUE, eval=FALSE}
 htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
@@ -1136,7 +1266,7 @@ htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"),
                     labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                     at = seq(-5, 5, 1))
 
-plot_heatmap(atcc_htmp, 
+plot_heatmap(a1_htmp, 
              plot = TRUE, 
              data_type = "log2intensity", 
              clust_fun = "euclidean", 
@@ -1150,7 +1280,7 @@ plot_heatmap(atcc_htmp,
              heatmap_legend_param = htmp_params)
 ```
 
-```{r lfqHeatmap, fig.cap=htmp_cap, fig.height=8}
+```{r a1Heatmap, fig.cap=htmp_cap, fig.height=8}
 htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
                     color_bar = "continuous", 
                     direction = "vertical", 
@@ -1160,7 +1290,7 @@ htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"),
                     labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                     at = seq(-5, 5, 1))
 
-plot_heatmap(atcc_htmp, 
+plot_heatmap(a1_htmp, 
              plot = TRUE, 
              data_type = "log2intensity", 
              clust_fun = "euclidean", 
@@ -1174,27 +1304,95 @@ plot_heatmap(atcc_htmp,
              heatmap_legend_param = htmp_params)
 
 htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been 
-             centred around 0."
+             centred around 0. ATCC10231 proteins significantly different in 
+             abundance between EV and WCL."
 ```
+
+The `a9_htmp` heatmap is plotted with (must use `cluster_split = FALSE` and 
+`split_type = "cutree"` because data has missing values):
+
+```{r, echo=TRUE, eval=FALSE}
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_height = unit(10, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    at = seq(-5, 5, 1))
+
+# a9_htmp has missing values, therefore must use cluster_split = FALSE and 
+# split_type = "cutree"
+plot_heatmap(a9_htmp, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "manhattan", 
+             split_type = "cutree", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = FALSE, 
+             colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
+             heatmap_legend_param = htmp_params)
+```
+
+```{r a9Heatmap, fig.cap=htmp_cap, fig.height=8}
+htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
+                    color_bar = "continuous", 
+                    direction = "vertical", 
+                    legend_height = unit(10, "cm"), 
+                    title_position = "lefttop-rot", 
+                    title_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    labels_gp = grid::gpar(colour = "black", fontsize = 16), 
+                    at = seq(-5, 5, 1))
+
+plot_heatmap(a9_htmp, 
+             plot = TRUE, 
+             data_type = "log2intensity", 
+             clust_fun = "manhattan", 
+             split_type = "cutree", 
+             k = 5, 
+             legend_pos = "right",
+             cluster_split = FALSE, 
+             colour_lims = c(-4,4), 
+             row_title_fontsize = 16, 
+             col_name_fontsize = 14, 
+             heatmap_legend_param = htmp_params)
+
+htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been 
+             centred around 0. Top 100 ATCC90028 EV proteins with the 
+             lowest mean LFQ EV LFQ intensity."
+```
+
 
 ## Log<sub>2</sub> fold change heatmap
 
 To plot a log<sub>2</sub> fold change heatmap, a numeric matrix must be used 
 as the input.
 
-In this case the `atcc_overall` data.frame is subset to remove all columns 
-except a column with identifiers (e.g. UniProt accessions), 
-the `logFC` data columns, and a logical significance column. Then the 
-data.frame is filtered for significant proteins, the UniProt accession column 
-is converted to rownames, the significance column is dropped, and the 
-data.frame is converted to a matrix.
+In this case, the `logFC`, `CGD_gene_name`, and `significant` columns from 
+both the `a1_res` and `a9_res` data.frames are selected and combined into a 
+single data.frame using the `CGD_gene_name` column as a reference. Then the 
+data.frame is filtered for proteins significantly different in both strains.
+Following this, the `CGD_gene_name` column 
+is converted to rownames and the significance columns are dropped and the 
+data.frame is converted to a numeric matrix.
 
 ```{r logfcHeatmapData, echo=TRUE}
-atcc_htmp2 <- atcc_overall %>% 
-  select(UP_accession, matches("EV.vs.*W"), significant) %>% 
-  filter(significant == TRUE) %>% 
-  tibble::column_to_rownames(var = "UP_accession") %>% 
-  select(-significant) %>% 
+# get data for log2 LFQ intensity heatmap
+# find proteins signficantly different between EV and WCL from both strains
+sig_both <- a1_res %>% 
+  select(logFC, CGD_gene_name, significant) %>% 
+  full_join(., select(a9_res, logFC, CGD_gene_name, significant), 
+            by = "CGD_gene_name") %>% 
+  rename(a1_lfc = logFC.x,
+         a9_lfc = logFC.y, 
+         a1_sig = significant.x, 
+         a9_sig = significant.y) %>% 
+  filter(a1_sig == TRUE & a9_sig == TRUE) %>% 
+  tibble::column_to_rownames(var = "CGD_gene_name") %>% 
+  select(a1_lfc, a9_lfc) %>% 
   as.matrix()
 ```
 
@@ -1210,7 +1408,7 @@ htmp2_params <- list(title = expression(bold(log[2]("FC"))),
                      labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                      at = seq(-10, 10, 2))
 
-htmp2 <- plot_heatmap(atcc_htmp2, 
+htmp2 <- plot_heatmap(sig_both, 
                       plot = TRUE,
                       data_type = "log2fc", 
                       clust_fun = "euclidean", 
@@ -1233,12 +1431,12 @@ htmp2_params <- list(title = expression(bold(log[2]("FC"))),
                      labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                      at = seq(-10, 10, 2))
 
-htmp2 <- plot_heatmap(atcc_htmp2, 
+htmp2 <- plot_heatmap(sig_both, 
                       plot = TRUE,
                       data_type = "log2fc", 
                       clust_fun = "euclidean", 
                       split_type = "kmeans", 
-                      k = 5, 
+                      k = 4, 
                       legend_pos = "right", 
                       row_title_fontsize = 16, 
                       col_name_fontsize = 14, 
@@ -1247,6 +1445,10 @@ htmp2 <- plot_heatmap(atcc_htmp2,
 
 htmp2_cap <- "Protein log<sub>2</sub> fold change heatmap."
 ```
+
+Generally, proteins signficantly enriched in ATCC10231 EVs are also signficantly 
+enriched in ATCC90028 EVs. Similarly, signficantly depleted EV proteins are
+depleted in EVs from both strains.
 
 # Session information {-}
 

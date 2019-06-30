@@ -860,7 +860,8 @@ intensity heatmap, a numeric matrix must be used as the input.
 
 In this case the `yeast_res` data.frame is subset to remove all columns 
 except a column with identifiers (e.g. UniProt accessions), 
-log2FC data columns, and a logical significance column. Then the data.frame is 
+log2 LFQ intensity data columns, and a logical significance column. 
+Then the data.frame is 
 filtered for significant proteins, the UniProt accession column is converted to 
 rownames, the significance column is dropped, and the data.frame is converted 
 to a matrix.
