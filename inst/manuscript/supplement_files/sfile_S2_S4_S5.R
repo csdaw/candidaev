@@ -1,7 +1,4 @@
-#### Supplemental File S2 ####
-# differential expression analyses
-# results tables
-
+#### Setup ####
 # need writexl package to write output to .xlsx
 requireNamespace("writexl", quietly = TRUE)
 
@@ -84,39 +81,6 @@ yeast_res <- get_results(efit = y_efit,
                          p_val = 0.01,
                          lfc = 0,
                          type = "individual")[[1]]
-s2_a <- yeast_res %>%
-  mutate(group = case_when(group == "EV up" ~ "EV sig",
-                           group == "WCL up" ~ "W sig",
-                           TRUE ~ as.character(group)),
-         CGDID = match_id(UP_accession, uniprot,
-                          "UP_accession", "CGDID"),
-         Function = match_id(UP_accession, uniprot,
-                             "UP_accession", "CGD_description"),
-         Feature_name = match_id(UP_accession, uniprot,
-                                 "UP_accession", "CGD_feature_name")) %>%
-  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
-         everything(), -Protein_name)
-colnames(s2_a) <- c("Accession",
-                    "CGDID",
-                    "Feature name",
-                    "Protein name",
-                    "Function",
-                    "Log2(LFQ) EV1",
-                    "Log2(LFQ) EV2",
-                    "Log2(LFQ) EV3",
-                    "Log2(LFQ) W1",
-                    "Log2(LFQ) W2",
-                    "Log2(LFQ) W3",
-                    "EV log2(LFQ) mean",
-                    "W log2(LFQ) mean",
-                    "log2(fold change)",
-                    "t",
-                    "p-value",
-                    "Adjusted p-value",
-                    "B",
-                    "Significant",
-                    "Group")
-s2_a[102, 4] <- "EVP1"
 
 #### DAY286 biofilm ####
 # filter out reverse, contaminant proteins, proteins with <2 unique peptides
@@ -186,45 +150,7 @@ biofilm_res <- get_results(efit = b_efit,
                            lfc = 0,
                            type = "individual")[[1]]
 
-s2_d <- biofilm_res %>%
-  mutate(group = case_when(group == "EV up" ~ "EV sig",
-                           group == "WCL up" ~ "W sig",
-                           TRUE ~ as.character(group)),
-         CGDID = match_id(UP_accession, uniprot,
-                          "UP_accession", "CGDID"),
-         Function = match_id(UP_accession, uniprot,
-                             "UP_accession", "CGD_description"),
-         Feature_name = match_id(UP_accession, uniprot,
-                                 "UP_accession", "CGD_feature_name")) %>%
-  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
-         everything(), -Protein_name)
-colnames(s2_d) <- c("Accession",
-                    "CGDID",
-                    "Feature name",
-                    "Protein name",
-                    "Function",
-                    "Log2(LFQ) EV1",
-                    "Log2(LFQ) EV2",
-                    "Log2(LFQ) EV3",
-                    "Log2(LFQ) EV4",
-                    "Log2(LFQ) EV5",
-                    "Log2(LFQ) W1",
-                    "Log2(LFQ) W2",
-                    "Log2(LFQ) W3",
-                    "Log2(LFQ) W4",
-                    "Log2(LFQ) W5",
-                    "EV log2(LFQ) mean",
-                    "W log2(LFQ) mean",
-                    "log2(fold change)",
-                    "t",
-                    "p-value",
-                    "Adjusted p-value",
-                    "B",
-                    "Significant",
-                    "Group")
-s2_d[67, 4] <- "EVP1"
-
-#### ATCC90028 ###
+#### ATCC ####
 # filter out reverse, contaminant proteins, proteins with <2 unique peptides
 # extract LFQ intensity columns and UniProt accessions
 # log2 transform LFQ intensities
@@ -245,79 +171,155 @@ atcc_filt <- filter_na4(atcc_lfq, "or", "<=",
 # normalise LFQ intensities
 atcc_norm <- normalizeCyclicLoess(atcc_filt)
 
-# filter for proteins identified in min 1/3 reps of 10231 EV
-# define 'ATCC10231 EV proteins'
-atcc1_ev <- filter_na(atcc_norm, op = "<=",
-                      pat = "A10231_EV", val = 2)
+#### ATCC10231 ####
+# filter for proteins quantified in min 2/3 reps of EV or WCL
+a1_norm <- filter_na2(atcc_norm, logic = "or", op = "<=",
+                      pat1 = "A10231_EV", val1 = 1,
+                      pat2 = "A10231_W", val2 = 1)
+a1_norm <- a1_norm[, -c(7:12)]
 
-# filter for proteins identified in min 1/3 reps of 10231 WCL
-# define 'ATCC10231 WCL proteins'
-atcc1_w <- filter_na(atcc_norm, op = "<=",
-                     pat = "A10231_W", val = 2)
+# filter for proteins quantified in min 1/3 reps of EV
+# define 'EV proteins'
+a1_ev <- filter_na(a1_norm, op = "<=", pat = "EV", val = 2)
 
-# filter for proteins identified in min 1/3 reps of 90028 EV
-# define 'ATCC90028 EV proteins'
-atcc9_ev <- filter_na(atcc_norm, op = "<=",
-                      pat = "A90028_EV", val = 2)
-
-# filter for proteins identified in min 1/3 reps of 90028 WCL
-# define 'ATCC90028 WCL proteins'
-atcc9_w <- filter_na(atcc_norm, op = "<=",
-                     pat = "A90028_W", val = 2)
+# filter for proteins quantified in min 1/3 reps of WCL
+# define 'WCL proteins'
+a1_wcl <- filter_na(a1_norm, op = "<=", pat = "W", val = 2)
 
 # can't impute with so many missing values
-# filter for exclusive to 10231 EV or WCL or 90028 EV or WCL (don't impute)
-atcc_excl <- filter_na4(atcc_norm, logic = "or", op = "==",
-                        pat1 = "A10231_EV", val1 = 3,
-                        pat2 = "A10231_W", val2 = 3,
-                        pat3 = "A90028_EV", val3 = 3,
-                        pat4 = "A90028_W", val4 = 3)
+# separate EV/WCL exclusive proteins (don't impute) from
+# EV/WCL common proteins (impute)
+a1_excl <- filter_na2(a1_norm, logic = "or", op = "==",
+                      pat1 = "EV", val1 = 3,
+                      pat2 = "W", val2 = 3)
 
-# filter for proteins with min 1 valid value in all 4 sample types (impute)
-atcc_both <- filter_na4(atcc_norm, logic = "and", op = "<=",
-                        pat1 = "A10231_EV", val1 = 2,
-                        pat2 = "A10231_W", val2 = 2,
-                        pat3 = "A90028_EV", val3 = 2,
-                        pat4 = "A90028_W", val4 = 2)
+a1_both <- filter_na2(a1_norm, logic = "and", op = "<=",
+                      pat1 = "EV", val1 = 2,
+                      pat2 = "W", val2 = 2)
 
 # proteins with missing values tend to have lower intensity
 # therefore proteins are MNAR, close to detection limit
 # use left censored imputation method
-atcc_imp <- impute_QRILC(atcc_both)
+a1_imp <- impute_QRILC(a1_both)
 
 # recombine imputed proteins and non-imputed proteins in matrix
-atcc_de <- rbind(atcc_excl, atcc_imp)
-colnames(atcc_de) <- stringi::stri_replace_all_regex(colnames(atcc_de),
-                                                     c("A10231_", "A90028_"),
-                                                     c("A1_", "A9_"),
-                                                     vectorize_all = FALSE)
+a1_de <- rbind(a1_excl, a1_imp)
+colnames(a1_de) <- gsub("A10231", "A1", colnames(a1_de))
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-atcc_samp <- data.frame(T = (rep(c("A1_EV", "A1_WCL",
-                                   "A9_EV", "A9_WCL"), each = 3)))
+a1_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
 
-atcc_design <- stats::model.matrix(~ 0 + T, data = atcc_samp)
-colnames(atcc_design) <- c("A1_EV", "A1_W", "A9_EV", "A9_W")
+a1_design <- stats::model.matrix(~ 0 + T, data = a1_samp)
+colnames(a1_design) <- c("A1_EV", "A1_W")
 
 # define sample comparisons of interest
-atcc_contrasts <- c("A1_EV - A1_W", "A9_EV - A9_W")
+a1_contrasts <- c("A1_EV - A1_W")
 
-# make all pair-wise comparisons for specified contrasts
+# make all pair-wise comparisons between EV and WCL
 # and perform limma::eBayes()
-atcc_efit <- limma_eBayes(atcc_de, atcc_design, atcc_contrasts)
+a1_efit <- limma_eBayes(a1_de, design = a1_design, contrasts = a1_contrasts)
 
-# extract overall results
-atcc_overall <- get_results(efit = atcc_efit, mat = atcc_de,
-                            p_val = 0.01, lfc = 0, type = "overall")
-
-# extract results for ATCC90028
-a9_res <- get_results(efit = atcc_efit,
-                      mat = atcc_de,
+# extract DE results
+a1_res <- get_results(efit = a1_efit,
+                      mat = a1_de,
                       p_val = 0.01,
                       lfc = 0,
-                      type = "individual")[[2]]
+                      type = "individual")[[1]]
 
+#### ATCC90028 ####
+# filter for proteins quantified in min 2/3 reps of EV or WCL
+a9_norm <- filter_na2(atcc_norm, logic = "or", op = "<=",
+                      pat1 = "A90028_EV", val1 = 1,
+                      pat2 = "A90028_W", val2 = 1)
+a9_norm <- a9_norm[, -c(1:6)]
+
+# filter for proteins quantified in min 1/3 reps of EV
+# define 'EV proteins'
+a9_ev <- filter_na(a9_norm, op = "<=", pat = "EV", val = 2)
+
+# filter for proteins quantified in min 1/3 reps of WCL
+# define 'WCL proteins'
+a9_wcl <- filter_na(a9_norm, op = "<=", pat = "W", val = 2)
+
+# can't impute with so many missing values
+# separate EV/WCL exclusive proteins (don't impute) from
+# EV/WCL common proteins (impute)
+a9_excl <- filter_na2(a9_norm, logic = "or", op = "==",
+                      pat1 = "EV", val1 = 3,
+                      pat2 = "W", val2 = 3)
+
+a9_both <- filter_na2(a9_norm, logic = "and", op = "<=",
+                      pat1 = "EV", val1 = 2,
+                      pat2 = "W", val2 = 2)
+
+# proteins with missing values tend to have lower intensity
+# therefore proteins are MNAR, close to detection limit
+# use left censored imputation method
+a9_imp <- impute_QRILC(a9_both)
+
+# recombine imputed proteins and non-imputed proteins in matrix
+a9_de <- rbind(a9_excl, a9_imp)
+colnames(a9_de) <- gsub("A90028", "A9", colnames(a9_de))
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+a9_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+
+a9_design <- stats::model.matrix(~ 0 + T, data = a9_samp)
+colnames(a9_design) <- c("A9_EV", "A9_W")
+
+# define sample comparisons of interest
+a9_contrasts <- c("A9_EV - A9_W")
+
+# make all pair-wise comparisons between EV and WCL
+# and perform limma::eBayes()
+a9_efit <- limma_eBayes(a9_de, design = a9_design, contrasts = a9_contrasts)
+
+# extract DE results
+a9_res <- get_results(efit = a9_efit,
+                      mat = a9_de,
+                      p_val = 0.01,
+                      lfc = 0,
+                      type = "individual")[[1]]
+
+#### Supplemental File S2 ####
+# DAY286 yeast results
+s2_a <- yeast_res %>%
+  mutate(group = case_when(group == "EV up" ~ "EV sig",
+                           group == "WCL up" ~ "WCL sig",
+                           TRUE ~ as.character(group)),
+         CGDID = match_id(UP_accession, uniprot,
+                          "UP_accession", "CGDID"),
+         Function = match_id(UP_accession, uniprot,
+                             "UP_accession", "CGD_description"),
+         Feature_name = match_id(UP_accession, uniprot,
+                                 "UP_accession", "CGD_feature_name")) %>%
+  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
+         everything(), -Protein_name)
+colnames(s2_a) <- c("Accession",
+                    "CGDID",
+                    "Feature name",
+                    "Protein name",
+                    "Function",
+                    "Log2(LFQ) EV1",
+                    "Log2(LFQ) EV2",
+                    "Log2(LFQ) EV3",
+                    "Log2(LFQ) WCL1",
+                    "Log2(LFQ) WCL2",
+                    "Log2(LFQ) WCL3",
+                    "EV log2(LFQ) mean",
+                    "W log2(LFQ) mean",
+                    "log2(fold change)",
+                    "t",
+                    "p-value",
+                    "Adjusted p-value",
+                    "B",
+                    "Significant",
+                    "Group")
+s2_a[102, 4] <- "EVP1"
+
+# ATCC90028 yeast results
 s2_b <- a9_res %>%
   mutate(group = case_when(group == "A9_EV up" ~ "EV sig",
                            group == "A9_W up" ~ "WCL sig",
@@ -340,9 +342,9 @@ colnames(s2_b) <- c("Accession",
                     "Log2(LFQ) EV1",
                     "Log2(LFQ) EV2",
                     "Log2(LFQ) EV3",
-                    "Log2(LFQ) W1",
-                    "Log2(LFQ) W2",
-                    "Log2(LFQ) W3",
+                    "Log2(LFQ) WCL1",
+                    "Log2(LFQ) WCL2",
+                    "Log2(LFQ) WCL3",
                     "EV log2(LFQ) mean",
                     "W log2(LFQ) mean",
                     "log2(fold change)",
@@ -352,16 +354,9 @@ colnames(s2_b) <- c("Accession",
                     "B",
                     "Significant",
                     "Group")
-s2_b[216, 4] <- "EVP1"
+s2_b[131, 4] <- "EVP1"
 
-#### ATCC10231 ####
-# extract results for ATCC10231
-a1_res <- get_results(efit = atcc_efit,
-                      mat = atcc_de,
-                      p_val = 0.01,
-                      lfc = 0,
-                      type = "individual")[[1]]
-
+# ATCC10231 yeast results
 s2_c <- a1_res %>%
   mutate(group = case_when(group == "A1_EV up" ~ "EV sig",
                            group == "A1_W up" ~ "WCL sig",
@@ -384,9 +379,9 @@ colnames(s2_c) <- c("Accession",
                     "Log2(LFQ) EV1",
                     "Log2(LFQ) EV2",
                     "Log2(LFQ) EV3",
-                    "Log2(LFQ) W1",
-                    "Log2(LFQ) W2",
-                    "Log2(LFQ) W3",
+                    "Log2(LFQ) WCL1",
+                    "Log2(LFQ) WCL2",
+                    "Log2(LFQ) WCL3",
                     "EV log2(LFQ) mean",
                     "W log2(LFQ) mean",
                     "log2(fold change)",
@@ -396,14 +391,51 @@ colnames(s2_c) <- c("Accession",
                     "B",
                     "Significant",
                     "Group")
-s2_c[176, 4] <- "EVP1"
+s2_c[127, 4] <- "EVP1"
 
-
+# DAY286 biofilm results
+s2_d <- biofilm_res %>%
+  mutate(group = case_when(group == "EV up" ~ "EV sig",
+                           group == "WCL up" ~ "WCL sig",
+                           TRUE ~ as.character(group)),
+         CGDID = match_id(UP_accession, uniprot,
+                          "UP_accession", "CGDID"),
+         Function = match_id(UP_accession, uniprot,
+                             "UP_accession", "CGD_description"),
+         Feature_name = match_id(UP_accession, uniprot,
+                                 "UP_accession", "CGD_feature_name")) %>%
+  select(UP_accession, CGDID, Feature_name, CGD_gene_name, Function,
+         everything(), -Protein_name)
+colnames(s2_d) <- c("Accession",
+                    "CGDID",
+                    "Feature name",
+                    "Protein name",
+                    "Function",
+                    "Log2(LFQ) EV1",
+                    "Log2(LFQ) EV2",
+                    "Log2(LFQ) EV3",
+                    "Log2(LFQ) EV4",
+                    "Log2(LFQ) EV5",
+                    "Log2(LFQ) WCL1",
+                    "Log2(LFQ) WCL2",
+                    "Log2(LFQ) WCL3",
+                    "Log2(LFQ) WCL4",
+                    "Log2(LFQ) WCL5",
+                    "EV log2(LFQ) mean",
+                    "W log2(LFQ) mean",
+                    "log2(fold change)",
+                    "t",
+                    "p-value",
+                    "Adjusted p-value",
+                    "B",
+                    "Significant",
+                    "Group")
+s2_d[67, 4] <- "EVP1"
 
 #### export ####
 s2_sheets <- list("DAY286 yeast" = s2_a,
-                  "ATCC90028" = s2_b,
-                  "ATCC10231" = s2_c,
+                  "ATCC90028 yeast" = s2_b,
+                  "ATCC10231 yeast" = s2_c,
                   "DAY286 biofilm" = s2_d)
 writexl::write_xlsx(s2_sheets, "inst/manuscript/supplement_files/sfile_S2.xlsx")
 
@@ -413,8 +445,8 @@ writexl::write_xlsx(s2_sheets, "inst/manuscript/supplement_files/sfile_S2.xlsx")
 #### Figure 4A ####
 # figure 4a EV venn
 s4_a_comp <- list("DAY Y" = rownames(y_ev),
-                  "ATCC90028" = rownames(atcc9_ev),
-                  "ATCC10231" = rownames(atcc1_ev),
+                  "ATCC90028" = rownames(a9_ev),
+                  "ATCC10231" = rownames(a1_ev),
                   "DAY B" = rownames(b_ev))
 
 s4_a <- plot_venn(vlist = s4_a_comp, use_uniprot = FALSE, type = "df") %>%
@@ -430,8 +462,8 @@ s4_a <- plot_venn(vlist = s4_a_comp, use_uniprot = FALSE, type = "df") %>%
 #### Figure 4B ####
 # figure 4b WCL venn
 s4_b_comp <- list("DAY Y" = rownames(y_wcl),
-                  "ATCC90028" = rownames(atcc9_w),
-                  "ATCC10231" = rownames(atcc1_w),
+                  "ATCC90028" = rownames(a9_wcl),
+                  "ATCC10231" = rownames(a1_wcl),
                   "DAY B" = rownames(b_wcl))
 s4_b <- plot_venn(vlist = s4_b_comp, use_uniprot = FALSE, type = "df") %>%
   mutate(Proteins = lapply(..values.., function(x) match_id(x, uniprot,
@@ -499,7 +531,7 @@ writexl::write_xlsx(s4_sheets, "inst/manuscript/supplement_files/sfile_S4.xlsx")
 s5_comp <- s4_a_comp
 
 s5_overlap <- plot_venn(vlist = s5_comp, use_uniprot = FALSE, type = "df") %>%
-  filter(..count.. == 403) %>%
+  filter(..count.. == 396) %>%
   pull(..values..) %>%
   unlist() %>%
   match_id(., uniprot, "UP_accession", "CGD_gene_name")
@@ -545,7 +577,7 @@ s5 <- plot_heatmap(mt = s5_table_filt,
                    k = 5,
                    cluster_split = FALSE) %>%
   mutate(cluster = recode(cluster,
-                          "1" = 2, "2" = 4, "3" = 1, "4" = 3, "5" = 5)) %>%
+                          "1" = 4, "2" = 1, "3" = 5, "4" = 2, "5" = 3)) %>%
   arrange(cluster) %>%
   select(-order) %>%
   bind_rows(s5_table_excl) %>%
@@ -564,7 +596,7 @@ s5 <- plot_heatmap(mt = s5_table_filt,
          "ATCC10231 log2FC" = a1_lfc,
          "DAY286 biofilm log2FC" = b_lfc,
          "Cluster" = cluster)
-s5[397, 4] <- "EVP1"
+s5[390, 4] <- "EVP1"
 
 #### export ####
 writexl::write_xlsx(s5, "inst/manuscript/supplement_files/sfile_S5.xlsx")

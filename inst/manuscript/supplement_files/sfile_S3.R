@@ -88,14 +88,14 @@ s3_d <- process_fungifun("inst/manuscript/figures/f3_GO_DAY_B.csv") %>%
 #### Figure 5 ####
 ## import FungiFun2 results
 s3_e <- process_fungifun("inst/manuscript/figures/f5_GO_clust1.csv") %>%
-  mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found)) %>%
-  rnm_cols()
-
-s3_f <- process_fungifun("inst/manuscript/figures/f5_GO_clust2.csv") %>%
   mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found)) %>%
   rnm_cols()
 
+s3_f <- process_fungifun("inst/manuscript/figures/f5_GO_clust2.csv") %>%
+  rnm_cols()
+
 s3_g <- process_fungifun("inst/manuscript/figures/f5_GO_clust3.csv") %>%
+  mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found)) %>%
   rnm_cols()
 
 s3_h <- process_fungifun("inst/manuscript/figures/f5_GO_clust4.csv") %>%
@@ -118,8 +118,8 @@ s3_j <- process_fungifun("inst/manuscript/figures/f5_GO_clust6.csv") %>%
 
 #### export ####
 s3_sheets <- list("Fig 3a DAY286 y" = s3_a,
-                  "Fig 3b ATCC90028" = s3_b,
-                  "Fig 3c ATCC10231" = s3_c,
+                  "Fig 3b ATCC90028 y" = s3_b,
+                  "Fig 3c ATCC10231 y" = s3_c,
                   "Fig 3d DAY286 b" = s3_d,
                   "Fig 5 Cluster 1" = s3_e,
                   "Fig 5 Cluster 2" = s3_f,

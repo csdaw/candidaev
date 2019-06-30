@@ -71,37 +71,44 @@ s1_a <- yeast %>%
   rename_all(list(~ stringr::str_replace_all(., "C6.EV", "EV1"))) %>%
   rename_all(list(~ stringr::str_replace_all(., "C7.EV", "EV2"))) %>%
   rename_all(list(~ stringr::str_replace_all(., "C8.EV", "EV3"))) %>%
-  rename_all(list(~ stringr::str_replace_all(., "C6.WCL", "W1"))) %>%
-  rename_all(list(~ stringr::str_replace_all(., "C7.WCL", "W2"))) %>%
-  rename_all(list(~ stringr::str_replace_all(., "C8.WCL", "W3"))) %>%
+  rename_all(list(~ stringr::str_replace_all(., "C6.WCL", "WCL1"))) %>%
+  rename_all(list(~ stringr::str_replace_all(., "C7.WCL", "WCL2"))) %>%
+  rename_all(list(~ stringr::str_replace_all(., "C8.WCL", "WCL3"))) %>%
   make_s1(.)
 s1_a[215, 4] <- "EVP1"
 
-#### ATCC90028 ####
-s1_b <- atcc %>%
+#### ATCC ####
+atcc_filt <- atcc %>%
+  filter(Reverse != "+",
+         Potential.contaminant != "+",
+         Unique.peptides >= 2) %>%
   filter_zero4(., logic = "or", "<=",
                pat1 = "LFQ.*A1_EV", 1,
                pat2 = "LFQ.*A1_W", 1,
                pat3 = "LFQ.*A9_EV", 1,
-               pat4 = "LFQ.*A9_W", 1) %>%
-  filter_zero(., op = "<=", pat = "LFQ.intensity.A9", val = 5) %>%
+               pat4 = "LFQ.*A9_W", 1)
+
+#### ATCC90028 ####
+s1_b <- atcc_filt %>%
+  filter_zero2(., logic = "or", op = "<=",
+               pat1 = "LFQ.*A9_EV", val1 = 1,
+               pat2 = "LFQ.*A9_W", val2 = 1) %>%
   select(-contains("A1")) %>%
   rename_all(list(~ stringr::str_replace_all(., "A9_", ""))) %>%
+  rename_all(list(~ stringr::str_replace_all(., "W", "WCL"))) %>%
   make_s1(.)
-s1_b[358, 4] <- "EVP1"
+s1_b[352, 4] <- "EVP1"
 
 #### ATCC10231 ####
-s1_c <- atcc %>%
-  filter_zero4(., logic = "or", "<=",
-              pat1 = "LFQ.*A1_EV", 1,
-              pat2 = "LFQ.*A1_W", 1,
-              pat3 = "LFQ.*A9_EV", 1,
-              pat4 = "LFQ.*A9_W", 1) %>%
-  filter_zero(., op = "<=", pat = "LFQ.intensity.A1", val = 5) %>%
+s1_c <- atcc_filt %>%
+  filter_zero2(., logic = "or", op = "<=",
+               pat1 = "LFQ.*A1_EV", val1 = 1,
+               pat2 = "LFQ.*A1_W", val2 = 1) %>%
   select(-contains("A9")) %>%
   rename_all(list(~ stringr::str_replace_all(., "A1_", ""))) %>%
+  rename_all(list(~ stringr::str_replace_all(., "W", "WCL"))) %>%
   make_s1()
-s1_c[318, 4] <- "EVP1"
+s1_c[280, 4] <- "EVP1"
 
 #### DAY286 biofilm ####
 s1_d <- biofilm %>%
@@ -114,12 +121,13 @@ s1_d <- biofilm %>%
   rename_all(list(~ stringr::str_replace_all(., "(?<=EV|W)5", "3"))) %>%
   rename_all(list(~ stringr::str_replace_all(., "(?<=EV|W)6", "4"))) %>%
   rename_all(list(~ stringr::str_replace_all(., "(?<=EV|W)7", "5"))) %>%
+  rename_all(list(~ stringr::str_replace_all(., "W", "WCL"))) %>%
   make_s1(.)
 s1_d[200, 4] <- "EVP1"
 
 #### export ####
 s1_sheets <- list("DAY286 yeast" = s1_a,
-                  "ATCC90028" = s1_b,
-                  "ATCC10231" = s1_c,
+                  "ATCC90028 yeast" = s1_b,
+                  "ATCC10231 yeast" = s1_c,
                   "DAY286 biofilm" = s1_d)
 writexl::write_xlsx(s1_sheets, "inst/manuscript/supplement_files/sfile_S1.xlsx")
