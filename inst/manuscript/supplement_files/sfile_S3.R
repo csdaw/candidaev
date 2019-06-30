@@ -19,6 +19,7 @@ rnm_cols <- function(df) {
            "Adjusted p-value" = adj.p.val,
            "N protein found" = N.prot.found,
            "N protein GO term" = N.prot.cat,
+           "N protein input" = N.prot.input,
            "GO term coverage ratio" = Cat.ratio,
            "Input coverage ratio" = Input.ratio)
 }

@@ -59,6 +59,7 @@ make_s1 <- function(df) {
            Score,
            everything(),
            -First.protein) %>%
+    rename("Accession" = Majority.protein.IDs) %>%
     rename_all(list(~ stringr::str_replace_all(., "\\.", " ")))
 }
 
