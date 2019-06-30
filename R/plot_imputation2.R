@@ -83,15 +83,15 @@ plot_imputation2 <- function(exd, facet_labels = NULL, mat, ...) {
   # Get arguments from call
   call <- match.call()
   arglist <- lapply(call[-1], function(x) x)
-  var.names <- vapply(arglist, deparse, character(1))
-  arglist <- lapply(arglist, eval.parent, n = 2)
-  names(arglist) <- var.names
-  arglist <- arglist[c(-1,-2)]
+  to_plot <- arglist[c(-1,-2)]
+  var.names <- vapply(to_plot, deparse, character(1))
+  to_plot <- lapply(to_plot, eval.parent, n = length(to_plot))
+  names(to_plot) <- var.names
 
   # Show error if inputs are not the required classes
   assertthat::assert_that(is.data.frame(exd),
                           assert_exd(exd))
-  lapply(arglist, function(x) {
+  lapply(to_plot, function(x) {
     assertthat::assert_that(is.matrix(x))
   })
 
@@ -103,8 +103,8 @@ plot_imputation2 <- function(exd, facet_labels = NULL, mat, ...) {
       left_join(., as.data.frame(exd), by = "ID")
   }
 
-  df <- purrr::map_df(arglist, gather_join2, .id = "var") %>%
-    mutate(var = factor(var, levels = names(arglist)))
+  df <- purrr::map_df(to_plot, gather_join2, .id = "var") %>%
+    mutate(var = factor(var, levels = names(to_plot)))
 
   # Density plots for different conditions with facet_wrap
   # for original and imputed samles
