@@ -30,8 +30,7 @@
 #' \code{"log2fc"} depending on the data in the numeric matrix.
 #'
 #' @param clust_fun character: one of c("gower", "euclidean", "maximum",
-#' "manhattan", "canberra", "binary", "minkowski", "pearson", "spearman",
-#' "kendall").
+#' "manhattan", "canberra", "binary", "minkowski").
 #'
 #' @param split_type character: method for splitting rows into slices, one of c("kmeans", "cutree").
 #' Use \code{"kmeans"} if \code{mt} does not contain \code{NA} values, or \code{"cutree"}
@@ -191,8 +190,7 @@ plot_heatmap <- function(mt,
                          df = FALSE,
                          data_type = c("log2fc", "log2intensity"),
                          clust_fun = c("gower", "euclidean", "maximum", "manhattan",
-                                       "canberra", "binary", "minkowski", "pearson",
-                                       "spearman", "kendall"),
+                                       "canberra", "binary", "minkowski"),
                          split_type = c("kmeans", "cutree"),
                          k = 5,
                          cluster_split = TRUE,
