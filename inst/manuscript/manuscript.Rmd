@@ -728,6 +728,7 @@ f2b1 <- plot_volcano(data = yeast_res,
                      p_val = adj.P.Val, 
                      log2fc = logFC,
                      group = group, 
+                     use_labels = TRUE,
                      label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
                      point_size = 0.6, 
                      label_size = 2, 
@@ -776,6 +777,7 @@ f2b2 <- plot_volcano(data = a9_res,
                      p_val = adj.P.Val, 
                      log2fc = logFC,
                      group = group, 
+                     use_labels = TRUE, 
                      label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
                      point_size = 0.6, 
                      label_size = 2, 
@@ -821,6 +823,7 @@ f2b3 <- plot_volcano(data = a1_res,
                      p_val = adj.P.Val, 
                      log2fc = logFC,
                      group = group, 
+                     use_labels = TRUE, 
                      label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
                      point_size = 0.6, 
                      label_size = 2, 
@@ -867,6 +870,7 @@ f2b4 <- plot_volcano(data = biofilm_res,
                      p_val = adj.P.Val, 
                      log2fc = logFC,
                      group = group, 
+                     use_labels = TRUE, 
                      label_fun = ifelse(logFC >= 8, CGD_gene_name, ""), 
                      point_size = 0.6, 
                      label_size = 2, 
@@ -996,7 +1000,7 @@ f3_a1_go <- marker_comp[4] %>%
 # paste into FungiFun2 and download results .csv
 ```
 
-```{r figure4Plots, include=FALSE}
+```{r figure3Plots, include=FALSE}
 # import FungiFun2 GO enrichment results
 f3_y_go_table <- process_fungifun("figures/f3_GO_DAY_Y.csv")
 f3_b_go_table <- process_fungifun("figures/f3_GO_DAY_B.csv")
