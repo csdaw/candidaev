@@ -6,13 +6,12 @@
 \usage{
 plot_heatmap(mt, plot = TRUE, df = FALSE, data_type = c("log2fc",
   "log2intensity"), clust_fun = c("gower", "euclidean", "maximum",
-  "manhattan", "canberra", "binary", "minkowski", "pearson", "spearman",
-  "kendall"), split_type = c("kmeans", "cutree"), k = 5,
-  cluster_split = TRUE, split_order = seq(1, k, 1),
-  colour_lims = c(-8, 8), use_cbrewer = FALSE, cbrewer_pal = NULL,
-  colour_vals = c("#0000FF", "#B38BFF", "#FFFFFF", "#FF9E81", "#FF0000"),
-  legend_pos = "top", row_title_fontsize = 6, col_name_fontsize = 10,
-  ...)
+  "manhattan", "canberra", "binary", "minkowski"),
+  split_type = c("kmeans", "cutree"), k = 5, cluster_split = TRUE,
+  split_order = seq(1, k, 1), colour_lims = c(-8, 8),
+  use_cbrewer = FALSE, cbrewer_pal = NULL, colour_vals = c("#0000FF",
+  "#B38BFF", "#FFFFFF", "#FF9E81", "#FF0000"), legend_pos = "top",
+  row_title_fontsize = 6, col_name_fontsize = 10, ...)
 }
 \arguments{
 \item{mt}{numeric matrix: contains either log2 intensities or log2 fold change data.
@@ -32,8 +31,7 @@ appearance in the heatmap. If \code{FALSE}, a
 \code{"log2fc"} depending on the data in the numeric matrix.}
 
 \item{clust_fun}{character: one of c("gower", "euclidean", "maximum",
-"manhattan", "canberra", "binary", "minkowski", "pearson", "spearman",
-"kendall").}
+"manhattan", "canberra", "binary", "minkowski").}
 
 \item{split_type}{character: method for splitting rows into slices, one of c("kmeans", "cutree").
 Use \code{"kmeans"} if \code{mt} does not contain \code{NA} values, or \code{"cutree"}

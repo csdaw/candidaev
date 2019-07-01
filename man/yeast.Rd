@@ -7,7 +7,10 @@
 whole cell lysate LC-MS/MS data.}
 \format{An object of class \code{data.frame} with 1997 observations (rows) and 97 variables (columns).}
 \source{
-Dawson, CS, Bleackley, MR, Garcia Ceron, D, Anderson, MA (2019). Title. Journal vol(issue): 000-000. doi.
+Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
+M. A., Bleackley, M. R. (2019) Protein markers for \emph{Candida albicans}
+EVs include claudin-like Sur7 family proteins and Rho GTPases.
+Mol. Cell. Proteomics, submitted.
 }
 \usage{
 yeast

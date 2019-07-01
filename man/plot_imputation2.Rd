@@ -46,6 +46,7 @@ of \code{plot_imputation}:
 \item Dependance on a "SummarizedExperiment" object as input has been
 removed. Instead the input has been changed to a numeric matrix.
 \item Use of \code{theme_DEP1()} has been replaced with \code{theme_bw()}
+\item Parsing of function arguments has been slightly modified.
 }
 }
 \examples{

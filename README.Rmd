@@ -1,5 +1,8 @@
 ---
-output: github_document
+output:
+  github_document:
+    toc: TRUE
+    toc_depth: 4
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -16,9 +19,10 @@ knitr::opts_chunk$set(collapse = TRUE,
 
 This repository contains the research compendium for our paper:
 
-> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson, M. A., 
-Bleackley, M. R. (2019) Sur7 family proteins are putative markers for
-_Candida albicans_ extracellular vesicles. Mol. Cell. Proteomics, submitted.
+> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson, M. A., 
+Bleackley, M. R. (2019) Protein markers for _Candida albicans_ EVs include 
+claudin-like Sur7 family proteins and Rho GTPases. Mol. Cell. Proteomics, 
+submitted.
 
 It has been permanently archived at Zenodo with the DOI shown above.
 
@@ -36,9 +40,8 @@ production of this compendium.
 Please cite this compendium as:
 
 > Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson, M. A., 
-Bleackley, M. R. (2019) Research compendium for: _Sur7 family proteins are_
-_putative markers for_ Candida albicans _extracellular vesicles_, 2019. 
-Version x.x.x. Zenodo. URL.
+Bleackley, M. R. (2019) _Protein markers for_ Candida albicans _EVs include_ 
+_claudin-like Sur7 family proteins and Rho GTPases_, version x.x.x. Zenodo. URL.
 
 ### Contents
 

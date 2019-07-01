@@ -18,7 +18,8 @@
 #'   \item{\strong{replicate}}{Biological replicate.}
 #' }
 #'
-#' @source Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson, M. A.,
-#' Bleackley, M. R. (2019) Sur7 family proteins are putative markers for
-#' \emph{Candida albicans} extracellular vesicles. Mol. Cell. Proteomics, submitted.
+#' @source Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
+#' M. A., Bleackley, M. R. (2019) Protein markers for \emph{Candida albicans}
+#' EVs include claudin-like Sur7 family proteins and Rho GTPases.
+#' Mol. Cell. Proteomics, submitted.
 "atcc_exp"

@@ -1,4 +1,16 @@
 
+  - [candidaev](#candidaev)
+      - [Citation](#citation)
+      - [Contents](#contents)
+      - [Accessing the compendium](#accessing-the-compendium)
+          - [1. Downloading directly from
+            GitHub](#downloading-directly-from-github)
+          - [2. Cloning via `git`](#cloning-via-git)
+          - [3. Installing the package using R and
+            `devtools`](#installing-the-package-using-r-and-devtools)
+      - [Using the `candidaev` package](#using-the-candidaev-package)
+      - [R session information](#r-session-information)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # candidaev
@@ -8,10 +20,10 @@ commit](https://img.shields.io/github/last-commit/csdaw/candidaev.svg?style=popo
 
 This repository contains the research compendium for our paper:
 
-> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson,
-> M. A., Bleackley, M. R. (2019) Sur7 family proteins are putative
-> markers for *Candida albicans* extracellular vesicles. Mol. Cell.
-> Proteomics, submitted.
+> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
+> M. A., Bleackley, M. R. (2019) Protein markers for *Candida albicans*
+> EVs include claudin-like Sur7 family proteins and Rho GTPases. Mol.
+> Cell. Proteomics, submitted.
 
 It has been permanently archived at Zenodo with the DOI shown above.
 
@@ -29,9 +41,9 @@ in the production of this compendium.
 Please cite this compendium as:
 
 > Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson,
-> M. A., Bleackley, M. R. (2019) Research compendium for: *Sur7 family
-> proteins are* *putative markers for* Candida albicans *extracellular
-> vesicles*, 2019. Version x.x.x. Zenodo. URL.
+> M. A., Bleackley, M. R. (2019) *Protein markers for* Candida albicans
+> *EVs include* *claudin-like Sur7 family proteins and Rho GTPases*,
+> version x.x.x. Zenodo. URL.
 
 ### Contents
 
@@ -56,7 +68,7 @@ Please cite this compendium as:
 
 ### Accessing the compendium
 
-#### Downloading directly from GitHub
+#### 1\. Downloading directly from GitHub
 
 You can download the compendium as a zip from from this URL:
 <https://github.com/csdaw/candidaev/archive/master.zip>. Note that the
@@ -64,9 +76,9 @@ contents of `/data-raw` is not installed when the package is installed
 but instructions for downloaded just these files is provided
 [here](https://github.com/csdaw/candidaev/tree/master/data-raw).
 
-#### Cloning via `git`
+#### 2\. Cloning via `git`
 
-#### Installing the package using R and `devtools`
+#### 3\. Installing the package using R and `devtools`
 
 This research compendium can be installed as an R package `candidaev`
 from GitHub using `devtools`:
