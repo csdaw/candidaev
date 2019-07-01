@@ -1,7 +1,7 @@
 ---
 title: | 
-   **Protein markers for *Candida albicans* EVs include claudin-like Sur7 
-   family proteins and Rho GTPases**
+   **Supplement to: Protein markers for *Candida albicans* EVs include
+   claudin-like Sur7 family proteins and Rho GTPases**
 author: | 
    | Charlotte Dawson^a^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
      Pierre Faou^b^,
@@ -657,7 +657,7 @@ tabs2_cap <- "\\textbf{Candidate negative protein markers for
               vesicle-depleted culture media (i.e. the proteins may also be in 
               the soluble secretome) (ref:table1). Underlined proteins are 
               those identified as the best candidates for negative
-              EV markers according to the criteria depicted in Figure 1."
+              EV markers according to the criteria depicted in Figure S1."
 
 # draw table S2
 knitr::kable(wcl_longlist2[, -10], 

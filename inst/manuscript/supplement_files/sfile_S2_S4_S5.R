@@ -577,7 +577,7 @@ s5 <- plot_heatmap(mt = s5_table_filt,
                    k = 5,
                    cluster_split = FALSE) %>%
   mutate(cluster = recode(cluster,
-                          "1" = 4, "2" = 1, "3" = 5, "4" = 2, "5" = 3)) %>%
+                          "1" = 3, "2" = 1, "3" = 5, "4" = 4, "5" = 2)) %>%
   arrange(cluster) %>%
   select(-order) %>%
   bind_rows(s5_table_excl) %>%
@@ -588,15 +588,16 @@ s5 <- plot_heatmap(mt = s5_table_filt,
          Feature_name = match_id(id, uniprot,
                                  "CGD_gene_name", "CGD_feature_name")) %>%
   select(Accession, CGDID, Feature_name, id, Function,
-         y_lfc, a9_lfc, a1_lfc, b_lfc, cluster) %>%
+         b_lfc, a1_lfc, a9_lfc, y_lfc, cluster) %>%
   rename("Protein name" = id,
          "Feature name" = Feature_name,
-         "DAY286 yeast log2FC" = y_lfc,
-         "ATCC90028 log2FC" = a9_lfc,
-         "ATCC10231 log2FC" = a1_lfc,
          "DAY286 biofilm log2FC" = b_lfc,
+         "ATCC10231 log2FC" = a1_lfc,
+         "ATCC90028 log2FC" = a9_lfc,
+         "DAY286 yeast log2FC" = y_lfc,
          "Cluster" = cluster)
 s5[390, 4] <- "EVP1"
 
 #### export ####
-writexl::write_xlsx(s5, "inst/manuscript/supplement_files/sfile_S5.xlsx")
+writexl::write_xlsx(list("Fig. 5 Heatmap clusters" = s5),
+                    "inst/manuscript/supplement_files/sfile_S5.xlsx")
