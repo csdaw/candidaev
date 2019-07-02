@@ -3,20 +3,34 @@ title: "ATCC analysis"
 author: 
 - name: Charlotte Dawson
   affiliation: Department of Biochemistry and Genetics, 
-               La Trobe Institute of Molecular Science, 
-               La Trobe University, Australia
-- name: Mark Bleackley
-  affiliation: Department of Biochemistry and Genetics, 
-               La Trobe Institute of Molecular Science, 
-               La Trobe University, Australia
+               La Trobe Institute for Molecular Science, 
+               La Trobe University, Melbourne, 3086, 
+               Victoria, Australia
 - name: Donovan Garcia Ceron
   affiliation: Department of Biochemistry and Genetics, 
-               La Trobe Institute of Molecular Science, 
-               La Trobe University, Australia
+               La Trobe Institute for Molecular Science, 
+               La Trobe University, Melbourne, 3086, 
+               Victoria, Australia
+- name: Harinda Rajapaksha
+  affiliation: La Trobe Comprehensive Proteomics Platform, 
+               La Trobe Institute for Molecular Science, 
+               La Trobe University, Melbourne, 3086, 
+               Victoria, Australia
+- name: Pierre Faou
+  affiliation: La Trobe Comprehensive Proteomics Platform, 
+               La Trobe Institute for Molecular Science, 
+               La Trobe University, Melbourne, 3086, 
+               Victoria, Australia
 - name: Marilyn Anderson
   affiliation: Department of Biochemistry and Genetics, 
-               La Trobe Institute of Molecular Science, 
-               La Trobe University, Australia
+               La Trobe Institute for Molecular Science, 
+               La Trobe University, Melbourne, 3086, 
+               Victoria, Australia
+- name: Mark Bleackley
+  affiliation: Department of Biochemistry and Genetics, 
+               La Trobe Institute for Molecular Science, 
+               La Trobe University, Melbourne, 3086, 
+               Victoria, Australia
 date: '`r format(Sys.Date(), "%d %B %Y")`'
 output:
   BiocStyle::html_document:
@@ -133,7 +147,7 @@ data(atcc)
 
 The LC-MS/MS raw data, peak data, and results files have been 
 deposited in the ProteomeXchange Consortium database via the PRIDE partner 
-repository with the data set identifier y and DOI x. 
+repository with the data set identifier PXD014388. 
 
 # Data analysis
     
