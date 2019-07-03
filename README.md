@@ -3,12 +3,16 @@
       - [Citation](#citation)
       - [Contents](#contents)
       - [Accessing the compendium](#accessing-the-compendium)
-          - [1. Downloading directly from
-            GitHub](#downloading-directly-from-github)
-          - [2. Cloning via `git`](#cloning-via-git)
-          - [3. Installing the package using R and
+          - [1. Installing the package using R and
             `devtools`](#installing-the-package-using-r-and-devtools)
-      - [Using the `candidaev` package](#using-the-candidaev-package)
+          - [2. Cloning via `git`](#cloning-via-git)
+          - [3. Downloading directly from
+            GitHub](#downloading-directly-from-github)
+      - [Using the `candidaev` package after
+        installation](#using-the-candidaev-package-after-installation)
+          - [Accessing included MS data](#accessing-included-ms-data)
+          - [Viewing the vignettes](#viewing-the-vignettes)
+          - [Building the manuscript](#building-the-manuscript)
       - [R session information](#r-session-information)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -25,7 +29,10 @@ This repository contains the research compendium for our paper:
 > EVs include claudin-like Sur7 family proteins and Rho GTPases. Mol.
 > Cell. Proteomics, submitted.
 
-It has been permanently archived at Zenodo with the DOI shown above.
+It has been permanently archived at Zenodo with the DOI shown above. The
+raw MS data has been deposited in the ProteomeXchange Consortium
+database via the PRIDE partner repository with the data set identifiers
+PXD014367, PXD014388, and PXD014389.
 
 The compendium includes all the data, code, and text associated with the
 publication. It is structured as an R package to facilitate
@@ -41,9 +48,9 @@ in the production of this compendium.
 Please cite this compendium as:
 
 > Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson,
-> M. A., Bleackley, M. R. (2019) *Protein markers for* Candida albicans
-> *EVs include* *claudin-like Sur7 family proteins and Rho GTPases*,
-> version x.x.x. Zenodo. URL.
+> M. A., Bleackley, M. R. (2019) Research compendium for “Protein
+> markers for *Candida albicans* EVs include claudin-like Sur7 family
+> proteins and Rho GTPases”. version x.x.x. Zenodo. URL.
 
 ### Contents
 
@@ -61,39 +68,124 @@ Please cite this compendium as:
     ├── DESCRIPTION          # Research compendium metadata
     ├── LICENSE.md           # MIT License for code
     ├── NAMESPACE            # Auto-generated file for function export
-    ├── README.Rmd           # R markdown file to produce README.md
+    ├── README.Rmd           # Rmarkdown file to produce README.md
     ├── README.md            # Description of research compendium
     └── candidaev.Rproj      # R project file for compendium
 ```
 
 ### Accessing the compendium
 
-#### 1\. Downloading directly from GitHub
+#### 1\. Installing the package using R and `devtools`
 
-You can download the compendium as a zip from from this URL:
-<https://github.com/csdaw/candidaev/archive/master.zip>. Note that the
-contents of `/data-raw` is not installed when the package is installed
-but instructions for downloaded just these files is provided
-[here](https://github.com/csdaw/candidaev/tree/master/data-raw).
+This research compendium can be installed as an R package `candidaev`
+from GitHub using `devtools`. A full installation will include all the
+functions and data included in the package as well as some HTML
+vignettes, and the manuscript `.Rmd` file which can be used to reproduce
+the manuscript as it was submitted.
+
+A partial installation will only install functions and data, which can
+be used to analyse other MaxQuant `.txt` files.
+
+``` r
+# install the devtools package from CRAN if not already installed
+# install.packages("devtools")
+
+# install partial compendium (functions, data)
+devtools::install_github("csdaw/candidaev", 
+                         INSTALL_opts = "--no-inst")
+
+# install full compendium (functions, data, vignettes, manuscript) 
+# and other packages required to build vignettes and manuscript
+devtools::install_github("csdaw/candidaev", 
+                         build_opts = c("--no-resave-data", "--no-manual"), 
+                         dependencies = TRUE)
+```
+
+**Note:** the contents of `/data-raw` and
+`/inst/manuscript/supplement_files` are not installed when the package
+is installed using `install_github`. Instead, `/data-raw` can be
+manually downloaded from
+[here](https://github.com/csdaw/candidaev/tree/master/data-raw) and
+`/inst/manuscript/supplement_files` can be manually downloaded from
+[here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
 
 #### 2\. Cloning via `git`
 
-#### 3\. Installing the package using R and `devtools`
+The research compendium can be downloaded from GitHub as is using `git`.
+First install git from [here](https://git-scm.com/), navigate to a
+directory of choice then execute this line at a Bash prompt:
 
-This research compendium can be installed as an R package `candidaev`
-from GitHub using `devtools`:
+    git clone https://github.com/csdaw/candidaev.git
+
+**Note:** the `candidaev` package must be installed to function.
+
+#### 3\. Downloading directly from GitHub
+
+The research compendium can be downloaded from GitHub as a zip using
+this URL: <https://github.com/csdaw/candidaev/archive/master.zip>.
+
+**Note:** the `candidaev` package must be installed to function.
+
+### Using the `candidaev` package after installation
+
+#### Accessing included MS data
+
+The MaxQuant `proteinsGroups.txt` files on which the analyses in this
+compendium are based is available from the PRIDE data sets mentioned
+above. They are also included when the `candidaev` package is installed,
+and can be accessed with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("csdaw/candidaev")
+library(candidaev)
+
+data(atcc)
+
+data(biofilm)
+
+data(yeast)
 ```
 
-### Using the `candidaev` package
+#### Viewing the vignettes
+
+Three HTML vignettes detailing the analysis procedures used in the
+manuscript are included in this research compendium. These vignettes can
+be viewed with:
+
+``` r
+# if full compendium package was installed with devtools::install_github
+browseVignettes("candidaev")
+
+# if the partial compendium package was installed 
+# the vignettes are not included. Please install the full compendium.
+```
+
+#### Building the manuscript
+
+To generate the reproducible manuscript, an installation of LaTeX is
+required. TinyTex is a good option for this and can be installed using:
+
+``` r
+# install TinyTex R package
+install.packages("tinytex")
+
+# install TinyTex LaTex distribution
+tinytex::install_tinytex()
+```
+
+Then the manuscript (and supplement) can be built using:
+
+``` r
+# requires LaTeX installation and full compendium installation
+rmarkdown::render(system.file("manuscript", "manuscript.Rmd", 
+                              package = "candidaev"))
+rmarkdown::render(system.file("manuscript", "manuscript_supplement.Rmd", 
+                              package = "candidaev"))
+```
 
 ### R session information
 
-The system on which this document was compiled was running pandoc v2.6.
-Here is output of `sessionInfo()`.
+The system on which this document was compiled was running pandoc
+v2.7.1. Here is output of `sessionInfo()`.
 
     #> R version 3.6.0 (2019-04-26)
     #> Platform: x86_64-w64-mingw32/x64 (64-bit)
