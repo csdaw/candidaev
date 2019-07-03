@@ -3,7 +3,7 @@
 
 # /data-raw
 
-## description
+## Description
 
 This directory contains all of the raw data files used in this project.
 These files are *not* included when the package is installed using
@@ -12,7 +12,7 @@ and `.tab` files are provided in the [`/data`](../data) folder as `.rda`
 files which are accessible once the package has been installed and
 loaded or attached.
 
-To access these raw files:
+Some different ways to access these raw files include:
 
 1.  Right click on a desired file and select `Save link as...`.
 
@@ -23,18 +23,16 @@ To access these raw files:
 3.  Download this entire repository as a `.zip` from this URL:
     <https://github.com/csdaw/candidaev/archive/master.zip>
 
-4.  Clone this repository.
+4.  Clone this repository using `git`.
 
-## contents
+## Contents
 
 ``` 
     .
     ├── ...
     ├── /data-raw
-    │    ├── /external       # Supplementary data tables from other Candida EV proteomics papers
     │    ├── /lcms           # proteinGroups.txt files output by MaxQuant
-    │    ├── /nta            # Nanosight ns300 .csv summary tables
-    │    ├── /qubit          # Qubit 4 EV protein quantification data 
+    │    ├── /nta            # Nanosight NS300 .csv summary tables
     │    ├── /reference      # UniProt and Candida Genome Database reference tables
     │    ├── README.Rmd      # R markdown file to produce README.md
     │    └── README.md       # Description of /data-raw directory

@@ -3,21 +3,15 @@
 
 # R
 
-This directory contains R script files used throughout the project.
+## Description
 
-Each file contains several custom functions which have been documented
-using roxygen2 skeletons.
+This directory contains R script files used throughout the project. Each
+file contains one custom function or one data.frame which has been
+documented using an roxygen2 skeleton.
 
-# contents
+After installing `candidaev`, an index of all the included
+functions/data.frames can be viewed in R using:
 
-``` 
-    .
-    ├── ...
-    ├── /R
-    │    ├── file1.R          # Functions for x
-    │    ├── file2.R          # Functions for y
-    │    ├── file3.R          # Functions for z
-    │    ├── README.Rmd       # R markdown file to produce README.md
-    │    └── README.md        # Description of /R directory
-    └── ...
+``` r
+help(package = "candidaev")
 ```

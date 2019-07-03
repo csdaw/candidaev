@@ -1,12 +1,16 @@
 Package: candidaev
-Title: What the Package Does (One Line, Title Case)
+Title: Research compendium package for Dawson et al. (2019)
 Version: 2.0.1
 Authors@R:
     person(given = "Charlotte",
            family = "Dawson",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
+           email = "csdaw@outlook.com")
+Description: This R package repository is a research compendium for 
+  Dawson et al. (2019). The compendium includes all the data, code, and text 
+  associated with the publication. It also includes some HTML vignettes which 
+  detail the analyses used and an Rmarkdown file to reproduce the manuscript
+  in its submitted form.
 Depends: R (>= 2.10)
 License: MIT + file LICENSE
 ByteCompile: true

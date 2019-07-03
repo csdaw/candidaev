@@ -12,7 +12,9 @@
         installation](#using-the-candidaev-package-after-installation)
           - [Accessing included MS data](#accessing-included-ms-data)
           - [Viewing the vignettes](#viewing-the-vignettes)
-          - [Building the manuscript](#building-the-manuscript)
+          - [Viewing the manuscript](#viewing-the-manuscript)
+          - [Building the manuscript from
+            scratch](#building-the-manuscript-from-scratch)
       - [R session information](#r-session-information)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -148,8 +150,9 @@ data(yeast)
 #### Viewing the vignettes
 
 Three HTML vignettes detailing the analysis procedures used in the
-manuscript are included in this research compendium. These vignettes can
-be viewed with:
+manuscript are included in this research compendium. They are
+automatically built from scratch when the full research compendium is
+installed with `devtools`. These vignettes can be viewed with:
 
 ``` r
 # if full compendium package was installed with devtools::install_github
@@ -159,7 +162,12 @@ browseVignettes("candidaev")
 # the vignettes are not included. Please install the full compendium.
 ```
 
-#### Building the manuscript
+#### Viewing the manuscript
+
+The manuscript `.pdf` file, as submitted, can be downloaded
+[here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
+
+#### Building the manuscript from scratch
 
 To generate the reproducible manuscript, an installation of LaTeX is
 required. TinyTex is a good option for this and can be installed using:

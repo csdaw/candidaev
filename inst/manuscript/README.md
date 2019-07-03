@@ -1,45 +1,36 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# /vignettes
+# /inst/manuscript
 
-## description
+## Description
 
-This directory contains the submitted manuscript (see `manuscript.pdf`)
-for this paper :
+This directory contains the submitted manuscript, supplemental figures
+and tables, and supplemental files for our paper:
 
-> Authors, (YYYY). *Title of paper*. Name of journal/book
-> <https://doi.org/xxx/xxx>
+> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
+> M. A., Bleackley, M. R. (2019) Protein markers for *Candida albicans*
+> EVs include claudin-like Sur7 family proteins and Rho GTPases. Mol.
+> Cell. Proteomics, submitted.
 
-It also contains a more detailed analysis of the LC-MS/MS data, upon
-which the manuscript is based (see `analysis.md` or `analysis.html`).
-The Rmarkdown (`.Rmd`) files used to generate these documents are
-provided.
+The Rmarkdown (`.Rmd`), `.svg`, and `.R` files used to generate these
+documents are provided along with the derived `.pdf` and `.csv` files.
 
-Both the manuscript and the analysis documents *are* included as
-vignettes in this package so they can be easily viewed (or regenerated
-completely from the raw data) if the package is installed.
-Alternatively, one can download these documents directly from this
-GitHub repository.
-
-## how to access the manuscript
-
-## how to access the analysis
-
-## contents
+## Contents
 
 ``` 
     .
     ├── ...
-    ├── /vignettes
-    │    ├── /figures            # Contains figures
-    │    ├── /components         # Contains required components for knitting manuscript and analysis
-    │    ├── analysis.Rmd        # R markdown file to produce analysis.md or analysis.html
-    │    ├── analysis.html       # Full analysis upon which the manuscript is based.
-    │    ├── analysis.md         # Full analysis upon which the manuscript is based.
-    │    ├── manuscript.Rmd      # R markdown file to produce manuscript.pdf or manuscript.docx
-    │    ├── manuscript.pdf      # Final submitted manuscript
-    │    ├── README.Rmd          # R markdown file to produce README.md
-    │    └── README.md           # Description of /vignettes directory
+    ├── /inst
+    │    ├── /manuscript
+    │         ├── /components                 # Contains required components for building the manuscript
+    │         ├── /figures                    # Contains .svg and .csv files used to make some figures
+    │         ├── /supplement_files           # Contains .R scripts used to generate supplemental files
+    │         ├── manuscript.Rmd              # R markdown file to produce manuscript.pdf
+    │         ├── manuscript.pdf              # Final submitted manuscript
+    │         ├── manuscript_supplement.Rmd   # R markdown file to produce manuscript_supplement.pdf
+    │         ├── manuscript_supplement.pdf   # Final submitted supplemental figures and tables
+    │         ├── README.Rmd                  # R markdown file to produce README.md
+    │         └── README.md                   # Description of /inst/manuscript directory
     └── ...
 ```
