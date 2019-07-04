@@ -411,6 +411,85 @@ new antifungals with novel mechanisms of action paramount. Understanding the
 interface between the host and pathogen will help to identify new targets for 
 controlling _C. albicans_ infections.
 
+Extracellular vesicles (EVs) are key factors in the progression of many diseases 
+ranging from cancer [@xu2018] to neurodegenerative diseases [@quek2017] and 
+bacterial infections [@pathirana2016]. EVs are defined as “particles naturally 
+released from the cell that are delimited by a lipid bilayer and cannot 
+replicate” [@thery2018]. Packaging of cargo into EVs is a method for the 
+coordinated release of biological molecules via a non-classic method of 
+secretion.  This facilitates intercellular communication both within an 
+organism [@maas2017] and between organisms [@schorey2015].
+
+Recently, EVs have 
+been proposed to function in the pathogenesis of fungal disease, particularly 
+in yeast infections including those from the genera _Cryptococcus_ 
+[@bielska2018; @oliveira2010b; @rodrigues2008], _Paracoccidioides_ 
+[@dasilva2015a; @vallejo2011], and _Candida_ 
+[@joffe2016; @vargas2015; @wolf2015]. The cargo of fungal EVs comprises 
+proteins [@bleackley2019], nucleic acids [@dasilva2015], lipids 
+[@oliveira2009; @rodrigues2007; @vargas2015; @wolf2015] and carbohydrates 
+[@dasilva2015a; @rodrigues2007]. Fungal EVs activate innate immune cells in 
+vitro [@dasilva2016; @oliveira2010b; @vargas2015; @wolf2015] and are responsible 
+for the hypervirulence of a _Cryptococcus gattii_ strain that caused disease in 
+immunocompetent individuals [@bielska2018]. Given the potential roles for EVs in 
+host-pathogen interactions, there is significant motivation to better understand 
+the biology of fungal EVs.
+
+_C. albicans_ EVs are typical of fungal EVs. They contain proteins, lipids, 
+nucleic acids and carbohydrates 
+[@dasilva2015; @gil-bona2015b; @vargas2015; @wolf2015; @zarnowski2018]. 
+Activation of murine macrophages and dendritic cells by EVs from _C. albicans_ 
+indicates a potential role for EVs in modulating the innate immune response to 
+the fungus [@vargas2015; @wolf2015]. Formation of biofilms is a critical 
+component of _C. albicans_ pathogenesis [@nobile2015] and the biofilm matrix 
+provides a protective layer for the fungus against antifungal drugs [@taff2012]. 
+The cargo of EVs produced by _C. albicans_ biofilms includes key proteins and 
+carbohydrates for biofilm biogenesis, making EVs crucial contributors to the 
+establishment of biofilms [@zarnowski2018]. Furthermore, “add-back” of EVs from 
+wildtype biofilms restored the loss of azole resistance in biofilms formed by 
+strains with deletions in genes encoding important enzymes for matrix 
+generation [@zarnowski2018]. That is, EVs also function in antifungal drug 
+resistance.
+
+The tools and techniques for the study of fungal EVs have been adapted from 
+those established for mammalian systems, where EVs are most intensively 
+studied. Many of the cutting-edge experimental techniques for isolation, 
+tracking, and analysis of mammalian EVs are dependent on protein markers 
+[@lotvall2014]. They include identifying fractions containing EVs after density 
+gradient centrifugation [@greening2015] or size exclusion chromatography 
+[@gamez-valero2016], purification of EVs via immunoaffinity capture [@oksvold2015], 
+and imaging of EV release and uptake [@suetsugu2013]. Unfortunately, proteomic 
+analyses of fungal EVs have revealed that the markers that have been so useful 
+for the isolation and study of mammalian EVs are not present in fungal EVs 
+[@bleackley2019]. Thus, there are differences in the protein cargo and possibly 
+the biogenesis of EVs from fungi and mammalian cells, and _de novo_ 
+identification of fungal EV markers is essential. Inconsistencies between 
+published data sets on the protein content of fungal EVs [@bleackley2019] means 
+that a robust proteomic analysis of EVs from a particular species is required 
+to provide an adequate data set for EV marker identification. In this study, we 
+have addressed this problem by performing in-depth proteomic analyses on 
+multiple _C. albicans_ strains to define a set of broadly applicable 
+_C. albicans_ EV markers.
+
+We employed label-free quantitative proteomics to generate EV and whole cell 
+lysate (WCL) proteomes for a selection of different _C. albicans_ strains and 
+morphologies; DAY286 yeast, DAY286 biofilm, ATCC90028 yeast, and ATCC10231 
+yeast. By comparing the EV versus WCL data across all four strains we 
+identified 39 putative EV markers which are enriched in _C. albicans_ EVs 
+regardless of source, cell strain, or morphology. These candidate protein 
+markers include GTPases, enzymes crucial for cell wall synthesis, and 
+plasma membrane proteins resembling mammalian tetraspanins or claudins. 
+The “minimal information for studies of EVs” (MISEV) 2018 position statement 
+indicates that, in addition to demonstrating the enrichment of EV marker 
+proteins in EV preparations, a deficiency of non-EV proteins should also be 
+shown [@thery2018]. With this in mind, we identified 40 proteins that were 
+depleted in _C. albicans_ EVs compared to the WCL from the four strains. 
+Validation of these putative EV markers in vitro will allow future _C. albicans_ 
+EV research to align better with the recommendations set out in MISEV2018. 
+Furthermore, robust _C. albicans_ EV markers will allow adaptation of mammalian 
+EV analysis techniques for use in the study of EVs in _C. albicans_ pathogenesis 
+and will provide potential new targets for the development of novel antifungals. 
+
 # Experimental procedures
 
 ## Subsection 1
