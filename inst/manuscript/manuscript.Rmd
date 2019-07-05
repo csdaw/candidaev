@@ -378,7 +378,37 @@ a9_res <- get_results(efit = a9_efit,
 
 # Abbreviations
 
+A1 - ATCC10231
+
+A9 - ATCC90028
+
+DAY B - DAY286 biofilm
+
+DAY Y - DAY286 yeast
+
 EV - extracellular vesicle
+
+Evp1 - extracellular vesicle protein 1 (orf19.6741)
+
+Log<sub>2</sub>(FC) - log<sub>2</sub> fold change
+
+MCC - membrane compartment of Can1
+
+MDS - multidimensional scaling
+
+MISEV - minimal information for studies of EVs
+
+sEVs - small EVs
+
+SP - signal peptide
+
+TEMs - tetraspanin enriched microdomains
+
+TM - transmembrane domain
+
+VDM - vesicle depleted medium
+
+WCL - whole cell lysate
 
 \newpage
 
@@ -583,7 +613,7 @@ marker_longlist2 <- marker_longlist %>%
                       1, rep(2, 3), 1, rep(4, 2), 1, rep(4, 3), 1, 3, 
                       rep(1, 3), 4, 1, 2, 1, 2, 4)) %>% 
   arrange(pack_row) %>% 
-  mutate(VDS = c(rep("", 11), "Y", rep("", 7), "Y", rep("", 7), 
+  mutate(VDM = c(rep("", 11), "Y", rep("", 7), "Y", rep("", 7), 
                  rep("Y", 7), "", rep("Y", 4)))
 
 # fix number of TM domains for CDR1;CDR2
