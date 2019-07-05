@@ -522,9 +522,239 @@ and will provide potential new targets for the development of novel antifungals.
 
 # Experimental procedures
 
-## Subsection 1
+## _C. albicans_ strains and maintenance
 
-## Subsection 2
+_C. albicans_ strains used in this study were DAY286 [@davis2002], ATCC90028, 
+and ATCC10231. All strains were maintained on YPD Agar plates (1% yeast extract, 
+2% peptone, 2% dextrose, 2% agar). Liquid starter cultures were grown overnight 
+in YPD medium (1% yeast extract, 2% peptone, 2% dextrose) at 30°C and 300 rpm. 
+
+## Yeast culture conditions
+
+For isolation of EVs from yeast form _C. albicans_ (DAY286, ATCC90028, 
+ATCC10231), YPD starter cultures were used to inoculate 150 or 300 mL YPD at an 
+OD~600~ = 0.2 in a baffled flask. Cultures were incubated at 30°C overnight 
+(approximately 20h). The culture OD~600~ was measured immediately prior to EV 
+isolation.
+
+## Biofilm culture conditions
+
+Biofilms (DAY286) were generated based on the method described in [@ramage2002] 
+with modifications. Briefly, 500 mL pre-warmed ½ strength RPMI (250 mL RPMI 
+1640 (Sigma), 0.165 M MOPS (Sigma) and 250 mL 3.6% dextrose) was inoculated 
+using a liquid starter culture to 1.0 x 10^6^ cells/mL. Five 25 x 25 
+cm non-treated bioassay dishes (Thermo Fisher Scientific) were each filled with 
+100 mL of inoculated ½ RPMI and incubated statically for 4 h at 37°C to allow 
+for adhesion of cells to the dish. Following cell adhesion, the culture medium 
+and any non-adherent cells was decanted and replaced with 200 mL pre-warmed 
+full strength RPMI. Biofilms were formed by incubating the dishes for 54 h at 
+37°C with agitation at 28 rpm in an Incu-Shaker Mini (Benchmark Scientific).
+
+## EV isolation
+
+EVs were isolated according to the method described in [@rodrigues2007] with 
+minor modifications. In brief, yeast cells or biofilm fragments were separated 
+from the culture supernatants by centrifugation at 4,000 x g for 15 min 
+(75003607 rotor, Thermo Scientific), then 15,000 x g for 30 min 
+(JLA 16.250 rotor, Beckman Coulter). Supernatants were 0.45 μm (Millipore) 
+filtered then centrifuged twice at 100,000 x g for 1 h (45Ti rotor, 
+Beckman Coulter) to pellet EVs which were resuspended in phosphate buffered 
+saline (137 mM NaCl, 2.7 mM KCl, 10 mM Na~2~HPO~4~, 1.8 mM KH~2~PO~4~) (PBS). 
+An aliquot of yeast cells (250 µL) was reserved for preparation of yeast whole 
+cell lysate. Similarly, 250 μL of biofilm scrapings were resuspended in PBS for 
+preparation of biofilm lysate.
+
+## Preparation of whole cell lysate and protein quantification
+
+Samples were washed three times with PBS prior to the addition of approximately 
+400 µL of acid washed glass beads (Sigma). Cells were lysed using a TissueLyser 
+(Qiagen) at 30 bps for 3 x 1 min bursts with 1 min incubations on ice between 
+bursts. Debris and beads were pelleted by centrifugation for 5 min at 
+23,000 x g at 4 °C. The supernatant was retained as the respective lysate 
+sample. Protein concentration of EVs and whole cell lysates (WCL) was 
+determined using a Qubit^TM^ 4 fluorimeter (Life Technologies) and the 
+Qubit^TM^ protein assay kit according to the manufacturer’s instructions. 
+
+## Nanoparticle tracking analysis
+
+The particle size and concentration of EV samples was determined using a 
+NanoSight NS300 equipped with a 405 nm (blue) laser (Malvern Instruments).  
+Immediately prior to injection, EVs were diluted between 1:250 and 1:6000 
+in 0.22 μm (Millipore) filtered PBS to bring the particle concentration within 
+the manufacturer’s recommended range (10^7^ – 10^9^ particles/mL). NTA software 
+version 3.2 was used to record data in 60 s reads in triplicate. Instrument 
+settings included: a syringe infusion rate of 70, temperature held at 25°C, 
+a camera level of 11, and a detection threshold of 6. The particle 
+concentrations and particle size parameters were recorded. Dilution 
+factor correction and averaging of data across biological replicates was 
+performed using the R package _tidyNano_ [@nguyen2019].
+
+## Transmission electron microscopy
+
+Carbon-coated 400-mesh copper grids (ProSciTech) were glow discharged for 1 
+min in a K950X turbo evaporator coupled to a K350 glow discharge unit 
+(Quorum Technologies Ltd). EVs (5 µL) were deposited onto the grid and 
+incubated for 1 min. Grids were then washed once with ultrapure water and 
+negatively stained three times with 2% (v/v) uranyl acetate (Agar Scientific). 
+Excess solution was blotted off and the grids were dried overnight. A JEM 2100 
+electron microscope (JEOL Ltd) operated at 200 kV was used for imaging.
+
+## Experimental design and statistical rationale
+
+A total of 14 EV and WCL samples from four different _C. albicans_ strains were 
+used for proteomics and NTA analyses; DAY286 yeast (n = 3), ATCC90028 yeast 
+(n = 3), ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5). The EV and WCL 
+samples from an individual biological replicate were paired as they were derived 
+from cells in the same culture or biofilm. Biofilm EVs and WCLs were obtained 
+from 5 independent biofilms on different days. Yeast EVs and WCLs were obtained 
+from 3 independent yeast cultures in parallel on different days for each strain. 
+Preparation of EV and WCL proteomics samples and MS data acquisition was 
+performed in three separate batches; DAY286 yeast, DAY286 biofilm, and then 
+both ATCC strains. Proteomics samples were randomised prior to injection and 
+each biological replicate was injected twice. The raw data from both injections 
+was combined into one sample during protein identification and quantification. 
+All proteomics statistical and data analyses were performed using R version 
+3.6.0 [@rcoreteam2018], Statistical tests, multiple comparison corrections and 
+important individual R and Bioconductor packages are referenced where they have 
+been used. 
+
+## Sample preparation for mass spectrometry
+
+EVs or WCLs (15 μg protein) were boiled in LDS sample buffer (Life Technologies) 
+and TCEP (Thermo Fisher Scientific), then separated by short-range SDS-PAGE 
+[@greening2016]. The gel was fixed in 50% (v/v) methanol, 7% (v/v) acetic acid 
+for 30 min, and the samples were excised. The proteins were reduced (2 mM TCEP, 
+1 h) and alkylated (40 mM iodoacetamide, 30 min in the dark) before digestion 
+(1 μg trypsin, 18 h at 37°C). Peptides were then extracted from the gel pieces 
+with 85% (v/v) ACN, 0.5% (v/v) TFA, lyophilised and resuspended in 5% (v/v) 
+ACN, 0.5% (v/v) TFA.
+
+## Mass spectrometry (ESI-LC-MS/MS) of EVs and WCL proteins
+
+Peptides were analysed as described previously [@fingerhut2018] with 
+modifications. Using a nanoflow UPLC instrument (Scientific^TM^ 
+UltiMate^TM^ 3000 RSLCnano, Thermo Fisher Scientific), the 
+reconstituted peptides were loaded onto a precolumn (C18 PepMap 300 μm ID x 2 cm 
+trapping column, Thermo Fisher Scientific) and washed prior to separation using 
+a 90 min linear ACN gradient on an analytical column (BEH C18, 1.7 μm, 130 Å 
+and 75 μm ID x 25 cm, Waters). The nanoflow UPLC was coupled on-line to a 
+Q Exactive HF mass spectrometer (Thermo Fisher Scientific) with a 
+nanoelectrospray ion source (Thermo Fisher Scientific). The Orbitrap of the Q 
+Exactive HF was used for MS and the linear trap was used for MS/MS.
+
+Data were collected in data-dependent acquisition mode using an MS scan range 
+of m/z 350 – 1500 and resolution of 60,000. HCD MS/MS spectra were collected 
+for the 15 most intense ions per MS scan at 15,000 resolution with a normalised 
+collision energy of 28% and an isolation window of 1.4 m/z. Dynamic exclusion 
+parameters were set as follows: exclude isotope on, duration 30 sec and peptide 
+match preferred. Other Orbitrap instrument parameters included an MS maximum 
+injection time of 30 ms with AGC target 3 x 10^6^, for a maximum 
+injection time of 25 ms with an AGT target of 1 x 10^5^. 
+
+## Database search and protein identification
+
+Tandem MS data collected for EVs and WCLs were processed in MaxQuant 
+version 1.6.0.16 [@tyanova2016]. Andromeda was used to search the data against 
+the UniProt _C. albicans_ reference proteome (UP000000559; downloaded 
+16/06/2018; 6035 entries) and the common contaminants and decoys list [@cox2011]. 
+Trypsin was selected as the digestion enzyme and up to 2 missed cleavages were 
+allowed. Carbamidomethylation of cysteine was set as a fixed modification and 
+oxidation of methionine and N-terminal acetylation were set as variable 
+modifications. Peptide mass tolerances were 20 ppm (first search) and 4.5 ppm 
+(main search), and false discovery rate (FDR) cut offs were 0.01 for both 
+proteins and peptides. Minimum and maximum peptide lengths were set to 8 and 25 
+respectively and match between runs was not selected. Label-free quantification 
+(LFQ) of protein abundances was performed using the MaxLFQ algorithm [@cox2014]. 
+Fast LFQ was selected and normalisation was skipped. The proteinGroups.txt 
+MaxQuant output was used for further analyses. Metadata for identified proteins 
+(localisation, topology, function) were obtained from the UniProt _C. albicans_ 
+reference proteome was well as the _C. albicans_ SC5314 Assembly 22 chromosomal 
+feature file available from the Candida Genome Database 
+(candidagenome.org/download/chromosomal_feature_files) 
+[@arnaud2005; @skrzypek2017].
+
+## Protein filtering and proteomics analysis
+
+Data processing and statistical analyses were all performed using R 
+version 3.6.0 and RStudio version 1.2.1335 [@rcoreteam2018; @rstudioinc]. 
+The DAY286 yeast, DAY286 biofilm, and ATCC proteinGroups.txt files were 
+initially processed and analysed separately. Analysis methodology and some 
+modified functions were derived from the Bioconductor package _DEP_ [@zhang2018]. 
+First, reversed and contaminant proteins as well as proteins identified by less 
+than 2 unique peptides were removed. The resulting proteins were filtered for 
+those quantified (LFQ intensity > 0) in minimum 2/3 yeast or 4/5 biofilm EV or 
+WCL biological replicates. The raw LFQ intensities, sequence coverage, 
+number of unique peptides, and MS/MS counts for these proteins can be found in 
+supplemental File S1. LFQ intensities were log~2~ transformed, then 
+normalised using the default cyclic loess normalisation method from the 
+Bioconductor package _limma_ [@ritchie2015]. Proteins were then separated into 
+two groups: those exclusive to EVs or WCL, and those quantified in both samples. 
+Missing LFQ values in the latter group were imputed using the QRILC method from 
+the R package _imputeLCMD_ [@lazar2015], while exclusive proteins were left 
+untouched. Finally, differential abundance analysis of proteins in EV versus 
+WCL was performed using empirical Bayes method from _limma_ 
+[@phipson2016; @ritchie2015]. Protein log~2~(fold changes) indicated 
+the difference in average log~2~ LFQ intensity values between EVs and 
+WCLs, this value is referred to as the log~2~(FC). The resulting 
+p-values were adjusted using the Benjamini-Hochberg approach [@benjamini1995] 
+and the significance threshold was set at an adjusted p-value of 0.01. Proteins 
+were considered significantly enriched or depleted in EVs if they had a p-value 
+less than 0.01 and a positive or negative log~2~(FC) respectively. 
+Results of the differential abundance analyses are available in supplemental 
+File S2.
+
+## Functional enrichment analysis and clustering
+
+The online tool FungiFun2 version 2.2.8 (sbi.hki-jena.de/fungifun) was used for 
+all GO term enrichment analyses [@priebe2015]. Enriched GO terms were those 
+with a Benjamini-Hochberg adjusted p-value less than 0.05. Multidimensional 
+scaling (MDS) plots were constructed using the plotMDS function from _limma_ 
+[@ritchie2015]. The top 500 proteins with the largest standard deviations 
+between the proteomics samples were used for the distance calculation. To 
+construct the heatmap in Figure 5, unsupervised clustering of log~2~(FC) 
+values for the proteins common to EVs from all strains was performed using 
+Gower’s formula via the daisy function from the R package _cluster_ [@maechler2019].  
+
+## Protein localisation and attribute prediction
+
+Location information of proteins was obtained from the Candida Genome Database 
+(candidagenome.org) [@arnaud2005; @skrzypek2017]. When this information was not 
+available DeepLoc-1.0 (cbs.dtu.dk/services/DeepLoc) was used to predict 
+subcellular location [@almagroarmenteros2017]. Signal peptide and transmembrane 
+domain annotations for each protein were obtained from UniProtKB or were 
+predicted using TOPCONS2 (topcons.cbr.su.se) 
+[@theuniprotconsortium2019; @tsirigos2015]. Prediction of protein palmitoylation 
+sites was performed using CSS-PALM 4.0 (csspalm.biocuckoo.org) [@ren2008].
+
+## _C. albicans_ EV marker definition
+
+Lists of proteins significantly enriched and exclusive in EVs from each strain 
+were compared using the R package _VennDiagram_ [@chen2011]. Proteins common to 
+all four strains were selected as potential EV positive protein markers. This 
+was repeated for significantly enriched and exclusive proteins in WCL to define 
+potential EV negative protein markers. Initial candidate EV marker proteins 
+were refined using the following criteria to obtain a shortlist of the best 
+potential markers. Ideal positive EV markers were proteins that satisfied 
+MISEV2018 marker categories 1 and 2 [@thery2018] and had less than 5 transmembrane 
+domains, no recognisable signal peptide, and were not detected in 
+vesicle-depleted media [@gil-bona2015b]. Ideal negative EV marker proteins were 
+selected based on prior tagging with fluorescent proteins in literature, prior 
+detection via Western blot, and adherence to MISEV2018 marker categories
+3 or 4 [@thery2018].
+
+## Data availability
+
+The proteomics data have been deposited in the ProteomeXchange Consortium 
+database via the PRIDE partner repository [@deutsch2017; @perez-riverol2019] 
+with the data set identifiers PXD014367 (DAY286 yeast), PXD014388 (ATCC90028 
+and ATCC10231), and PXD014389 (DAY286 biofilm). These data include ‘RAW’ files, 
+peak list files, MaxQuant search engine txt output, and the UniProt C. albicans 
+reference proteome FASTA file. The proteinGroups.txt files and source code used 
+in this study is freely available in an online research compendium available at 
+github.com/csdaw/candidaev. It was constructed using the R package 
+_rrtools_ [@marwick2018] and is structured as an R package which can be used to 
+reproduce the results and manuscript as submitted. The compendium has also been 
+permanently archived at zenodo (url). 
 
 # Results
 
