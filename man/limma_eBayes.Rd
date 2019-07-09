@@ -18,6 +18,9 @@ produce a warning}
 \item{contrasts}{character vector: names of sample groups you want to contrast separated
 by a \code{-} sign. For example: \code{c("A1_EV - A1_W", "A9_EV - A9_W")}. These \strong{must}
 refer to column names present in the design matrix.}
+
+\item{block}{\code{NULL} or numeric vector: blocking for LmFit function. Must
+be the same length as the number of columns in \code{mat}.}
 }
 \value{
 Returns an object of class \code{MArrayLM}. See \code{\link[limma]{eBayes}} for
