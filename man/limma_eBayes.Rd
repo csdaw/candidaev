@@ -5,7 +5,7 @@
 \title{Perform differential protein abundance analysis with empirical Bayes
 method from \emph{limma}}
 \usage{
-limma_eBayes(mat, design, contrasts, block = NULL)
+limma_eBayes(mat, design, contrasts, ...)
 }
 \arguments{
 \item{mat}{numeric matrix: typically this will include log2 LFQ intensity data.
@@ -19,8 +19,7 @@ produce a warning}
 by a \code{-} sign. For example: \code{c("A1_EV - A1_W", "A9_EV - A9_W")}. These \strong{must}
 refer to column names present in the design matrix.}
 
-\item{block}{\code{NULL} or numeric vector: blocking for LmFit function. Must
-be the same length as the number of columns in \code{mat}.}
+\item{...}{other arguments to be passed to \code{limma::lmFit}.}
 }
 \value{
 Returns an object of class \code{MArrayLM}. See \code{\link[limma]{eBayes}} for

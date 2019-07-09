@@ -31,8 +31,7 @@
 #' by a \code{-} sign. For example: \code{c("A1_EV - A1_W", "A9_EV - A9_W")}. These \strong{must}
 #' refer to column names present in the design matrix.
 #'
-#' @param block \code{NULL} or numeric vector: blocking for LmFit function. Must
-#' be the same length as the number of columns in \code{mat}.
+#' @param ... other arguments to be passed to \code{limma::lmFit}.
 #'
 #' @return Returns an object of class \code{MArrayLM}. See \code{\link[limma]{eBayes}} for
 #' more information. This object is required for \code{\link{get_results}}.
@@ -104,9 +103,9 @@
 #' result_a9 <- result_list[[2]]
 #'
 #' @export
-limma_eBayes <- function(mat, design, contrasts, block = NULL) {
+limma_eBayes <- function(mat, design, contrasts, ...) {
   cm <- limma::makeContrasts(contrasts = contrasts, levels = design)
-  fit <- limma::lmFit(mat, design = design, block = block)
+  fit <- limma::lmFit(mat, design = design, ...)
 
   result <- limma::contrasts.fit(fit = fit, contrasts = cm)
 
