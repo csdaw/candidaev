@@ -2,6 +2,7 @@
   - [candidaev](#candidaev)
       - [Citation](#citation)
       - [Contents](#contents)
+      - [References](#references)
       - [Accessing the compendium](#accessing-the-compendium)
           - [1. Installing the package using R and
             `devtools`](#installing-the-package-using-r-and-devtools)
@@ -28,22 +29,23 @@ This repository contains the research compendium for our paper:
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
 > M. A., Bleackley, M. R. (2019) Protein markers for *Candida albicans*
-> EVs include claudin-like Sur7 family proteins and Rho GTPases. Mol.
-> Cell. Proteomics, submitted.
+> EVs include claudin-like Sur7 family proteins and Rho GTPases.
+> *Molecular and Cellular* *Proteomics*, submitted.
 
 It has been permanently archived at Zenodo with the DOI shown above. The
 raw MS data has been deposited in the ProteomeXchange Consortium
 database via the PRIDE partner repository with the data set identifiers
-PXD014367, PXD014388, and PXD014389.
+PXD014367, PXD014388, and PXD014389. The analysis techniques and
+workflow used in this compendium were derived from the *Bioconductor*
+package **[DEP](https://doi.org/10.18129/B9.bioc.DEP)**<sup>1</sup>.
 
 The compendium includes all the data, code, and text associated with the
 publication. It is structured as an R package to facilitate
 reproducilibity and distribution. The principles and motivations behind
 using research compendiums for academic research is detailed in [Marwick
-et al. (2018)](https://doi.org/10.1080/00031305.2017.1375986).
-
-The R package [rrtools](https://github.com/benmarwick/rrtools) was used
-in the production of this compendium.
+et al. (2018)](https://doi.org/10.1080/00031305.2017.1375986). The R
+package **[rrtools](https://github.com/benmarwick/rrtools)**<sup>2</sup>
+was used in the production of this compendium.
 
 ### Citation
 
@@ -75,6 +77,18 @@ Please cite this compendium as:
     └── candidaev.Rproj      # R project file for compendium
 ```
 
+### References
+
+1.  Zhang, X., Smits, A., van Tilburg, G., Ovaa, H., Huber, W.,
+    Vermeulen, M. (2018). Proteome-wide identification of ubiquitin
+    interactions using UbIA-MS. *Nature Protocols*, **13**, 530-550.
+    [doi:10.1038/nprot.2017.147](https://doi.org/10.1038/nprot.2017.147)
+
+2.  Marwick, B., Boettiger, C., Mullen, L. (2018). Packaging data
+    analytical work reproducibly using R (and friends). *The American
+    Statistician*, **72**(1), 80-88.
+    [doi:10.1080/00031305.2017.1375986](https://doi.org/10.1080/00031305.2017.1375986)
+
 ### Accessing the compendium
 
 #### 1\. Installing the package using R and `devtools`
@@ -100,7 +114,7 @@ devtools::install_github("csdaw/candidaev",
 # and other packages required to build vignettes and manuscript
 devtools::install_github("csdaw/candidaev", 
                          build_opts = c("--no-resave-data", "--no-manual"), 
-                         dependencies = TRUE)
+                         dependencies = TRUE, build_vignettes = TRUE)
 ```
 
 **Note:** the contents of `/data-raw` and
@@ -211,6 +225,6 @@ v2.7.1. Here is output of `sessionInfo()`.
     #> 
     #> loaded via a namespace (and not attached):
     #>  [1] compiler_3.6.0   magrittr_1.5     tools_3.6.0      htmltools_0.3.6 
-    #>  [5] yaml_2.2.0       Rcpp_1.0.1       stringi_1.4.3    rmarkdown_1.13.1
-    #>  [9] knitr_1.23       stringr_1.4.0    xfun_0.7         digest_0.6.19   
+    #>  [5] yaml_2.2.0       Rcpp_1.0.1       stringi_1.4.3    rmarkdown_1.13.6
+    #>  [9] knitr_1.23       stringr_1.4.0    xfun_0.8         digest_0.6.19   
     #> [13] evaluate_0.14

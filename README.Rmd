@@ -21,22 +21,23 @@ This repository contains the research compendium for our paper:
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson, M. A., 
 Bleackley, M. R. (2019) Protein markers for _Candida albicans_ EVs include 
-claudin-like Sur7 family proteins and Rho GTPases. Mol. Cell. Proteomics, 
-submitted.
+claudin-like Sur7 family proteins and Rho GTPases. _Molecular and Cellular_ 
+_Proteomics_, submitted.
 
 It has been permanently archived at Zenodo with the DOI shown above. The raw 
 MS data has been deposited in the ProteomeXchange Consortium database via 
 the PRIDE partner repository with the data set identifiers PXD014367, 
-PXD014388, and PXD014389.
+PXD014388, and PXD014389. The analysis techniques and workflow used in this 
+compendium were derived from the _Bioconductor_ package 
+**[DEP](https://doi.org/10.18129/B9.bioc.DEP)**^1^.
 
 The compendium includes all the data, code, and text associated with the 
 publication. It is structured as an R package to facilitate reproducilibity and 
 distribution. The principles and motivations behind using research compendiums 
 for academic research is detailed in 
 [Marwick et al. (2018)](https://doi.org/10.1080/00031305.2017.1375986). 
-
-The R package [rrtools](https://github.com/benmarwick/rrtools) was used in the 
-production of this compendium.
+The R package **[rrtools](https://github.com/benmarwick/rrtools)**^2^ was used 
+in the production of this compendium.
 
 ### Citation
 
@@ -69,6 +70,19 @@ GTPases". version x.x.x. Zenodo. URL.
 
 ```
 
+### References
+
+1. Zhang, X., Smits, A., van Tilburg, G., Ovaa, H., Huber, W., Vermeulen, 
+   M. (2018). Proteome-wide identification of ubiquitin interactions using UbIA-MS. 
+   _Nature Protocols_, **13**, 530-550. 
+   [doi:10.1038/nprot.2017.147](https://doi.org/10.1038/nprot.2017.147)
+
+2. Marwick, B., Boettiger, C., Mullen, L. (2018). Packaging data analytical 
+   work reproducibly using R (and friends). _The American Statistician_, 
+   **72**(1), 80-88. 
+   [doi:10.1080/00031305.2017.1375986](https://doi.org/10.1080/00031305.2017.1375986)
+
+
 ### Accessing the compendium
 
 #### 1. Installing the package using R and `devtools`
@@ -94,7 +108,7 @@ devtools::install_github("csdaw/candidaev",
 # and other packages required to build vignettes and manuscript
 devtools::install_github("csdaw/candidaev", 
                          build_opts = c("--no-resave-data", "--no-manual"), 
-                         dependencies = TRUE)
+                         dependencies = TRUE, build_vignettes = TRUE)
 ```
 
 **Note:** the contents of `/data-raw` and `/inst/manuscript/supplement_files` 

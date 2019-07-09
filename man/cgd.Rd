@@ -8,12 +8,12 @@
 \source{
 Arnaud, M.B., Costanzo, M. C., Skrzypek, M. S., Binkley, G., Lane, C., Miyasato, S. R., & Sherlock, G.
 (2005). The Candida Genome Database (CGD), a community resource for \emph{Candida albicans} gene and
-protein information. \emph{Nucleic Acids Research, 33}(suppl_1), D358-D363.
+protein information. \emph{Nucleic Acids Research}, \strong{33}(suppl_1), D358-D363.
 \href{https://doi.org/10.1093/nar/gki003}{doi:10.1093/nar/gki003}
 
 Skrzypek, M. S., Binkley, J., Binkley, G., Miyasato, S. R., Simison, M., & Sherlock, G. (2017).
 The Candida Genome Database (CGD): incorporation of Assembly 22, systematic identifiers and visualization of
-high throughput sequencing data. \emph{Nucleic Acids Research, 45}(D1), D592-D596.
+high throughput sequencing data. \emph{Nucleic Acids Research}, \strong{45}(D1), D592-D596.
 \href{https://doi.org/10.1093/nar/gkw924}{doi:10.1093/nar/gkw924}
 }
 \usage{

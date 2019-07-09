@@ -66,3 +66,9 @@ my_norm <- limma::normalizeCyclicLoess(my_filt)
 plot_detect2(my_norm)
 
 }
+\references{
+Zhang, X., Smits, A., van Tilburg, G., Ovaa, H., Huber, W., Vermeulen,
+M. (2018). Proteome-wide identification of ubiquitin interactions using UbIA-MS.
+\emph{Nature Protocols}, \strong{13}, 530-550.
+\href{https://doi.org/10.1038/nprot.2017.147}{doi:10.1038/nprot.2017.147}
+}
