@@ -4,14 +4,14 @@
 \alias{plot_imputation2}
 \title{Visualise effect of imputation on protein intensities}
 \usage{
-plot_imputation2(exd, facet_labels = NULL, mat, ...)
+plot_imputation2(exd, facet_labels = FALSE, mat, ...)
 }
 \arguments{
 \item{exd}{data.frame: contains information for plot labels. See the
 examples section of \code{\link{assert_exd}} or \code{\link{atcc_exp}} for
 examples of appropriately structured experimental designs.}
 
-\item{facet_labels}{\code{NULL} or a named vector: if\code{NULL} then
+\item{facet_labels}{\code{FALSE} or a named vector: if\code{FALSE} then
 the matrix names will be used for the facet labels (aka. strip text). Use a
 named vector to customise the facet labels. For example if you are plotting
 the following: \code{plot_imputation2(exp, facet_labels = x, mat1, mat2)}
@@ -85,9 +85,20 @@ my_imp2 <- imputeLCMD::impute.MinProb(my_norm)
 
 # density plot before and after imputations
 plot_imputation2(exd = atcc_exp,
+                 facet_labels = FALSE
                  my_norm,
                  my_imp,
                  my_imp2)
+
+ # density plot before and after imputations
+ # with custom labels
+ plot_imputation2(exd = atcc_exp,
+                  facet_labels = c(my_norm = "A",
+                                   my_imp = "B",
+                                   my_imp2 = "C"),
+                  my_norm,
+                  my_imp,
+                  my_imp2)
 }
 \references{
 Zhang, X., Smits, A., van Tilburg, G., Ovaa, H., Huber, W., Vermeulen,
