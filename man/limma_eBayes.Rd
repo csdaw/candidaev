@@ -5,7 +5,7 @@
 \title{Perform differential protein abundance analysis with empirical Bayes
 method from \emph{limma}}
 \usage{
-limma_eBayes(mat, design, contrasts)
+limma_eBayes(mat, design, contrasts, block = NULL)
 }
 \arguments{
 \item{mat}{numeric matrix: typically this will include log2 LFQ intensity data.

@@ -101,9 +101,9 @@
 #' result_a9 <- result_list[[2]]
 #'
 #' @export
-limma_eBayes <- function(mat, design, contrasts) {
+limma_eBayes <- function(mat, design, contrasts, block = NULL) {
   cm <- limma::makeContrasts(contrasts = contrasts, levels = design)
-  fit <- limma::lmFit(mat, design = design)
+  fit <- limma::lmFit(mat, design = design, block = block)
 
   result <- limma::contrasts.fit(fit = fit, contrasts = cm)
 

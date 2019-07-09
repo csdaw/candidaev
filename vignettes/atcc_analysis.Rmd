@@ -579,7 +579,7 @@ venn_comp <- list("ATCC90028" = rownames(a9_norm),
 
 # plot the Venn diagram
 venn <- plot_venn(venn_comp, 
-                  type = "df")
+                  type = "plot")
 
 grid::grid.draw(venn)
 ```

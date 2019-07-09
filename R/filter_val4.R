@@ -148,13 +148,13 @@ filter_val4 <- function(data, logic = c("and", "or"), op = c("==", ">=", "<="),
   # get sum of values in second group of columns
   sum2 <- apply(data[, c(grep(pat2, colnames(data)))], 1, function(x) sum(x, na.rm = TRUE))
 
-  # get sum of values in first group of columns
+  # get sum of values in third group of columns
   sum3 <- apply(data[, c(grep(pat3, colnames(data)))], 1, function(x) sum(x, na.rm = TRUE))
 
-  # get sum of values in second group of columns
+  # get sum of values in fourth group of columns
   sum4 <- apply(data[, c(grep(pat4, colnames(data)))], 1, function(x) sum(x, na.rm = TRUE))
 
-  # subset data based on sum of values in two column groups
+  # subset data based on sum of values in all column groups
   if(logic == "and") {
     subset(data,
            sapply(sum1, op, val1) &

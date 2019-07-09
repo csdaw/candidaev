@@ -152,7 +152,7 @@ filter_na4 <- function(data, logic = c("and", "or"), op = c("==", ">=", "<="),
   # get number of NA in fourth group of columns
   n_na4 <- apply(is.na(data[, c(grep(pat4, colnames(data)))]), 1, sum)
 
-  # subset data based on number of NA in two column groups
+  # subset data based on number of NA in all column groups
   if(logic == "and") {
     subset(data, sapply(n_na1, op, val1) &
              sapply(n_na2, op, val2) &
