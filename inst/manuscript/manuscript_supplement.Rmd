@@ -1,7 +1,7 @@
 ---
 title: | 
    **Supplement to: Protein markers for *Candida albicans* EVs include
-   claudin-like Sur7 family proteins and Rho GTPases**
+   claudin-like Sur7 family proteins and GTPases**
 author: | 
    | Charlotte Dawson^a^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
      Pierre Faou^b^,
@@ -87,9 +87,6 @@ library(kableExtra)
 
 # set seed for random number generation
 set.seed(1)
-
-# reference external R script with protein function lists
-knitr::read_chunk('components/protein_funs.R')
 ```
 
 
@@ -124,7 +121,7 @@ y_ev <- filter_na(yeast_norm2, op = "<=",
 y_wcl <- filter_na(yeast_norm2, op = "<=", 
                    pat = "W", val = 2)
 
-# can't impute with so many missing values
+# won't impute with so many missing values
 # separate EV/WCL exclusive proteins (don't impute) from 
 # EV/WCL common proteins (impute)
 yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==", 
@@ -135,10 +132,9 @@ yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=",
                          pat1 = "EV", val1 = 2, 
                          pat2 = "W", val2 = 2)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-yeast_imp <- impute_QRILC(yeast_both)
+# use bpca method from pcaMethods for missing value imputation
+yeast_imp <- pcaMethods::pca(yeast_both, method = "bpca")
+yeast_imp <- pcaMethods::completeObs(yeast_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 yeast_de <- rbind(yeast_excl, yeast_imp)
@@ -158,10 +154,11 @@ y_contrasts <- c("EV - WCL")
 y_efit <- limma_eBayes(yeast_de, design = y_design, contrasts = y_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 yeast_res <- get_results(efit = y_efit, 
                          mat = yeast_de, 
                          p_val = 0.01, 
-                         lfc = 0, 
+                         lfc = 1, 
                          type = "individual")[[1]]
 ```
 
@@ -193,7 +190,7 @@ b_ev <- filter_na(biofilm_norm, op = "<=",
 b_wcl <- filter_na(biofilm_norm, op = "<=", 
                    pat = "W", val = 4)
 
-# can't impute with so many missing values
+# won't impute with so many missing values
 # filter for proteins with 4-5 NA values in EV or WCL (don't impute)
 biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=", 
                          pat1 = "EV", val1 = 4, 
@@ -204,17 +201,16 @@ biofilm_both <- filter_na2(biofilm_norm, logic = "and", op = "<=",
                          pat1 = "EV", val1 = 3, 
                          pat2 = "W", val2 = 3)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-biofilm_imp <- impute_QRILC(biofilm_both)
+# use bpca method from pcaMethods for missing value imputation
+biofilm_imp <- pcaMethods::pca(biofilm_both, method = "bpca")
+biofilm_imp <- pcaMethods::completeObs(biofilm_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 biofilm_de <- rbind(biofilm_excl, biofilm_imp)
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+b_samp <- data.frame(T = rep(c("EV", "WCL"), each = 5))
 
 b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
 colnames(b_design) <- c("EV", "WCL")
@@ -227,10 +223,11 @@ b_contrasts <- c("EV - WCL")
 b_efit <- limma_eBayes(biofilm_de, design = b_design, contrasts = b_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 biofilm_res <- get_results(efit = b_efit, 
                            mat = biofilm_de, 
                            p_val = 0.01, 
-                           lfc = 0, 
+                           lfc = 1, 
                            type = "individual")[[1]]
 ```
 
@@ -257,7 +254,7 @@ atcc_norm <- normalizeCyclicLoess(atcc_filt)
 ```
 
 ```{r atcc1, include=FALSE}
-# filter for proteins quantified in min 2/3 reps of EV or WCL
+# filter for proteins quantified in min 2/3 reps of ATCC10231 EV or WCL
 a1_norm <- filter_na2(atcc_norm, logic = "or", op = "<=", 
                       pat1 = "A10231_EV", val1 = 1, 
                       pat2 = "A10231_W", val2 = 1)
@@ -271,7 +268,7 @@ a1_ev <- filter_na(a1_norm, op = "<=", pat = "EV", val = 2)
 # define 'WCL proteins'
 a1_wcl <- filter_na(a1_norm, op = "<=", pat = "W", val = 2)
 
-# can't impute with so many missing values
+# won't impute with so many missing values
 # separate EV/WCL exclusive proteins (don't impute) from
 # EV/WCL common proteins (impute)
 a1_excl <- filter_na2(a1_norm, logic = "or", op = "==",
@@ -282,10 +279,9 @@ a1_both <- filter_na2(a1_norm, logic = "and", op = "<=",
                       pat1 = "EV", val1 = 2,
                       pat2 = "W", val2 = 2)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-a1_imp <- impute_QRILC(a1_both)
+# use bpca method from pcaMethods for missing value imputation
+a1_imp <- pcaMethods::pca(a1_both, method = "bpca")
+a1_imp <- pcaMethods::completeObs(a1_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 a1_de <- rbind(a1_excl, a1_imp)
@@ -306,15 +302,16 @@ a1_contrasts <- c("A1_EV - A1_W")
 a1_efit <- limma_eBayes(a1_de, design = a1_design, contrasts = a1_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 a1_res <- get_results(efit = a1_efit,
                       mat = a1_de,
                       p_val = 0.01,
-                      lfc = 0,
+                      lfc = 1,
                       type = "individual")[[1]]
 ```
 
 ```{r atcc9, include=FALSE}
-# filter for proteins quantified in min 2/3 reps of EV or WCL
+# filter for proteins quantified in min 2/3 reps of ATCC90028 EV or WCL
 a9_norm <- filter_na2(atcc_norm, logic = "or", op = "<=",
                       pat1 = "A90028_EV", val1 = 1,
                       pat2 = "A90028_W", val2 = 1)
@@ -339,10 +336,9 @@ a9_both <- filter_na2(a9_norm, logic = "and", op = "<=",
                       pat1 = "EV", val1 = 2,
                       pat2 = "W", val2 = 2)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-a9_imp <- impute_QRILC(a9_both)
+# use bpca method from pcaMethods for missing value imputation
+a9_imp <- pcaMethods::pca(a9_both, method = "bpca")
+a9_imp <- pcaMethods::completeObs(a9_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 a9_de <- rbind(a9_excl, a9_imp)
@@ -363,10 +359,11 @@ a9_contrasts <- c("A9_EV - A9_W")
 a9_efit <- limma_eBayes(a9_de, design = a9_design, contrasts = a9_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 a9_res <- get_results(efit = a9_efit,
                       mat = a9_de,
                       p_val = 0.01,
-                      lfc = 0,
+                      lfc = 1,
                       type = "individual")[[1]]
 ```
 
@@ -586,9 +583,7 @@ wcl_candidates <- wcl_comp_tab %>%
 
 # construct table S2
 wcl_longlist <- wcl_candidates %>% 
-  mutate(Function = match_id(Name, uniprot, "CGD_gene_name", 
-                             "Protein_name", concat = TRUE, str_split = FALSE),
-         DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", 
+  mutate(DAY.Y = match_id(Name, yeast_res, "CGD_gene_name", 
                           "logFC", concat = TRUE, str_split = FALSE), 
          A9 = match_id(Name, a9_res, "CGD_gene_name", 
                        "logFC", concat = TRUE, str_split = FALSE), 
@@ -611,29 +606,35 @@ wcl_longlist <- wcl_candidates %>%
   rename("DAY Y" = DAY.Y, "DAY B" = DAY.B) %>% 
   arrange(Name)
 
-# load vector of protein functions from external R script
-<<fun_list2>>
+# load .csv file with table S2 labels
+wcl_labels <- read.csv("components/tableS2.csv", stringsAsFactors = FALSE) %>% 
+  mutate(Function = case_when(Superscript == "a" ~ paste0(Function, 
+                                                          footnote_marker_alphabet(1)), 
+                              Superscript == "b" ~ paste0(Function, 
+                                                          footnote_marker_alphabet(2)),
+                              Superscript == "c" ~ paste0(Function, 
+                                                          footnote_marker_alphabet(3)), 
+                              TRUE ~ as.character(Function)), 
+         VDM = c(rep("", 62)))
 
-# add proper protein functions to table 1
+# add proper protein functions to table S2
 # also add vesicle depleted supernatant info and 
 # group proteins according to localisation
-wcl_longlist2 <- wcl_longlist %>% 
-  mutate(Function = function_desc2, 
-         VDM = c(rep("", 40)), 
-         pack_row = c(rep(4, 2), 3, rep(2, 2), 7, rep(1, 2), rep(7, 2), 1, 
-                      rep(2, 4), 7, 3, 2, 5, 1, 
-                      2, 6, 2, 1, 7, rep(1, 2), 2, 1, 5, 1, 
-                      1, 6, 2, 1, rep(8, 2), rep(1, 3))) %>% 
-  arrange(pack_row)
+wcl_longlist2 <- match_id_multi(df = wcl_longlist, 
+                                id = "Name", 
+                                ref = wcl_labels, 
+                                match = "Name", 
+                                new = c("Function", "Loc_num", "VDM"), 
+                                str_split = FALSE) %>% 
+  select(Name, Function, everything()) %>% 
+  arrange(Loc_num)
 ```
 
 (ref:table1) [@gil-bona2015]
 
 (ref:footnote1) [@skrzypek2017]
 
-(ref:footnote2) [@almagroarmenteros2017]
-
-(ref:footnote3) [@savojardo2018]
+(ref:footnote2) [@theuniprotconsortium2019]
 
 
 ```{r tableS2}
@@ -642,9 +643,10 @@ tabs2_cap <- "\\textbf{Candidate negative protein markers for
               those that were found to be exclusive to whole cell lysate (WCL) 
               or significantly enriched in WCL across the four 
               \\textit{C. albicans} strains examined in this study. Proteins 
-              are grouped according to their subcellular localisation as 
-              annotated in the Candida Genome Database (candidagenome.org) 
-              (ref:footnote1). The log\\textsubscript{2} ratio of the abundance 
+              are grouped according to their 
+              subcellular localisation as annotated in the Candida Genome 
+              Database (candidagenome.org) (ref:footnote1) unless otherwise 
+              indicated. The log\\textsubscript{2} ratio of the abundance 
               (mean MaxQuant LFQ intensity) of each protein in EVs compared to 
               WCL for each strain is listed. A negative value indicates that a 
               protein was enriched in WCL compared to EV. \`\`ex\" indicates 
@@ -660,35 +662,40 @@ tabs2_cap <- "\\textbf{Candidate negative protein markers for
               EV markers according to the criteria depicted in Figure S1."
 
 # draw table S2
-knitr::kable(wcl_longlist2[, -10], 
+knitr::kable(wcl_longlist2[, -9], 
              caption = tabs2_cap, 
              format = "latex", 
              booktabs = TRUE, 
              longtable = TRUE, 
              linesep = "", 
              escape = FALSE) %>% 
-  row_spec(row = c(20, 25, 29, 36), underline = TRUE) %>% 
+  row_spec(row = c(26, 32, 36:38, 42, 58), underline = TRUE) %>% 
   add_header_above(c(" " = 2, 
                      "log\\\\textsubscript{2}(fold change) EV vs WCL" = 4, 
                      " " = 3), escape = FALSE) %>% 
   kable_styling(font_size = 8, 
                 latex_options = c("HOLD_position")) %>% 
-  pack_rows("Cytoplasm", 1, 14) %>% 
-  pack_rows("Mitochondria", 15, 25) %>% 
-  pack_rows("Nucleus", 26, 27) %>% 
-  pack_rows("Vacuole", 28, 29) %>% 
-  pack_rows("Peroxisome", 30, 31) %>% 
-  pack_rows("Proteasome", 32, 33) %>% 
-  pack_rows("Cell wall, cell surface, fungal biofilm matrix", 34, 38) %>% 
-  pack_rows("Ribosome", 39, 40) %>% 
+  pack_rows("Cytoplasm", 1, 13) %>% 
+  pack_rows("Cytosol and mitochondria", 14, 16) %>% 
+  pack_rows("Mitochondria", 17, 32) %>% 
+  pack_rows("Nucleus", 33, 34) %>% 
+  pack_rows("Vacuole", 35, 38) %>% 
+  pack_rows("Cell wall, cell surface, fungal biofilm matrix", 39, 50) %>% 
+  pack_rows("Proteasome", 51, 54) %>% 
+  pack_rows("Cytoplasmic stress granule", 55, 56) %>% 
+  pack_rows("Peroxisome", 57, 57) %>% 
+  pack_rows("Actin cortical patch", 58, 58) %>% 
+  pack_rows("Unknown", 59, 62) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence 
-                         similarity with \\\\textit{S. cerevisiae} ortholog as 
+                         similarity with \\\\textit{S. cerevisiae} homolog as 
                          annotated in the Candida Genome Database 
                          (ref:footnote1)", 
-                        "Protein localisation was predicted using DeepLoc-1.0 
-                         (ref:footnote2)", 
-                        "Protein localisation was predicted using BUSCA 
-                         (ref:footnote3)"), 
+                        "Protein localisation was obtained from the GO Cellular
+                        Component annotation in the \\\\textit{C. albicans} 
+                        UniProt reference proteome UP000000559 (ref:footnote2).", 
+                        "Protein and has no Cellular Component annotation in 
+                         the Candida Genome Database or UniProt reference 
+                        proteome."), 
            escape = FALSE, 
            threeparttable = TRUE)
 ```
