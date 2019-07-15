@@ -1,0 +1,48 @@
+Name,Function,Superscript,Localisation,Loc_num,VDM,Underline
+ARF3,Ras family GTPase,a,Plasma membrane,1,,Y
+BGL2,"1,3-beta-glucanosyltransferase",,"Cell wall, cell surface",2,Y,
+CDC42,Rho family GTPase,,Plasma membrane,1,,Y
+CDR1;CDR2,Multidrug transporter of ABC superfamily,,Plasma membrane,1,,
+CHS3,Major chitin synthase of yeast and hyphae,,Plasma membrane,1,,
+CRH11,GPI-anchored cell wall transglycosylase,,"Cell wall, cell surface",2,Y,
+ECM33,GPI-anchored cell wall protein,,"Cell wall, cell surface",2,Y,
+ENA21,Predicted P-type ATPase sodium pump,a,Plasma membrane,1,,
+ERO1,ER oxidoreductin,,Endoplasmic reticulum,3,Y,
+FAA4,Long-chain fatty acid-CoA ligase,a,Plasma membrane,1,,Y
+FET34,Multicopper feroxidase,,Plasma membrane,1,,Y
+GAP4,High-affinity S-adenosylmethionine permease,,Plasma membrane,1,,
+GPD2,Glycerol-3-phosphate dehydrogenase,,"Cell wall, cell surface",2,,Y
+GSC1,"1,3-beta-glucan synthase",,Plasma membrane,1,,
+HGT1,High-affinity MFS glucose transporter,,Plasma membrane,1,,
+HGT6,Putative high-affinity MFS glucose transporter,,Plasma membrane,1,,
+HGT7,Putative MFS glucose transporter,,Plasma membrane,1,,
+MIR1,Putative mitochondrial phosphate transporter,a,Mitochondrion,6,,
+MP65,Cell surface mannoprotein,,"Cell wall, cell surface",2,Y,
+MSB2,Mucin family adhesin-like protein,,"Cell wall, cell surface",2,Y,
+MTS1,Sphingolipid C9-methyltransferase,,Plasma membrane,1,,Y
+NCE102,Non-classical protein export protein,,Plasma membrane,1,,Y
+orf19.1054,"\textit{S. cerevisiae} ortholog is Pom33, transmembrane nucleoporin",b,Endoplasmic reticulum,3,,Y
+orf19.2168.3,"\textit{S. cerevisiae} ortholog is Yop1, reticulon-interacting protein",a,Endoplasmic reticulum,3,,Y
+orf19.3799,"\textit{S. cerevisiae} ortholog is Rtn1, reticulon protein",b,Endoplasmic reticulum,3,,Y
+orf19.6741,"\textit{S. cerevisiae} ortholog is Pun1, plasma membrane protein",a,Plasma membrane,1,Y,Y
+PGA4,"1,3-beta-glucanosyltransferase",,"Cell wall, cell surface",2,Y,
+PGA52,GPI-anchored cell surface protein of unknown function,,"Cell wall, cell surface",2,Y,
+PHM7,Putative ion transporter,,Plasma membrane,1,,
+PHR1,Cell surface glycosidase,,"Cell wall, cell surface",2,,Y
+PHR2,Glycosidase,,"Cell wall, cell surface",2,Y,
+PLB4.5,Phospholipase B,,"Cell wall, cell surface",2,Y,
+PMA1,Plasma membrane ATPase,,Plasma membrane,1,,
+POR1,Mitochondrial outer membrane porin,a,Mitochondrion,6,,
+RAC1,G-protein of RAC subfamily,,Plasma membrane,1,,Y
+RHO1,Rho family GTPase,,Plasma membrane,1,,Y
+RHO3,Rho family GTPase,,Plasma membrane,1,,Y
+SAP9,Secreted aspartyl protease,,"Cell wall, cell surface",2,Y,
+SEC4,Rab family GTPase,a,"Endosome, Golgi, transport vesicle",4,,Y
+SEC61,ER protein-translocation complex subunit,,Endoplasmic reticulum,3,,
+SSO2,Plasma membrane t-SNARE,a,Plasma membrane,1,,Y
+SUR7,"Protein required for normal cell wall, plasma membrane",c,Plasma membrane,1,,Y
+VAC8,Protein involved in vacuolar inheritance,a,Vacuole,5,,Y
+YCK2,"\textit{S. cerevisiae} ortholog is Yck2, casein kinase",,Plasma membrane,1,,Y
+YKT6,"Palmitoyltransferase, putative vacuolar SNARE complex protein",a,"Endosome, Golgi, transport vesicle",4,,Y
+YPT31,Rab family GTPase,a,"Endosome, Golgi, transport vesicle",4,,Y
+YWP1,Secreted yeast cell wall protein,,"Cell wall, cell surface",2,Y,
