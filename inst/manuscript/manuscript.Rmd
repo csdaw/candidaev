@@ -1756,9 +1756,9 @@ f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across
            \`\`cluster 8\". Functional enrichment analyses were performed on 
            the heatmap protein clusters using the online tool FungiFun2 
            [@priebe2015]. A selection of significantly enriched GO terms are 
-           presented in the table inset. Full lists of enriched GO terms are 
-           available in supplemental File S3. Full lists of the proteins 
-           in each cluster are available in supplemental File S5.
+           presented in the table inset. Full lists of enriched GO terms and 
+           proteins in each cluster are available in supplemental Files S3 and 
+           S5 respectively."
 ```
 
 \newpage
@@ -1829,7 +1829,7 @@ f6_cap <- "\\textbf{Identification of common signficantly enriched or exclusive
 
 \newpage
 
-```{r figure7, fig.cap=f7_cap, fig.width=3.5, fig.height=2.8}
+```{r figure7, fig.cap=f7_cap, fig.width=4, fig.height=3.6}
 f7_cap <- "\\textbf{Twenty-two best potential \\textit{C. albicans} positive EV 
            protein markers.} These proteins are those underlined in Table 
            \\@ref(tab:table1). They are are enriched or exclusive to EVs 
