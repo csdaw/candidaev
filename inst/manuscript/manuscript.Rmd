@@ -1621,7 +1621,7 @@ f5_params <- list(color_bar = "continuous",
 
 # plot heatmap
 f5_htmp <- plot_heatmap(mt = f5_table_filt, 
-                        plot = TRUE,
+                        plot = FALSE,
                         df = FALSE, 
                         data_type = "log2fc", 
                         clust_fun = "gower", 
@@ -1662,17 +1662,13 @@ f5_clusters <- plot_heatmap(mt = f5_table_filt,
   arrange(cluster)
 
 # extract identifiers from each cluster
-f5_clust1 <- f5_clusters %>% 
-  filter(cluster == 1) %>% 
+f5_clust1_2 <- f5_clusters %>% 
+  filter(cluster == 1 | cluster == 2) %>% 
   mutate(id = gsub("PEP1", "CaO19.3767", id)) %>% 
   pull(id) %>% 
   stringr::str_extract_all(., "[^;]+") %>% 
   unlist()
 
-f5_clust2 <- f5_clusters %>% 
-  filter(cluster == 2) %>% 
-  pull(id)
-  
 f5_clust3 <- f5_clusters %>% 
   filter(cluster == 3) %>% 
   mutate(id = gsub("CHS3", "CaO19.4937", id)) %>% 
@@ -1686,25 +1682,34 @@ f5_clust4 <- f5_clusters %>%
 # but GO enrichment still possible
 f5_clust5 <- f5_clusters %>% 
   filter(cluster == 5) %>% 
+  mutate(id = gsub("RPS1", "CaO19.3002", id)) %>% 
+  pull(id) %>% 
+  stringr::str_extract_all(., "[^;]+") %>% 
+  unlist() %>% 
+  unique()
+
+f5_clust6 <- f5_clusters %>% 
+  filter(cluster == 6) %>% 
   mutate(id = gsub("ALA1", "CaO19.5746", id), 
          id = gsub("MDH1", "CaO19.7481", id), 
-         id = gsub("RPS1", "CaO19.3002", id), 
          id = gsub("TSA1", "CaO19.7417", id)) %>% 
   pull(id) %>% 
   stringr::str_extract_all(., "[^;]+") %>% 
   unlist() %>% 
   unique()
 
+f5_clust7 <- f5_clusters %>% 
+  filter(cluster == 7) %>% 
+  pull(id)
+
 # cluster 6 is proteins that could not be clustered
 # because all 4 log2FCs = NA
-f5_clust6 <- sort(rownames(f5_table_excl))
+f5_clust8 <- sort(rownames(f5_table_excl))
 
 # import FungiFun2 results
-f5_go1 <- process_fungifun("figures/f5_GO_clust1.csv") %>% 
-  mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found))
-
 # issue with PEP1, ambiguous ID in FungiFun, used CaO19.3767 as identifier
-f5_go2 <- process_fungifun("figures/f5_GO_clust2.csv")
+f5_go1_2 <- process_fungifun("figures/f5_GO_clust1_2.csv") %>% 
+  mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found))
 
 f5_go3 <- process_fungifun("figures/f5_GO_clust3.csv") %>% 
   mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found))
@@ -1714,12 +1719,16 @@ f5_go4 <- process_fungifun("figures/f5_GO_clust4.csv")
 
 # issue with ALA1, MDH1, used CaO19.5746 and CaO19.7481 as identifiers
 f5_go5 <- process_fungifun("figures/f5_GO_clust5.csv") %>% 
+  mutate(Prot.found = gsub("CaO19.3002", "RPS1", Prot.found))
+
+f5_go6 <- process_fungifun("figures/f5_GO_clust6.csv") %>% 
   mutate(Prot.found = gsub("CaO19.5746", "ALA1", Prot.found), 
          Prot.found = gsub("CaO19.7481", "MDH1", Prot.found), 
-         Prot.found = gsub("CaO19.3002", "RPS1", Prot.found), 
          Prot.found = gsub("CaO19.7417", "TSA1", Prot.found))
 
-f5_go6 <- process_fungifun("figures/f5_GO_clust6.csv")
+f5_go7 <- process_fungifun("figures/f5_GO_clust7.csv")
+
+f5_go8 <- process_fungifun("figures/f5_GO_clust8.csv")
 ```
 
 ```{r figure5, fig.cap=f5_cap, fig.height=6}
@@ -1741,15 +1750,15 @@ f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across
            black is EV exclusive. Unsupervised clustering of rows and columns 
            was performed using Gower's formula via the daisy function from the 
            R package \\textit{cluster} [@maechler2019]. Proteins which were 
-           exclusive to EVs from all four strains could not be clustered and 
+           exclusive to EVs from all four strains and therefore had no valid 
+           log\\textsubscript{2}(FC) values
            were seperated prior to clustering, in the group designated 
-           \`\`cluster 6\". Functional enrichment analyses were performed on 
+           \`\`cluster 8\". Functional enrichment analyses were performed on 
            the heatmap protein clusters using the online tool FungiFun2 
            [@priebe2015]. A selection of significantly enriched GO terms are 
-           presented in the table inset. Lists of the proteins identified in 
-           each cluster are shown and are also available in supplemental 
-           File S5. \\textsuperscript{a} indicates where all proteins from 
-           each protein group in the cluster were used for the GO analysis."
+           presented in the table inset. Full lists of enriched GO terms are 
+           available in supplemental File S3. Full lists of the proteins 
+           in each cluster are available in supplemental File S5.
 ```
 
 \newpage
