@@ -1678,8 +1678,6 @@ f5_clust4 <- f5_clusters %>%
   filter(cluster == 4) %>% 
   pull(id)
 
-# cluster 5 has too many proteins to fit in table
-# but GO enrichment still possible
 f5_clust5 <- f5_clusters %>% 
   filter(cluster == 5) %>% 
   mutate(id = gsub("RPS1", "CaO19.3002", id)) %>% 
@@ -1702,7 +1700,7 @@ f5_clust7 <- f5_clusters %>%
   filter(cluster == 7) %>% 
   pull(id)
 
-# cluster 6 is proteins that could not be clustered
+# cluster 8 is proteins that could not be clustered
 # because all 4 log2FCs = NA
 f5_clust8 <- sort(rownames(f5_table_excl))
 
@@ -1711,16 +1709,18 @@ f5_clust8 <- sort(rownames(f5_table_excl))
 f5_go1_2 <- process_fungifun("figures/f5_GO_clust1_2.csv") %>% 
   mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found))
 
+# issue with CHS3, ambiguous ID in FungiFun, used CaO19.4937 as identifier
 f5_go3 <- process_fungifun("figures/f5_GO_clust3.csv") %>% 
   mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found))
 
-# issue with CHS3, ambiguous ID in FungiFun, used CaO19.4937 as identifier
 f5_go4 <- process_fungifun("figures/f5_GO_clust4.csv")
 
-# issue with ALA1, MDH1, used CaO19.5746 and CaO19.7481 as identifiers
+# issue with RPS1, ambiguous ID in FungiFun, used CaO19.3002 as identifier
 f5_go5 <- process_fungifun("figures/f5_GO_clust5.csv") %>% 
   mutate(Prot.found = gsub("CaO19.3002", "RPS1", Prot.found))
 
+# issue with ALA1, MDH1, TSA1
+# used CaO19.5746, CaO19.7481, CaO19.7417 as identifiers
 f5_go6 <- process_fungifun("figures/f5_GO_clust6.csv") %>% 
   mutate(Prot.found = gsub("CaO19.5746", "ALA1", Prot.found), 
          Prot.found = gsub("CaO19.7481", "MDH1", Prot.found), 

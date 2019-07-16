@@ -7,10 +7,6 @@ library(dplyr)
 library(candidaev)
 library(limma)
 
-# set seed for rng
-# ensures results output is identical to manuscript
-set.seed(1)
-
 #### DAY286 yeast ####
 # filter out reverse, contaminant proteins, proteins with <2 unique peptides
 # extract LFQ intensity columns and UniProt accessions
@@ -32,17 +28,17 @@ yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=",
 # normalise LFQ intensities
 yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
 
-# filter for proteins identified in min 1/3 reps of EV
+# filter for proteins quantified in min 1/3 reps of EV
 # define 'EV proteins'
 y_ev <- filter_na(yeast_norm2, op = "<=",
                   pat = "EV", val = 2)
 
-# filter for proteins identified in min 1/3 reps of WCL
+# filter for proteins quantified in min 1/3 reps of WCL
 # define 'WCL proteins'
 y_wcl <- filter_na(yeast_norm2, op = "<=",
                    pat = "W", val = 2)
 
-# can't impute with so many missing values
+# won't impute with so many missing values
 # separate EV/WCL exclusive proteins (don't impute) from
 # EV/WCL common proteins (impute)
 yeast_excl <- filter_na2(yeast_norm2, logic = "or", op = "==",
@@ -53,17 +49,16 @@ yeast_both <- filter_na2(yeast_norm2, logic = "and", op = "<=",
                          pat1 = "EV", val1 = 2,
                          pat2 = "W", val2 = 2)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-yeast_imp <- impute_QRILC(yeast_both)
+# use bpca method from pcaMethods for missing value imputation
+yeast_imp <- pcaMethods::pca(yeast_both, method = "bpca")
+yeast_imp <- pcaMethods::completeObs(yeast_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 yeast_de <- rbind(yeast_excl, yeast_imp)
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-y_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 3)))
+y_samp <- data.frame(T = rep(c("EV", "WCL"), each = 3))
 
 y_design <- stats::model.matrix(~ 0 + T, data = y_samp)
 colnames(y_design) <- c("EV", "WCL")
@@ -76,10 +71,11 @@ y_contrasts <- c("EV - WCL")
 y_efit <- limma_eBayes(yeast_de, design = y_design, contrasts = y_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 yeast_res <- get_results(efit = y_efit,
                          mat = yeast_de,
                          p_val = 0.01,
-                         lfc = 0,
+                         lfc = 1,
                          type = "individual")[[1]]
 
 #### DAY286 biofilm ####
@@ -100,17 +96,17 @@ biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=",
 # normalise LFQ intensities
 biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
 
-# filter for proteins identified in min 1/5 reps of EV
+# filter for proteins quantified in min 1/5 reps of EV
 # define 'EV proteins'
 b_ev <- filter_na(biofilm_norm, op = "<=",
                   pat = "EV", val = 4)
 
-# filter for proteins identified in min 1/5 reps of WCL
+# filter for proteins quantified in min 1/5 reps of WCL
 # define 'WCL proteins'
 b_wcl <- filter_na(biofilm_norm, op = "<=",
                    pat = "W", val = 4)
 
-# can't impute with so many missing values
+# won't impute with so many missing values
 # filter for proteins with 4-5 NA values in EV or WCL (don't impute)
 biofilm_excl <- filter_na2(biofilm_norm, logic = "or", op = ">=",
                            pat1 = "EV", val1 = 4,
@@ -121,17 +117,16 @@ biofilm_both <- filter_na2(biofilm_norm, logic = "and", op = "<=",
                            pat1 = "EV", val1 = 3,
                            pat2 = "W", val2 = 3)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-biofilm_imp <- impute_QRILC(biofilm_both)
+# use bpca method from pcaMethods for missing value imputation
+biofilm_imp <- pcaMethods::pca(biofilm_both, method = "bpca")
+biofilm_imp <- pcaMethods::completeObs(biofilm_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 biofilm_de <- rbind(biofilm_excl, biofilm_imp)
 
 # see limma user guide section 9.2 for more info about DE
 # create design matrix
-b_samp <- data.frame(T = (rep(c("EV", "WCL"), each = 5)))
+b_samp <- data.frame(T = rep(c("EV", "WCL"), each = 5))
 
 b_design <- stats::model.matrix(~ 0 + T, data = b_samp)
 colnames(b_design) <- c("EV", "WCL")
@@ -144,10 +139,11 @@ b_contrasts <- c("EV - WCL")
 b_efit <- limma_eBayes(biofilm_de, design = b_design, contrasts = b_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 biofilm_res <- get_results(efit = b_efit,
                            mat = biofilm_de,
                            p_val = 0.01,
-                           lfc = 0,
+                           lfc = 1,
                            type = "individual")[[1]]
 
 #### ATCC ####
@@ -172,7 +168,7 @@ atcc_filt <- filter_na4(atcc_lfq, "or", "<=",
 atcc_norm <- normalizeCyclicLoess(atcc_filt)
 
 #### ATCC10231 ####
-# filter for proteins quantified in min 2/3 reps of EV or WCL
+# filter for proteins quantified in min 2/3 reps of ATCC10231 EV or WCL
 a1_norm <- filter_na2(atcc_norm, logic = "or", op = "<=",
                       pat1 = "A10231_EV", val1 = 1,
                       pat2 = "A10231_W", val2 = 1)
@@ -186,7 +182,7 @@ a1_ev <- filter_na(a1_norm, op = "<=", pat = "EV", val = 2)
 # define 'WCL proteins'
 a1_wcl <- filter_na(a1_norm, op = "<=", pat = "W", val = 2)
 
-# can't impute with so many missing values
+# won't impute with so many missing values
 # separate EV/WCL exclusive proteins (don't impute) from
 # EV/WCL common proteins (impute)
 a1_excl <- filter_na2(a1_norm, logic = "or", op = "==",
@@ -197,10 +193,9 @@ a1_both <- filter_na2(a1_norm, logic = "and", op = "<=",
                       pat1 = "EV", val1 = 2,
                       pat2 = "W", val2 = 2)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-a1_imp <- impute_QRILC(a1_both)
+# use bpca method from pcaMethods for missing value imputation
+a1_imp <- pcaMethods::pca(a1_both, method = "bpca")
+a1_imp <- pcaMethods::completeObs(a1_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 a1_de <- rbind(a1_excl, a1_imp)
@@ -221,14 +216,15 @@ a1_contrasts <- c("A1_EV - A1_W")
 a1_efit <- limma_eBayes(a1_de, design = a1_design, contrasts = a1_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 a1_res <- get_results(efit = a1_efit,
                       mat = a1_de,
                       p_val = 0.01,
-                      lfc = 0,
+                      lfc = 1,
                       type = "individual")[[1]]
 
 #### ATCC90028 ####
-# filter for proteins quantified in min 2/3 reps of EV or WCL
+# filter for proteins quantified in min 2/3 reps of ATCC90028 EV or WCL
 a9_norm <- filter_na2(atcc_norm, logic = "or", op = "<=",
                       pat1 = "A90028_EV", val1 = 1,
                       pat2 = "A90028_W", val2 = 1)
@@ -253,10 +249,9 @@ a9_both <- filter_na2(a9_norm, logic = "and", op = "<=",
                       pat1 = "EV", val1 = 2,
                       pat2 = "W", val2 = 2)
 
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-# use left censored imputation method
-a9_imp <- impute_QRILC(a9_both)
+# use bpca method from pcaMethods for missing value imputation
+a9_imp <- pcaMethods::pca(a9_both, method = "bpca")
+a9_imp <- pcaMethods::completeObs(a9_imp)
 
 # recombine imputed proteins and non-imputed proteins in matrix
 a9_de <- rbind(a9_excl, a9_imp)
@@ -277,10 +272,11 @@ a9_contrasts <- c("A9_EV - A9_W")
 a9_efit <- limma_eBayes(a9_de, design = a9_design, contrasts = a9_contrasts)
 
 # extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
 a9_res <- get_results(efit = a9_efit,
                       mat = a9_de,
                       p_val = 0.01,
-                      lfc = 0,
+                      lfc = 1,
                       type = "individual")[[1]]
 
 #### Supplemental File S2 ####
@@ -559,11 +555,11 @@ s5_table_filt <- s5_table %>%
   tibble::column_to_rownames(var = "CGD_gene_name") %>%
   as.matrix()
 
-# excluded proteins (aka cluster 6)
+# excluded proteins (aka cluster 8)
 s5_table_excl <- s5_table %>%
   filter_at(.vars = vars(contains("lfc")),
             all_vars(is.na(.))) %>%
-  mutate(cluster = 6) %>%
+  mutate(cluster = 8) %>%
   rename("id" = CGD_gene_name) %>%
   arrange(id)
 
@@ -574,10 +570,11 @@ s5 <- plot_heatmap(mt = s5_table_filt,
                    data_type = "log2fc",
                    clust_fun = "gower",
                    split_type = "cutree",
-                   k = 5,
+                   k = 7,
                    cluster_split = FALSE) %>%
   mutate(cluster = recode(cluster,
-                          "1" = 3, "2" = 1, "3" = 5, "4" = 4, "5" = 2)) %>%
+                          "4" = 1, "1" = 2, "6" = 3, "2" = 4,
+                          "3" = 5, "5" = 6, "7" = 7)) %>%
   arrange(cluster) %>%
   select(-order) %>%
   bind_rows(s5_table_excl) %>%

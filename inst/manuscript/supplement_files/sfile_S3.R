@@ -88,32 +88,35 @@ s3_d <- process_fungifun("inst/manuscript/figures/f3_GO_DAY_B.csv") %>%
 
 #### Figure 5 ####
 ## import FungiFun2 results
-s3_e <- process_fungifun("inst/manuscript/figures/f5_GO_clust1.csv") %>%
+s3_e <- process_fungifun("inst/manuscript/figures/f5_GO_clust1_2.csv") %>%
   mutate(Prot.found = gsub("CaO19.3767", "PEP1", Prot.found)) %>%
   rnm_cols()
 
-s3_f <- process_fungifun("inst/manuscript/figures/f5_GO_clust2.csv") %>%
-  rnm_cols()
-
-s3_g <- process_fungifun("inst/manuscript/figures/f5_GO_clust3.csv") %>%
+s3_f <- process_fungifun("inst/manuscript/figures/f5_GO_clust3.csv") %>%
   mutate(Prot.found = gsub("CaO19.4937", "CHS3", Prot.found)) %>%
   rnm_cols()
 
-s3_h <- process_fungifun("inst/manuscript/figures/f5_GO_clust4.csv") %>%
+s3_g <- process_fungifun("inst/manuscript/figures/f5_GO_clust4.csv") %>%
   rnm_cols()
 
-s3_i <- process_fungifun("inst/manuscript/figures/f5_GO_clust5.csv") %>%
+s3_h <- process_fungifun("inst/manuscript/figures/f5_GO_clust5.csv") %>%
+  mutate(Prot.found = gsub("CaO19.3002", "RPS1", Prot.found)) %>%
+  rnm_cols()
+
+s3_i <- process_fungifun("inst/manuscript/figures/f5_GO_clust6.csv") %>%
   mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
                                                       c("CaO19.5746",
                                                         "CaO19.7481",
-                                                        "CaO19.3002",
                                                         "CaO19.7417"),
                                                       c("ALA1", "MDH1",
-                                                        "RPS1", "TSA1"),
+                                                        "TSA1"),
                                                       vectorize_all = FALSE)) %>%
   rnm_cols()
 
-s3_j <- process_fungifun("inst/manuscript/figures/f5_GO_clust6.csv") %>%
+s3_j <- process_fungifun("inst/manuscript/figures/f5_GO_clust7.csv") %>%
+  rnm_cols()
+
+s3_k <- process_fungifun("inst/manuscript/figures/f5_GO_clust8.csv") %>%
   rnm_cols()
 
 
@@ -122,10 +125,11 @@ s3_sheets <- list("Fig 3a DAY286 y" = s3_a,
                   "Fig 3b ATCC90028 y" = s3_b,
                   "Fig 3c ATCC10231 y" = s3_c,
                   "Fig 3d DAY286 b" = s3_d,
-                  "Fig 5 Cluster 1" = s3_e,
-                  "Fig 5 Cluster 2" = s3_f,
-                  "Fig 5 Cluster 3" = s3_g,
-                  "Fig 5 Cluster 4" = s3_h,
-                  "Fig 5 Cluster 5" = s3_i,
-                  "Fig 5 Cluster 6" = s3_j)
+                  "Fig 5 Cluster 1+2" = s3_e,
+                  "Fig 5 Cluster 3" = s3_f,
+                  "Fig 5 Cluster 4" = s3_g,
+                  "Fig 5 Cluster 5" = s3_h,
+                  "Fig 5 Cluster 6" = s3_i,
+                  "Fig 5 Cluster 7" = s3_j,
+                  "Fig 5 Cluster 8" = s3_k)
 writexl::write_xlsx(s3_sheets, "inst/manuscript/supplement_files/sfile_S3.xlsx")
