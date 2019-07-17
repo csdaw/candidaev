@@ -926,7 +926,7 @@ knitr::kable(marker_longlist2[ ,-9],
 
 # Figures
 
-```{r figure1Data, include=FALSE, cache=TRUE}
+```{r figure1Data, include=FALSE}
 # construct data.frame with nta experiment info
 nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3", 
                                   "ATCC90028_1", "ATCC90028_2", "ATCC90028_3", 
@@ -1376,7 +1376,7 @@ f3_y <- plot_go_bar(f3_y_go_table, c(1:4,6, 23,26:28,30, 42,44:46), f3_pal) +
   theme(legend.text = element_text(size = 10), 
         legend.title = element_text(size = 10))
 
-f3_b <- plot_go_bar(f3_b_go_table, c(1:4,6, 54:57,67, 73:75,77), f3_pal) + 
+f3_b <- plot_go_bar(f3_b_go_table, c(1:4,6, 54:57,67, 73,75,77,87), f3_pal) + 
   annotate("text", x = 14, y = 60, label = "bold('DAY286 B')", parse = TRUE)
 
 f3_a9 <- plot_go_bar(f3_a9_go_table, c(1:5, 12,14,17,18,24, 26:29), f3_pal) + 
