@@ -206,7 +206,7 @@ The system on which this document was compiled was running
 pandoc v`r rmarkdown::pandoc_version()`. Here is output of 
 `sessionInfo()`.
 
-```{r sessionInfo, echo=FALSE}
-sessionInfo()
+```{r sessionInfo, echo=FALSE, cache=FALSE}
+devtools::sessionInfo()
 ```
 

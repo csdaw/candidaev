@@ -1,7 +1,7 @@
 ---
 title: | 
    **Protein markers for *Candida albicans* EVs include claudin-like Sur7 
-   family proteins and Rho GTPases**
+   family proteins and GTPases**
 author: | 
    | Charlotte Dawson^a^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
      Pierre Faou^b^,
@@ -28,7 +28,7 @@ fontsize: 12pt
 geometry: margin=1in
 classoption: letterpaper
 mainfont: Times New Roman
-linestretch: 2
+linestretch: 1.5
 header-includes:
   - \usepackage{titling}
   - \pretitle{\begin{center}\fontsize{14bp}{14bp}\selectfont}
@@ -38,9 +38,7 @@ header-includes:
   - \predate{\begin{center}\fontsize{10bp}{10bp}\selectfont}
   - \postdate{\par\end{center}}
   - \usepackage{fancyhdr}
-  - \usepackage{lipsum}
   - \pagestyle{fancy}
-  - \fancyhead[L]{Defining \textit{Candida albicans} EV protein markers}
   - \setlength{\headheight}{15pt}
   - \usepackage{float}
   - \let\origfigure\figure
@@ -53,12 +51,6 @@ header-includes:
 ---
 
 **Corresponding author:** Mark Bleackley, m.bleackley@latrobe.edu.au
-
-**Running title:** Defining _Candida albicans_ EV protein markers
-
-
-
-\newpage
 
 ```{r setup, include=FALSE}
 # set knit options
@@ -111,7 +103,7 @@ yeast_filt2 <- filter_na2(yeast_lfq2, logic = "or", op = "<=",
                           pat2 = "W", val2 = 1)
 
 # normalise LFQ intensities
-yeast_norm2 <- normalizeCyclicLoess(yeast_filt2)
+yeast_norm2 <- limma::normalizeCyclicLoess(yeast_filt2)
 
 # filter for proteins quantified in min 1/3 reps of EV
 # define 'EV proteins'
@@ -180,7 +172,7 @@ biofilm_filt <- filter_na2(biofilm_lfq, logic = "or", op = "<=",
                            pat2 = "W", val2 = 1)
 
 # normalise LFQ intensities
-biofilm_norm <- normalizeCyclicLoess(biofilm_filt)
+biofilm_norm <- limma::normalizeCyclicLoess(biofilm_filt)
 
 # filter for proteins quantified in min 1/5 reps of EV
 # define 'EV proteins'
@@ -252,7 +244,7 @@ atcc_filt <- filter_na4(atcc_lfq, "or", "<=",
                         pat4 = "A90028_W", 1)
 
 # normalise LFQ intensities
-atcc_norm <- normalizeCyclicLoess(atcc_filt)
+atcc_norm <- limma::normalizeCyclicLoess(atcc_filt)
 ```
 
 ```{r atcc1, include=FALSE}
@@ -369,404 +361,6 @@ a9_res <- get_results(efit = a9_efit,
                       type = "individual")[[1]]
 ```
 
-
-# Abbreviations
-
-A1 - ATCC10231
-
-A9 - ATCC90028
-
-DAY B - DAY286 biofilm
-
-DAY Y - DAY286 yeast
-
-EV - extracellular vesicle
-
-Evp1 - extracellular vesicle protein 1 (orf19.6741)
-
-Log<sub>2</sub>(FC) - log<sub>2</sub> fold change
-
-MCC - membrane compartment of Can1
-
-MDS - multidimensional scaling
-
-MISEV - minimal information for studies of EVs
-
-sEVs - small EVs
-
-SP - signal peptide
-
-TEMs - tetraspanin enriched microdomains
-
-TM - transmembrane domain
-
-VDM - vesicle depleted medium
-
-WCL - whole cell lysate
-
-\newpage
-
-# Abstract
-
-\newpage
-
-# Introduction
-
-Fungal infections are ubiquitous and are estimated to affect over 20% of the 
-world’s population [@havlickova2008]. These infections range from 
-non-life-threatening mycoses of the skin and nails, to deadly systemic 
-infections. They represent a significant burden to healthcare systems, with the 
-direct medical cost of fungal disease in the United States in 2017 estimated to 
-be \$7.2 billion [@benedict2018]. The fungi responsible for most fungal 
-infections worldwide are the various species of _Candida_ [@pfaller2007]. 
-_Candida_ is primarily associated with relatively harmless superficial infections 
-[@brown2012], but infections of the bloodstream or internal organs are 
-associated with mortality rates as high as 75% [@guinea2014; @kullberg2015]. 
-Over 12,000 people were hospitalised for invasive candidiasis in the US in 2017 
-alone, at a cost of almost \$1.2 billion [@benedict2018]. The species 
-responsible for the majority of _Candida_ infections is _Candida albicans_ 
-[@guinea2014]. _C. albicans_ infections are most often treated with two classes 
-of antifungals, the azoles which target biosynthesis of the fungal-specific 
-sterol ergosterol, and the echinocandins, which target biosynthesis of the major
-cell wall polysaccharide 1,3-β-glucan [@pappas2016]. Resistance to these and 
-other antifungals has begun to emerge 
-[@fisher2018; @perlin2015; @perlin2017; @whaley2017] making the development of 
-new antifungals with novel mechanisms of action paramount. Understanding the 
-interface between the host and pathogen will help to identify new targets for 
-controlling _C. albicans_ infections.
-
-Extracellular vesicles (EVs) are key factors in the progression of many diseases 
-ranging from cancer [@xu2018] to neurodegenerative diseases [@quek2017] and 
-bacterial infections [@pathirana2016]. EVs are defined as “particles naturally 
-released from the cell that are delimited by a lipid bilayer and cannot 
-replicate” [@thery2018]. Packaging of cargo into EVs is a method for the 
-coordinated release of biological molecules via a non-classic method of 
-secretion.  This facilitates intercellular communication both within an 
-organism [@maas2017] and between organisms [@schorey2015].
-
-Recently, EVs have 
-been proposed to function in the pathogenesis of fungal disease, particularly 
-in yeast infections including those from the genera _Cryptococcus_ 
-[@bielska2018; @oliveira2010b; @rodrigues2008], _Paracoccidioides_ 
-[@dasilva2015a; @vallejo2011], and _Candida_ 
-[@joffe2016; @vargas2015; @wolf2015]. The cargo of fungal EVs comprises 
-proteins [@bleackley2019], nucleic acids [@dasilva2015], lipids 
-[@oliveira2009; @rodrigues2007; @vargas2015; @wolf2015] and carbohydrates 
-[@dasilva2015a; @rodrigues2007]. Fungal EVs activate innate immune cells in 
-vitro [@dasilva2016; @oliveira2010b; @vargas2015; @wolf2015] and are responsible 
-for the hypervirulence of a _Cryptococcus gattii_ strain that caused disease in 
-immunocompetent individuals [@bielska2018]. Given the potential roles for EVs in 
-host-pathogen interactions, there is significant motivation to better understand 
-the biology of fungal EVs.
-
-_C. albicans_ EVs are typical of fungal EVs. They contain proteins, lipids, 
-nucleic acids and carbohydrates 
-[@dasilva2015; @gil-bona2015b; @vargas2015; @wolf2015; @zarnowski2018]. 
-Activation of murine macrophages and dendritic cells by EVs from _C. albicans_ 
-indicates a potential role for EVs in modulating the innate immune response to 
-the fungus [@vargas2015; @wolf2015]. Formation of biofilms is a critical 
-component of _C. albicans_ pathogenesis [@nobile2015] and the biofilm matrix 
-provides a protective layer for the fungus against antifungal drugs [@taff2012]. 
-The cargo of EVs produced by _C. albicans_ biofilms includes key proteins and 
-carbohydrates for biofilm biogenesis, making EVs crucial contributors to the 
-establishment of biofilms [@zarnowski2018]. Furthermore, “add-back” of EVs from 
-wildtype biofilms restored the loss of azole resistance in biofilms formed by 
-strains with deletions in genes encoding important enzymes for matrix 
-generation [@zarnowski2018]. That is, EVs also function in antifungal drug 
-resistance.
-
-The tools and techniques for the study of fungal EVs have been adapted from 
-those established for mammalian systems, where EVs are most intensively 
-studied. Many of the cutting-edge experimental techniques for isolation, 
-tracking, and analysis of mammalian EVs are dependent on protein markers 
-[@lotvall2014]. They include identifying fractions containing EVs after density 
-gradient centrifugation [@greening2015] or size exclusion chromatography 
-[@gamez-valero2016], purification of EVs via immunoaffinity capture [@oksvold2015], 
-and imaging of EV release and uptake [@suetsugu2013]. Unfortunately, proteomic 
-analyses of fungal EVs have revealed that the markers that have been so useful 
-for the isolation and study of mammalian EVs are not present in fungal EVs 
-[@bleackley2019]. Thus, there are differences in the protein cargo and possibly 
-the biogenesis of EVs from fungi and mammalian cells, and _de novo_ 
-identification of fungal EV markers is essential. Inconsistencies between 
-published data sets on the protein content of fungal EVs [@bleackley2019] means 
-that a robust proteomic analysis of EVs from a particular species is required 
-to provide an adequate data set for EV marker identification. In this study, we 
-have addressed this problem by performing in-depth proteomic analyses on 
-multiple _C. albicans_ strains to define a set of broadly applicable 
-_C. albicans_ EV markers.
-
-We employed label-free quantitative proteomics to generate EV and whole cell 
-lysate (WCL) proteomes for a selection of different _C. albicans_ strains and 
-morphologies; DAY286 yeast, DAY286 biofilm, ATCC90028 yeast, and ATCC10231 
-yeast. By comparing the EV versus WCL data across all four strains we 
-identified 39 putative EV markers which are enriched in _C. albicans_ EVs 
-regardless of source, cell strain, or morphology. These candidate protein 
-markers include GTPases, enzymes crucial for cell wall synthesis, and 
-plasma membrane proteins resembling mammalian tetraspanins or claudins. 
-The “minimal information for studies of EVs” (MISEV) 2018 position statement 
-indicates that, in addition to demonstrating the enrichment of EV marker 
-proteins in EV preparations, a deficiency of non-EV proteins should also be 
-shown [@thery2018]. With this in mind, we identified 40 proteins that were 
-depleted in _C. albicans_ EVs compared to the WCL from the four strains. 
-Validation of these putative EV markers in vitro will allow future _C. albicans_ 
-EV research to align better with the recommendations set out in MISEV2018. 
-Furthermore, robust _C. albicans_ EV markers will allow adaptation of mammalian 
-EV analysis techniques for use in the study of EVs in _C. albicans_ pathogenesis 
-and will provide potential new targets for the development of novel antifungals. 
-
-# Experimental procedures
-
-## _C. albicans_ strains and maintenance
-
-_C. albicans_ strains used in this study were DAY286 [@davis2002], ATCC90028, 
-and ATCC10231. All strains were maintained on YPD Agar plates (1% yeast extract, 
-2% peptone, 2% dextrose, 2% agar). Liquid starter cultures were grown overnight 
-in YPD medium (1% yeast extract, 2% peptone, 2% dextrose) at 30°C and 300 rpm. 
-
-## Yeast culture conditions
-
-For isolation of EVs from yeast form _C. albicans_ (DAY286, ATCC90028, 
-ATCC10231), YPD starter cultures were used to inoculate 150 or 300 mL YPD at an 
-OD~600~ = 0.2 in a baffled flask. Cultures were incubated at 30°C overnight 
-(approximately 20h). The culture OD~600~ was measured immediately prior to EV 
-isolation.
-
-## Biofilm culture conditions
-
-Biofilms (DAY286) were generated based on the method described in [@ramage2002] 
-with modifications. Briefly, 500 mL pre-warmed ½ strength RPMI (250 mL RPMI 
-1640 (Sigma), 0.165 M MOPS (Sigma) and 250 mL 3.6% dextrose) was inoculated 
-using a liquid starter culture to 1.0 x 10^6^ cells/mL. Five 25 x 25 
-cm non-treated bioassay dishes (Thermo Fisher Scientific) were each filled with 
-100 mL of inoculated ½ RPMI and incubated statically for 4 h at 37°C to allow 
-for adhesion of cells to the dish. Following cell adhesion, the culture medium 
-and any non-adherent cells was decanted and replaced with 200 mL pre-warmed 
-full strength RPMI. Biofilms were formed by incubating the dishes for 54 h at 
-37°C with agitation at 28 rpm in an Incu-Shaker Mini (Benchmark Scientific).
-
-## EV isolation
-
-EVs were isolated according to the method described in [@rodrigues2007] with 
-minor modifications. In brief, yeast cells or biofilm fragments were separated 
-from the culture supernatants by centrifugation at 4,000 x g for 15 min 
-(75003607 rotor, Thermo Scientific), then 15,000 x g for 30 min 
-(JLA 16.250 rotor, Beckman Coulter). Supernatants were 0.45 μm (Millipore) 
-filtered then centrifuged twice at 100,000 x g for 1 h (45Ti rotor, 
-Beckman Coulter) to pellet EVs which were resuspended in phosphate buffered 
-saline (137 mM NaCl, 2.7 mM KCl, 10 mM Na~2~HPO~4~, 1.8 mM KH~2~PO~4~) (PBS). 
-An aliquot of yeast cells (250 µL) was reserved for preparation of yeast whole 
-cell lysate. Similarly, 250 μL of biofilm scrapings were resuspended in PBS for 
-preparation of biofilm lysate.
-
-## Preparation of whole cell lysate and protein quantification
-
-Samples were washed three times with PBS prior to the addition of approximately 
-400 µL of acid washed glass beads (Sigma). Cells were lysed using a TissueLyser 
-(Qiagen) at 30 bps for 3 x 1 min bursts with 1 min incubations on ice between 
-bursts. Debris and beads were pelleted by centrifugation for 5 min at 
-23,000 x g at 4 °C. The supernatant was retained as the respective lysate 
-sample. Protein concentration of EVs and whole cell lysates (WCL) was 
-determined using a Qubit^TM^ 4 fluorimeter (Life Technologies) and the 
-Qubit^TM^ protein assay kit according to the manufacturer’s instructions. 
-
-## Nanoparticle tracking analysis
-
-The particle size and concentration of EV samples was determined using a 
-NanoSight NS300 equipped with a 405 nm (blue) laser (Malvern Instruments).  
-Immediately prior to injection, EVs were diluted between 1:250 and 1:6000 
-in 0.22 μm (Millipore) filtered PBS to bring the particle concentration within 
-the manufacturer’s recommended range (10^7^ – 10^9^ particles/mL). NTA software 
-version 3.2 was used to record data in 60 s reads in triplicate. Instrument 
-settings included: a syringe infusion rate of 70, temperature held at 25°C, 
-a camera level of 11, and a detection threshold of 6. The particle 
-concentrations and particle size parameters were recorded. Dilution 
-factor correction and averaging of data across biological replicates was 
-performed using the R package _tidyNano_ [@nguyen2019].
-
-## Transmission electron microscopy
-
-Carbon-coated 400-mesh copper grids (ProSciTech) were glow discharged for 1 
-min in a K950X turbo evaporator coupled to a K350 glow discharge unit 
-(Quorum Technologies Ltd). EVs (5 µL) were deposited onto the grid and 
-incubated for 1 min. Grids were then washed once with ultrapure water and 
-negatively stained three times with 2% (v/v) uranyl acetate (Agar Scientific). 
-Excess solution was blotted off and the grids were dried overnight. A JEM 2100 
-electron microscope (JEOL Ltd) operated at 200 kV was used for imaging.
-
-## Experimental design and statistical rationale
-
-A total of 14 EV and WCL samples from four different _C. albicans_ strains were 
-used for proteomics and NTA analyses; DAY286 yeast (n = 3), ATCC90028 yeast 
-(n = 3), ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5). The EV and WCL 
-samples from an individual biological replicate were paired as they were derived 
-from cells in the same culture or biofilm. Biofilm EVs and WCLs were obtained 
-from 5 independent biofilms on different days. Yeast EVs and WCLs were obtained 
-from 3 independent yeast cultures in parallel on different days for each strain. 
-Preparation of EV and WCL proteomics samples and MS data acquisition was 
-performed in three separate batches; DAY286 yeast, DAY286 biofilm, and then 
-both ATCC strains. Proteomics samples were randomised prior to injection and 
-each biological replicate was injected twice. The raw data from both injections 
-was combined into one sample during protein identification and quantification. 
-All proteomics statistical and data analyses were performed using R version 
-3.6.0 [@rcoreteam2018], Statistical tests, multiple comparison corrections and 
-important individual R and Bioconductor packages are referenced where they have 
-been used. 
-
-## Sample preparation for mass spectrometry
-
-EVs or WCLs (15 μg protein) were boiled in LDS sample buffer (Life Technologies) 
-and TCEP (Thermo Fisher Scientific), then separated by short-range SDS-PAGE 
-[@greening2016]. The gel was fixed in 50% (v/v) methanol, 7% (v/v) acetic acid 
-for 30 min, and the samples were excised. The proteins were reduced (2 mM TCEP, 
-1 h) and alkylated (40 mM iodoacetamide, 30 min in the dark) before digestion 
-(1 μg trypsin, 18 h at 37°C). Peptides were then extracted from the gel pieces 
-with 85% (v/v) ACN, 0.5% (v/v) TFA, lyophilised and resuspended in 5% (v/v) 
-ACN, 0.5% (v/v) TFA.
-
-## Mass spectrometry (ESI-LC-MS/MS) of EVs and WCL proteins
-
-Peptides were analysed as described previously [@fingerhut2018] with 
-modifications. Using a nanoflow UPLC instrument (Scientific^TM^ 
-UltiMate^TM^ 3000 RSLCnano, Thermo Fisher Scientific), the 
-reconstituted peptides were loaded onto a precolumn (C18 PepMap 300 μm ID x 2 cm 
-trapping column, Thermo Fisher Scientific) and washed prior to separation using 
-a 90 min linear ACN gradient on an analytical column (BEH C18, 1.7 μm, 130 Å 
-and 75 μm ID x 25 cm, Waters). The nanoflow UPLC was coupled on-line to a 
-Q Exactive HF mass spectrometer (Thermo Fisher Scientific) with a 
-nanoelectrospray ion source (Thermo Fisher Scientific). The Orbitrap of the Q 
-Exactive HF was used for MS and the linear trap was used for MS/MS.
-
-Data were collected in data-dependent acquisition mode using an MS scan range 
-of m/z 350 – 1500 and resolution of 60,000. HCD MS/MS spectra were collected 
-for the 15 most intense ions per MS scan at 15,000 resolution with a normalised 
-collision energy of 28% and an isolation window of 1.4 m/z. Dynamic exclusion 
-parameters were set as follows: exclude isotope on, duration 30 sec and peptide 
-match preferred. Other Orbitrap instrument parameters included an MS maximum 
-injection time of 30 ms with AGC target 3 x 10^6^, for a maximum 
-injection time of 25 ms with an AGT target of 1 x 10^5^. 
-
-## Database search and protein identification
-
-Tandem MS data collected for EVs and WCLs were processed in MaxQuant 
-version 1.6.0.16 [@tyanova2016]. Andromeda was used to search the data against 
-the UniProt _C. albicans_ reference proteome (UP000000559; downloaded 
-16/06/2018; 6035 entries) and the common contaminants and decoys list [@cox2011]. 
-Trypsin was selected as the digestion enzyme and up to 2 missed cleavages were 
-allowed. Carbamidomethylation of cysteine was set as a fixed modification and 
-oxidation of methionine and N-terminal acetylation were set as variable 
-modifications. Peptide mass tolerances were 20 ppm (first search) and 4.5 ppm 
-(main search), and false discovery rate (FDR) cut offs were 0.01 for both 
-proteins and peptides. Minimum and maximum peptide lengths were set to 8 and 25 
-respectively and match between runs was not selected. Label-free quantification 
-(LFQ) of protein abundances was performed using the MaxLFQ algorithm [@cox2014]. 
-Fast LFQ was selected and normalisation was skipped. The proteinGroups.txt 
-MaxQuant output was used for further analyses. Metadata for identified proteins 
-(localisation, topology, function) were obtained from the UniProt _C. albicans_ 
-reference proteome was well as the _C. albicans_ SC5314 Assembly 22 chromosomal 
-feature file available from the Candida Genome Database 
-(candidagenome.org/download/chromosomal_feature_files) 
-[@arnaud2005; @skrzypek2017].
-
-## Protein filtering and proteomics analysis
-
-Data processing and statistical analyses were all performed using R 
-version 3.6.0 and RStudio version 1.2.1335 [@rcoreteam2018; @rstudioinc]. 
-The DAY286 yeast, DAY286 biofilm, and ATCC proteinGroups.txt files were 
-initially processed and analysed separately. Analysis methodology and some 
-modified functions were derived from the Bioconductor package _DEP_ [@zhang2018]. 
-First, reversed and contaminant proteins as well as proteins identified by less 
-than 2 unique peptides were removed. The resulting proteins were filtered for 
-those quantified (LFQ intensity > 0) in minimum 2/3 yeast or 4/5 biofilm EV or 
-WCL biological replicates. The raw LFQ intensities, sequence coverage, 
-number of unique peptides, and MS/MS counts for these proteins can be found in 
-supplemental File S1. LFQ intensities were log~2~ transformed, then 
-normalised using the default cyclic loess normalisation method from the 
-Bioconductor package _limma_ [@ritchie2015]. Proteins were then separated into 
-two groups: those exclusive to EVs or WCL, and those quantified in both samples. 
-Missing LFQ values in the latter group were imputed using the QRILC method from 
-the R package _imputeLCMD_ [@lazar2015], while exclusive proteins were left 
-untouched. Finally, differential abundance analysis of proteins in EV versus 
-WCL was performed using empirical Bayes method from _limma_ 
-[@phipson2016; @ritchie2015]. Protein log~2~(fold changes) indicated 
-the difference in average log~2~ LFQ intensity values between EVs and 
-WCLs, this value is referred to as the log~2~(FC). The resulting 
-p-values were adjusted using the Benjamini-Hochberg approach [@benjamini1995] 
-and the significance threshold was set at an adjusted p-value of 0.01. Proteins 
-were considered significantly enriched or depleted in EVs if they had a p-value 
-less than 0.01 and a positive or negative log~2~(FC) respectively. 
-Results of the differential abundance analyses are available in supplemental 
-File S2.
-
-## Functional enrichment analysis and clustering
-
-The online tool FungiFun2 version 2.2.8 (sbi.hki-jena.de/fungifun) was used for 
-all GO term enrichment analyses [@priebe2015]. Enriched GO terms were those 
-with a Benjamini-Hochberg adjusted p-value less than 0.05. Multidimensional 
-scaling (MDS) plots were constructed using the plotMDS function from _limma_ 
-[@ritchie2015]. The top 500 proteins with the largest standard deviations 
-between the proteomics samples were used for the distance calculation. To 
-construct the heatmap in Figure 5, unsupervised clustering of log~2~(FC) 
-values for the proteins common to EVs from all strains was performed using 
-Gower’s formula via the daisy function from the R package _cluster_ [@maechler2019].  
-
-## Protein localisation and attribute prediction
-
-Location information of proteins was obtained from the Candida Genome Database 
-(candidagenome.org) [@arnaud2005; @skrzypek2017]. When this information was not 
-available DeepLoc-1.0 (cbs.dtu.dk/services/DeepLoc) was used to predict 
-subcellular location [@almagroarmenteros2017]. Signal peptide and transmembrane 
-domain annotations for each protein were obtained from UniProtKB or were 
-predicted using TOPCONS2 (topcons.cbr.su.se) 
-[@theuniprotconsortium2019; @tsirigos2015]. Prediction of protein palmitoylation 
-sites was performed using CSS-PALM 4.0 (csspalm.biocuckoo.org) [@ren2008].
-
-## _C. albicans_ EV marker definition
-
-Lists of proteins significantly enriched and exclusive in EVs from each strain 
-were compared using the R package _VennDiagram_ [@chen2011]. Proteins common to 
-all four strains were selected as potential EV positive protein markers. This 
-was repeated for significantly enriched and exclusive proteins in WCL to define 
-potential EV negative protein markers. Initial candidate EV marker proteins 
-were refined using the following criteria to obtain a shortlist of the best 
-potential markers. Ideal positive EV markers were proteins that satisfied 
-MISEV2018 marker categories 1 and 2 [@thery2018] and had less than 5 transmembrane 
-domains, no recognisable signal peptide, and were not detected in 
-vesicle-depleted media [@gil-bona2015b]. Ideal negative EV marker proteins were 
-selected based on prior tagging with fluorescent proteins in literature, prior 
-detection via Western blot, and adherence to MISEV2018 marker categories
-3 or 4 [@thery2018].
-
-## Data availability
-
-The proteomics data have been deposited in the ProteomeXchange Consortium 
-database via the PRIDE partner repository [@deutsch2017; @perez-riverol2019] 
-with the data set identifiers PXD014367 (DAY286 yeast), PXD014388 (ATCC90028 
-and ATCC10231), and PXD014389 (DAY286 biofilm). These data include ‘RAW’ files, 
-peak list files, MaxQuant search engine txt output, and the UniProt C. albicans 
-reference proteome FASTA file. The proteinGroups.txt files and source code used 
-in this study is freely available in an online research compendium available at 
-github.com/csdaw/candidaev. It was constructed using the R package 
-_rrtools_ [@marwick2018] and is structured as an R package which can be used to 
-reproduce the results and manuscript as submitted. The compendium has also been 
-permanently archived at zenodo (url). 
-
-# Results
-
-# Discussion
-
-# Acknowledgements
-
-# Data availability
-
-# Acknowledgements
-
-\newpage
-
-# References 
-\setstretch{1.5}
-<div id="refs"></div>
-
-
 \newpage
 
 # Tables
@@ -858,11 +452,10 @@ marker_longlist2[15, 1] <- paste0("EVP1",
                                   footnote_marker_alphabet(4))
 ```
 
-<!-- assign markdown references for table caption -->
-(ref:table1) [@gil-bona2015]
-(ref:footnote1) [@skrzypek2017]
-(ref:footnote2) [@theuniprotconsortium2019]
-(ref:footnote3) [@tsirigos2015]
+<!-- Ref (31) is Gil-Bona et al. 2015 -->
+<!-- Ref (48, 49) is Arnaud et al. 2005, Skrzypek et al. 2017 -->
+<!-- Ref (57) is The UniProt Consortium 2019 -->
+<!-- Ref (58) is Tsirigos et al. 2015 -->
 
 ```{r table1}
 tab1_cap <- "\\textbf{Candidate positive protein markers for 
@@ -882,9 +475,9 @@ tab1_cap <- "\\textbf{Candidate positive protein markers for
              having a signal peptide according to UniProt. \`\`VDM\" shows 
              whether a protein has previously been detected in vesicle-depleted 
              culture media (i.e. the proteins may also be in the soluble secretome) 
-             (ref:table1). Underlined proteins are those identified as the 
+             (31). Underlined proteins are those identified as the 
              best candidates for positive EV markers according to the 
-             criteria depicted in supplemental Figure S1."
+             criteria depicted in Supplementary Figure S1."
 
 # draw table 1
 knitr::kable(marker_longlist2[ ,-9],
@@ -908,14 +501,12 @@ knitr::kable(marker_longlist2[ ,-9],
   pack_rows("Mitochondrion", 46, 47) %>% 
   footnote(alphabet = c("Protein localisation was inferred from sequence 
                          similarity with \\\\textit{S. cerevisiae} homolog as 
-                         annotated in the Candida Genome Database 
-                        (ref:footnote1).", 
+                         annotated in the Candida Genome Database (48, 49).", 
                         "Protein localisation was obtained from the GO Cellular
                         Component annotation in the \\\\textit{C. albicans} 
-                        UniProt reference proteome UP000000559 (ref:footnote2).", 
+                        UniProt reference proteome UP000000559 (57).", 
                         "Presence of transmembrane domains and absence of a 
-                        signal peptide was predicted using TOPCONS2 
-                        (ref:footnote3).",
+                        signal peptide was predicted using TOPCONS2 (58).",
                         "The name Evp1 for the protein encoded by orf19.6741 
                         was proposed in the present study."), 
            escape = FALSE, 
@@ -925,6 +516,8 @@ knitr::kable(marker_longlist2[ ,-9],
 \newpage
 
 # Figures
+
+## Figure 1
 
 ```{r figure1Data, include=FALSE}
 # construct data.frame with nta experiment info
@@ -1031,7 +624,7 @@ f1c <- ggpar(f1c,
 ```
 
 
-```{r figure1, fig.cap=f1_cap, fig.width=7.1, fig.height=4}
+```{r figure1, fig.width=7.1, fig.height=4}
 # draw figure 1
 ggarrange(f1a, 
           ggarrange(f1b, f1c, 
@@ -1043,27 +636,11 @@ ggarrange(f1a,
           nrow = 2, 
           ncol = 1, 
           heights = c(1,1))
-
-f1_cap <- "\\textbf{Characterisation and quantification of EVs from different 
-           \\textit{C. albicans} strains.} \\textit{(A)} Representative TEM 
-           images of EVs isolated from 4 different \\textit{C. albicans} 
-           strains. Scale bar indicates 0.5 $\\mu$m. \\textit{(B)} Size 
-           distribution of DAY286 yeast (n = 3), ATCC90028 yeast (n = 3), 
-           ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5) EVs as measured 
-           by nanoparticle tracking analysis. Line plots shown are the average 
-           of the biological replicates and the dashed grey line indicates 100 
-           nm. Plots for the individual biological replicates are presented in 
-           supplemental Figure S2. \\textit{(C)} Comparison of the ratio of 
-           particle concentration to protein concentration of the EV fraction, 
-           (particles/mL) $\\div$ ($\\mu$g protein/mL), across the four EV 
-           sources. Each dot represents one biological replicate. Sample means 
-           were compared using ANOVA followed by Tukey's HSD \\textit{post-hoc} 
-           test. P-values indicating significant differences are shown. The 
-           particle and protein concentrations for each biological replicate 
-           are provided in supplemental Table S1."
 ```
 
 \newpage
+
+## Figure 2
 
 ```{r figure2Yeast, include=FALSE}
 # compare DAY286 yeast EV WCL proteins
@@ -1251,7 +828,7 @@ f2b4 <- plot_volcano(data = biofilm_res,
 
 
 
-```{r figure2, fig.cap=f2_cap, fig.width=7.1, fig.height=6}
+```{r figure2, fig.width=7.1, fig.height=6}
 # draw figure 2
 ggarrange(ggarrange(f2a1, f2a2, f2a3, f2a4, 
                     labels = c("A", "", "", ""), 
@@ -1271,30 +848,11 @@ ggarrange(ggarrange(f2a1, f2a2, f2a3, f2a4,
           ncol = 1,
           nrow = 2, 
           heights = c(1,2))
-
-f2_cap <- "\\textbf{Differential abundance analysis of proteins identified in 
-           \\textit{C. albicans} EVs and whole cell lysates (WCL).} 
-           \\textit{(A)} Venn diagrams comparing the EV and WCL proteomes from 
-           four \\textit{C. albicans} strains; DAY286 yeast (n = 3), ATCC90028 
-           yeast (n = 3), ATCC10231 yeast (n = 3), and DAY286 biofilm (n = 5). 
-           Whole cell lysates were prepared from the EV source cells. Proteins 
-           were quantified (MaxQuant LFQ intensity) in minimum 2/3 (yeast) and 
-           4/5 (biofilm) biological replicates of EV or WCL. \\textit{(B)} 
-           Volcano plots depicting significantly enriched EV or WCL proteins. 
-           Differential abundance analysis was performed by comparing the mean 
-           normalised LFQ intensities of proteins identified in both EV and 
-           WCL (i.e. proteins in the venn overlap) using the Bioconductor 
-           package \\textit{limma} [@cox2014; @ritchie2015]. Significantly 
-           enriched proteins were identified using a Benjamini-Hochberg 
-           adjusted p-value cut off of 0.01 and log\\textsubscript{2}(FC) cutoff 
-           of 1. Counts of significant and 
-           non-significant proteins are indicated on each graph. Proteins with 
-           a log\\textsubscript{2}(FC) greater than 8 are labelled. Data tables 
-           underlying the venn diagrams and volcano plots are provided in 
-           supplemental File S2."
 ```
 
 \newpage
+
+## Figure 3
 
 ```{r figure3Data, include=FALSE}
 # get list of DAY286 yeast EV proteins exclusive and sig. enriched
@@ -1388,7 +946,7 @@ f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:4,6, 31,33:35,45, 49:52), f3_pal) +
 
 
 
-```{r figure3, fig.cap=f3_cap, fig.width=7.2, fig.height=6}
+```{r figure3, fig.width=7.2, fig.height=6}
 # draw figure 3
 ggarrange(f3_y, f3_a9, 
           f3_a1, f3_b, 
@@ -1398,19 +956,11 @@ ggarrange(f3_y, f3_a9,
           common.legend = TRUE, 
           legend = "bottom", 
           align = "hv")
-
-f3_cap <- "\\textbf{Functional enrichment analyses of the significantly 
-           enriched and exclusive \\textit{C. albicans} EV proteins.} The 
-           online tool FungiFun2 (elbe.hki-jena.de/fungifun) was used to 
-           identify enriched biological process (BP), cellular component (CC), 
-           and molecular function (MF) GO terms [@priebe2015]. A selection of 
-           the most significantly enriched terms for each GO domain are shown. 
-           They are presented top to bottom in order of increasing 
-           Benjamini-Hochberg adjusted p-value. Full lists of enriched GO 
-           terms can be found in supplemental File S3."
 ```
 
 \newpage
+
+## Figure 4
 
 ```{r figure4Data, include=FALSE}
 # figure 4a EV venn
@@ -1536,7 +1086,7 @@ f4d <- plot_mds(mds_data, mat_labels = mds_labels,
   ylab(label = "Dimension 2")
 ```
 
-```{r figure4, fig.cap=f4_cap, fig.width=7.1, fig.height=5}
+```{r figure4, fig.width=7.1, fig.height=5}
 ggarrange(ggarrange(f4a, f4b,
                     labels = c("A", "B"),
                     ncol = 2,
@@ -1552,28 +1102,11 @@ ggarrange(ggarrange(f4a, f4b,
           ncol = 1,
           nrow = 2,
           heights = c(2, 3))
-
-f4_cap <- "\\textbf{Combined comparison of \\textit{C. albicans} proteomes.} 
-           \\textit{(A)} Venn diagram comparing four \\textit{C. albicans} EV 
-           proteomes. Lists of proteins present in the centre and right 
-           partitions of each venn diagram in Figure \\@ref(fig:figure2)A were 
-           compared to identify proteins present in all four datasets. 
-           \\textit{(B)} Venn diagram comparing four \\textit{C. albicans} WCL 
-           proteomes. Lists of proteins present in the centre and left 
-           partitions of each venn diagram in Figure \\@ref(fig:figure2)A were 
-           compared to identify proteins present in all four datasets. The data 
-           tables underlying Figures \\@ref(fig:figure4)A and 
-           \\@ref(fig:figure4)B are provided in supplemental File S4. 
-           \\textit{(C)} Multidimensional scaling (MDS) plot of each LC-MS/MS 
-           biological replicate sample with the first 2 dimensions shown. 
-           Pairwise distance between samples approximately indicates the 
-           log\\textsubscript{2}(FC) between samples. \\textit{limma} was used 
-           to generate the MDS plots [@ritchie2015]. \\textit{(D)} MDS plot of 
-           each LC-MS/MS biological replicate sample with the second and third 
-           dimensions shown."
 ```
 
 \newpage
+
+## Figure 5
 
 ```{r figure5Heatmap, include=FALSE}
 # figure 5 heatmap
@@ -1731,7 +1264,7 @@ f5_go7 <- process_fungifun("figures/f5_GO_clust7.csv")
 f5_go8 <- process_fungifun("figures/f5_GO_clust8.csv")
 ```
 
-```{r figure5, fig.cap=f5_cap, fig.height=6}
+```{r figure5, fig.height=6}
 f5 <- png::readPNG("figures/figure5.png")
 
 # draw figure 5
@@ -1739,29 +1272,11 @@ ggplot() +
   background_image(f5) + 
   theme(plot.margin = margin(t = 0.1, l = 0.1, r = 0.1, b = 0.1, 
                              unit = "inches"))
-
-f5_cap <- "\\textbf{Identification of commonly enriched EV proteins across 
-           different \\textit{C. albicans} strains.} Heatmap of proteins 
-           (n = 396) identified in all four EV samples (venn overlap in Figure 
-           \\@ref(fig:figure4)A). Each column represents a 
-           \\textit{C. albicans} strain and each row represents a protein. The 
-           colours indicate the log\\textsubscript{2}(FC) of the protein for 
-           that particular strain; red is EV enriched, blue is EV depleted, and 
-           black is EV exclusive. Unsupervised clustering of rows and columns 
-           was performed using Gower's formula via the daisy function from the 
-           R package \\textit{cluster} [@maechler2019]. Proteins which were 
-           exclusive to EVs from all four strains and therefore had no valid 
-           log\\textsubscript{2}(FC) values
-           were seperated prior to clustering, in the group designated 
-           \`\`cluster 8\". Functional enrichment analyses were performed on 
-           the heatmap protein clusters using the online tool FungiFun2 
-           [@priebe2015]. A selection of significantly enriched GO terms are 
-           presented in the table inset. Full lists of enriched GO terms and 
-           proteins in each cluster are available in supplemental Files S3 and 
-           S5 respectively."
 ```
 
 \newpage
+
+## Figure 6
 
 ```{r figure6Data, include=FALSE}
 f6a_venn <- plot_venn(vlist = marker_comp, use_uniprot = FALSE, type = "plot", 
@@ -1808,37 +1323,18 @@ f6b <- as_ggplot(f6b_venn) +
   theme(plot.margin = unit(c(1.2,0,0,0), "lines"))
 ```
 
-```{r figure6, fig.cap=f6_cap, fig.width=2.5, fig.height=4}
+```{r figure6, fig.width=2.5, fig.height=4}
 ggarrange(f6a, f6b, 
           labels = c("A", "B"), 
           ncol = 1,
           nrow = 2)
-
-f6_cap <- "\\textbf{Identification of common signficantly enriched or exclusive 
-           \\textit{C. albicans} EV and WCL proteins.} Proteins identified as 
-           significantly enriched or exclusive to EVs in Figure 
-           \\@ref(fig:figure2) were compared to select those which were common 
-           to all 4 datasets. 47 proteins were identified as potential positive 
-           EV protein markers and 62 proteins as potential negative EV protein 
-           markers. The data tables underlying Figure 
-           \\@ref(fig:figure6) are provided in supplemental File S4. Details of 
-           the 47 positive EV protein marker candidates and 62 negative 
-           candidates can be found in Table \\@ref(tab:table1) and supplemental 
-           Table S2 respectively."
 ```
 
 \newpage
 
-```{r figure7, fig.cap=f7_cap, fig.width=4, fig.height=3.6}
-f7_cap <- "\\textbf{Twenty-two best potential \\textit{C. albicans} positive EV 
-           protein markers.} These proteins are those underlined in Table 
-           \\@ref(tab:table1). They are are enriched or exclusive to EVs 
-           isolated from all of the \\textit{C. albicans} strains investigated 
-           in this study. The proteins fit within the EV biomarker categories 
-           1 and 2 from MISEV2018 which includes transmembrane, 
-           GPI-anchored, and cytosolic proteins that are EV enriched 
-           [@thery2018]."
+## Figure 7
 
+```{r figure7, fig.width=4, fig.height=3.6}
 f7 <- png::readPNG("figures/figure7.png")
 
 ggplot() + 
@@ -1847,21 +1343,9 @@ ggplot() +
 
 \newpage
 
-```{r figure8, fig.cap=f8_cap, fig.width=7.2, fig.height=6}
-f8_cap <- "\\textbf{Predicted topology and palmitoylation sites of 
-           \\textit{C. albicans} MCC/eisosome proteins Sur7 and Evp1 
-           (orf19.6741) 
-           compared to the human tetraspanin CD81.} The presence of 
-           transmembrane (TM) domains and palmitoylation sites shown on the 
-           left side of the figure were predicted using the online tools 
-           TOPCONS2 (topcons.cbr.su.se) [@tsirigos2015] and CSS-PALM 4.0 
-           (csspalm.biocuckoo.org) [@ren2008] respectively. For CD81, 
-           palmitoylation sites experimentally determined in previous 
-           literature are shown [@delandre2009]. The right side of the figure 
-           shows a cartoon representation of the TOPCONS2 consensus topology 
-           prediction for the three proteins as well as the crystal structure 
-           of CD81 (PDB: 5TCX) [@zimmerman2016]."
+## Figure 8
 
+```{r figure8, fig.width=7.2, fig.height=6}
 f8 <- png::readPNG("figures/figure8.png")
 
 ggplot() + 

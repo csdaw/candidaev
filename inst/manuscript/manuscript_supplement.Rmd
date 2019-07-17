@@ -38,9 +38,7 @@ header-includes:
   - \predate{\begin{center}\fontsize{10bp}{10bp}\selectfont}
   - \postdate{\par\end{center}}
   - \usepackage{fancyhdr}
-  - \usepackage{lipsum}
   - \pagestyle{fancy}
-  - \fancyhead[L]{Defining \textit{Candida albicans} EV protein markers}
   - \setlength{\headheight}{15pt}
   - \usepackage{float}
   - \let\origfigure\figure
@@ -59,8 +57,6 @@ header-includes:
 ---
 
 **Corresponding author:** Mark Bleackley, m.bleackley@latrobe.edu.au
-
-**Running title:** Defining _Candida albicans_ EV protein markers
 
 \newpage
 
@@ -632,7 +628,7 @@ wcl_longlist2 <- match_id_multi(df = wcl_longlist,
 
 (ref:table1) [@gil-bona2015]
 
-(ref:footnote1) [@skrzypek2017]
+(ref:footnote1) [@arnaud2005; @skrzypek2017]
 
 (ref:footnote2) [@theuniprotconsortium2019]
 
@@ -654,12 +650,13 @@ tabs2_cap <- "\\textbf{Candidate negative protein markers for
               in EVs for that strain. The \`\`TM\" column indicates the number 
               of transmembrane domains for each protein as annotated in 
               UniProtKB. \`\`SP\" indicates whether a protein is annotated as 
-              having a signal peptide according to UniProtKB. \`\`VDM\" shows 
+              having a signal peptide according to UniProt. \`\`VDM\" shows 
               whether a protein has previously been detected in 
               vesicle-depleted culture media (i.e. the proteins may also be in 
               the soluble secretome) (ref:table1). Underlined proteins are 
               those identified as the best candidates for negative
-              EV markers according to the criteria depicted in Figure S1."
+              EV markers according to the criteria depicted in 
+              Supplementary Figure S1."
 
 # draw table S2
 knitr::kable(wcl_longlist2[, -9], 
