@@ -279,7 +279,7 @@ a9_res <- get_results(efit = a9_efit,
                       lfc = 1,
                       type = "individual")[[1]]
 
-#### Supplemental File S2 ####
+#### Supplementary Data S2 ####
 # DAY286 yeast results
 s2_a <- yeast_res %>%
   mutate(group = case_when(group == "EV up" ~ "EV sig",
@@ -433,9 +433,10 @@ s2_sheets <- list("DAY286 yeast" = s2_a,
                   "ATCC90028 yeast" = s2_b,
                   "ATCC10231 yeast" = s2_c,
                   "DAY286 biofilm" = s2_d)
-writexl::write_xlsx(s2_sheets, "inst/manuscript/supplement_files/sfile_S2.xlsx")
+writexl::write_xlsx(s2_sheets,
+                    "inst/manuscript/supplementary_data/supplementary_data_S2.xlsx")
 
-#### Supplemental File S4 ####
+#### Supplementary Data S4 ####
 # Venn diagram partition protein lists
 
 #### Figure 4A ####
@@ -520,9 +521,10 @@ s4_sheets <- list("Figure 4A" = s4_a,
                   "Figure 4B" = s4_b,
                   "Figure 6A" = s4_c,
                   "Figure 6B" = s4_d)
-writexl::write_xlsx(s4_sheets, "inst/manuscript/supplement_files/sfile_S4.xlsx")
+writexl::write_xlsx(s4_sheets,
+                    "inst/manuscript/supplementary_data/supplementary_data_S4.xlsx")
 
-#### Supplemental File S5 ####
+#### Supplementary Data S5 ####
 # Figure 5 protein clusters
 s5_comp <- s4_a_comp
 
@@ -597,4 +599,4 @@ s5[390, 4] <- "EVP1"
 
 #### export ####
 writexl::write_xlsx(list("Fig. 5 Heatmap clusters" = s5),
-                    "inst/manuscript/supplement_files/sfile_S5.xlsx")
+                    "inst/manuscript/supplementary_data/supplementary_data_S5.xlsx")

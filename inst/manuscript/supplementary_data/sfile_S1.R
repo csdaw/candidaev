@@ -1,4 +1,4 @@
-#### Supplemental File S1 ####
+#### Supplementary Data S1 ####
 # table of proteins
 # post-filtration but pre-log2 transformation
 # pre-normalisation, pre-imputation etc.
@@ -131,4 +131,5 @@ s1_sheets <- list("DAY286 yeast" = s1_a,
                   "ATCC90028 yeast" = s1_b,
                   "ATCC10231 yeast" = s1_c,
                   "DAY286 biofilm" = s1_d)
-writexl::write_xlsx(s1_sheets, "inst/manuscript/supplement_files/sfile_S1.xlsx")
+writexl::write_xlsx(s1_sheets,
+                    "inst/manuscript/supplementary_data/supplementary_data_S1.xlsx")

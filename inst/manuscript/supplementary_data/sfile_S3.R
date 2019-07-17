@@ -1,4 +1,4 @@
-#### Supplemental File S3 ####
+#### Supplementary Data S3 ####
 # FungiFun2 functional enrichment results
 
 # need writexl package to write output to .xlsx
@@ -132,4 +132,5 @@ s3_sheets <- list("Fig 3a DAY286 y" = s3_a,
                   "Fig 5 Cluster 6" = s3_i,
                   "Fig 5 Cluster 7" = s3_j,
                   "Fig 5 Cluster 8" = s3_k)
-writexl::write_xlsx(s3_sheets, "inst/manuscript/supplement_files/sfile_S3.xlsx")
+writexl::write_xlsx(s3_sheets,
+                    "inst/manuscript/supplementary_data/supplementary_data_S3.xlsx")
