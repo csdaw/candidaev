@@ -454,8 +454,8 @@ marker_longlist2[15, 1] <- paste0("EVP1",
 
 <!-- Ref (31) is Gil-Bona et al. 2015 -->
 <!-- Ref (48, 49) is Arnaud et al. 2005, Skrzypek et al. 2017 -->
-<!-- Ref (57) is The UniProt Consortium 2019 -->
-<!-- Ref (58) is Tsirigos et al. 2015 -->
+<!-- Ref (58) is The UniProt Consortium 2019 -->
+<!-- Ref (59) is Tsirigos et al. 2015 -->
 
 ```{r table1}
 tab1_cap <- "\\textbf{Candidate positive protein markers for 
@@ -504,9 +504,9 @@ knitr::kable(marker_longlist2[ ,-9],
                          annotated in the Candida Genome Database (48, 49).", 
                         "Protein localisation was obtained from the GO Cellular
                         Component annotation in the \\\\textit{C. albicans} 
-                        UniProt reference proteome UP000000559 (57).", 
+                        UniProt reference proteome UP000000559 (58).", 
                         "Presence of transmembrane domains and absence of a 
-                        signal peptide was predicted using TOPCONS2 (58).",
+                        signal peptide was predicted using TOPCONS2 (59).",
                         "The name Evp1 for the protein encoded by orf19.6741 
                         was proposed in the present study."), 
            escape = FALSE, 
