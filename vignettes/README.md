@@ -10,8 +10,8 @@ that detail the proteomic analyses used in our paper:
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
 > M. A., Bleackley, M. R. (2019) Protein markers for *Candida albicans*
-> EVs include claudin-like Sur7 family proteins and Rho GTPases. Mol.
-> Cell. Proteomics, submitted.
+> EVs include claudin-like Sur7 family proteins and GTPases. *Journal of
+> Extracellular* *Vesicles*, submitted.
 
 ## Contents
 

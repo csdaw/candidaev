@@ -21,8 +21,8 @@ This repository contains the research compendium for our paper:
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson, M. A., 
 Bleackley, M. R. (2019) Protein markers for _Candida albicans_ EVs include 
-claudin-like Sur7 family proteins and Rho GTPases. _Molecular and Cellular_ 
-_Proteomics_, submitted.
+claudin-like Sur7 family proteins and GTPases. _Journal of Extracellular_ 
+_Vesicles_, submitted.
 
 It has been permanently archived at Zenodo with the DOI shown above. The raw 
 MS data has been deposited in the ProteomeXchange Consortium database via 
@@ -45,8 +45,8 @@ Please cite this compendium as:
 
 > Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson, M. A., 
 Bleackley, M. R. (2019) Research compendium for "Protein markers for 
-_Candida albicans_ EVs include claudin-like Sur7 family proteins and Rho 
-GTPases". version x.x.x. Zenodo. URL.
+_Candida albicans_ EVs include claudin-like Sur7 family proteins and GTPases". 
+version x.x.x. Zenodo. URL.
 
 ### Contents
 
@@ -55,7 +55,7 @@ GTPases". version x.x.x. Zenodo. URL.
     ├── /R                   # Script files for functions and included data
     ├── /data-raw            # Raw data used (but not modified) in analyses
     ├── /data                # Data tables installed with package
-    ├── /inst/manuscript     # Final submitted manuscript and supplemental files
+    ├── /inst/manuscript     # Final submitted manuscript, figures, and supplementary data
     ├── /man                 # Auto-generated documentation for functions and included data
     ├── /vignettes           # Detailed examples of how analyses were performed
     ├── .Rbuildignore        # List of files and directories to ignore during R package build
@@ -89,9 +89,9 @@ GTPases". version x.x.x. Zenodo. URL.
 
 This research compendium can be installed as an R package `candidaev` from 
 GitHub using `devtools`. A full installation will include all the functions and 
-data included in the package as well as some HTML vignettes,
-and the manuscript `.Rmd` file which can be used to reproduce the manuscript as
-it was submitted.
+data included in the package as well as some HTML vignettes, the manuscript
+text, the figures `.Rmd` file which can be used to reproduce the analysis and 
+figures as submitted.
 
 A partial installation will only install functions and data, which can be
 used to analyse other MaxQuant `.txt` files.
@@ -111,12 +111,12 @@ devtools::install_github("csdaw/candidaev",
                          dependencies = TRUE, build_vignettes = TRUE)
 ```
 
-**Note:** the contents of `/data-raw` and `/inst/manuscript/supplement_files` 
+**Note:** the contents of `/data-raw` and `/inst/manuscript/supplementary_data` 
 are not installed when the package is 
 installed using `install_github`. Instead, `/data-raw` can be manually 
 downloaded from 
 [here](https://github.com/csdaw/candidaev/tree/master/data-raw) and 
-`/inst/manuscript/supplement_files` can be manually downloaded from 
+`/inst/manuscript/supplementary_data` can be manually downloaded from 
 [here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
 
 #### 2. Cloning via `git`
@@ -174,12 +174,16 @@ browseVignettes("candidaev")
 
 #### Viewing the manuscript
 
-The manuscript `.pdf` file, as submitted, can be downloaded 
+The manuscript `.docx` file, as submitted, can be downloaded 
 [here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
 
-#### Building the manuscript from scratch
+The figures for the manuscript were produced using the `candidaev_figures.Rmd` 
+file which can be downloaded
+[here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
 
-To generate the reproducible manuscript, an installation of LaTeX is required. 
+#### Building the figures from scratch
+
+To generate the reproducible figures, an installation of LaTeX is required. 
 TinyTex is a good option for this and can be installed using:
 
 ```{r, eval=FALSE}
@@ -190,13 +194,13 @@ install.packages("tinytex")
 tinytex::install_tinytex()
 ```
 
-Then the manuscript (and supplement) can be built using:
+Then the manuscript figures (and supplement) can be built using:
 
 ```{r, eval=FALSE}
 # requires LaTeX installation and full compendium installation
-rmarkdown::render(system.file("manuscript", "manuscript.Rmd", 
+rmarkdown::render(system.file("manuscript", "candidaev_figures.Rmd", 
                               package = "candidaev"))
-rmarkdown::render(system.file("manuscript", "manuscript_supplement.Rmd", 
+rmarkdown::render(system.file("manuscript", "candidaev_supplement.Rmd", 
                               package = "candidaev"))
 ```
 
@@ -207,6 +211,6 @@ pandoc v`r rmarkdown::pandoc_version()`. Here is output of
 `sessionInfo()`.
 
 ```{r sessionInfo, echo=FALSE, cache=FALSE}
-devtools::sessionInfo()
+devtools::session_info()
 ```
 

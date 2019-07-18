@@ -13,13 +13,13 @@ knitr::opts_chunk$set(collapse = TRUE,
 
 ## Description
 
-This directory contains the submitted manuscript, supplemental figures and 
-tables, and supplemental files for our paper: 
+This directory contains the submitted manuscript `.docx` file, main figures,
+supplementary figures, and supplementary data for our paper: 
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson, M. A., 
 Bleackley, M. R. (2019) Protein markers for _Candida albicans_ EVs include 
-claudin-like Sur7 family proteins and Rho GTPases. Mol. Cell. Proteomics, 
-submitted.
+claudin-like Sur7 family proteins and GTPases. _Journal of Extracellular_ 
+_Vesicles_, submitted.
 
 The Rmarkdown (`.Rmd`), `.svg`, and `.R` files used to generate these 
 documents are provided along with the derived `.pdf` and `.csv` files.
@@ -33,12 +33,13 @@ documents are provided along with the derived `.pdf` and `.csv` files.
     │         ├── /components                 # Contains required components for building the manuscript
     │         ├── /figures                    # Contains .svg and .csv files used to make some figures
     │         ├── /supplement_files           # Contains .R scripts used to generate supplemental files
-    │         ├── manuscript.Rmd              # R markdown file to produce manuscript.pdf
-    │         ├── manuscript.pdf              # Final submitted manuscript
-    │         ├── manuscript_supplement.Rmd   # R markdown file to produce manuscript_supplement.pdf
-    │         ├── manuscript_supplement.pdf   # Final submitted supplemental figures and tables
-    │         ├── README.Rmd                  # R markdown file to produce README.md
-    │         └── README.md                   # Description of /inst/manuscript directory
+    │         ├── README.Rmd                  # Rmarkdown file to produce README.md
+    │         ├── README.md                   # Description of /inst/manuscript directory
+    │         ├── candidaev_manuscript.docx   # Full manuscript text and figure legends as submitted
+    │         ├── candidaev_figures.pdf       # Main figures and table as submitted
+    │         ├── candidaev_figures.Rmd       # Rmarkdown file to produce candidaev_figures.pdf
+    │         ├── candidaev_supplement.pdf    # Supplementary figures and tables as submitted
+    │         └── candidaev_supplement.Rmd    # Rmarkdown file to produce candidaev_supplement.pdf
     └── ...
 
 ```
