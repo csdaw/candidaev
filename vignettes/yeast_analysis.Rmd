@@ -60,7 +60,7 @@ knitr::opts_chunk$set(collapse = FALSE,
                       comment = "#>")
 
 # check for installation of packages requires to knit this vignette
-req_pkgs <- c("BiocStyle", "ggpubr", "stringi", "DT")
+req_pkgs <- c("BiocStyle", "ggpubr", "stringi", "DT", "pcaMethods", "statmod")
 
 check_pkgs <- function(x) {
   if(!requireNamespace(x, quietly = TRUE)) {
@@ -85,8 +85,8 @@ al. (2019). The tools provided in this package,
 `r Githubpkg("csdaw/candidaev")`, allows the step-by-step reproduction of the 
 results presented in the paper. 
 The manuscript in its submitted form and the `.Rmarkdown` file used to 
-generate it can found 
-[here](https://github.com/csdaw/candidaev/tree/master/manuscript).
+generate the main and supplementary figures can found 
+[here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
 
 The analysis workflow used in this vignette is derived from the excellent 
 **Bioconductor** package `r Biocpkg("DEP")`[^1]. Furthermore, some of the 
@@ -150,18 +150,13 @@ repository with the data set identifier PXD014367.
 
 ## Setup
 
-The packages required for the analyses are loaded and a specific 
-seed is set for the steps requiring random number generation (imputation 
-and clustering).
+The packages required for the analyses are loaded.
 
 ```{r setup, echo=TRUE, warning=FALSE, message=FALSE}
 # load packages
 library(candidaev)
 library(dplyr)
 library(ggplot2)
-
-# set seed for imputation, kmeans, MDS plot
-set.seed(1)
 ```
 
 ## Exploring the `yeast` data set
@@ -651,9 +646,7 @@ knitr::kable(sum_table(yeast_both),
              digits = 1)
 ```
 
-The pattern of missing values in `yeast_both` seems to be biased to certain 
-samples, especially WCL replicate 2. Therefore, 
-these proteins may be missing not at random (MNAR). 
+The pattern of missing values in `yeast_both` can be visualised.
 
 ```{r yMissVal2, fig.cap=missval2_cap , fig.height=8}
 plot_missval2(yeast_both)
@@ -675,13 +668,14 @@ plot_detect2(yeast_both)
 detect_cap <- "LFQ intensities of proteins with and without missing values."
 ```
 
-These plots show that missing values are biased to proteins with lower 
-average intensities, and are likely MNAR. Hence, a left-censored imputation 
-method is used for imputation of missing values. 
+Missing values are imputed using the `bpca` method in the `pca` function from 
+the **Bioconductor** package `r Biocpkg("pcaMethods")`, which is designed for 
+missing value imputation.
 
 ```{r, echo=TRUE, eval=FALSE}
-# impute missing values with QRILC method
-yeast_imp <- impute_QRILC(yeast_both)
+# impute missing values with bpca method
+yeast_imp <- pcaMethods::pca(yeast_both, method = "bpca")
+yeast_imp <- pcaMethods::completeObs(yeast_imp)
 ```
 
 ```{r, echo=TRUE, eval=FALSE}
@@ -693,11 +687,9 @@ plot_imputation2(yeast_exp,
 ```
 
 ```{r yImpute, fig.cap=imp_cap, fig.wide=TRUE}
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
-
-# use left censored imputation method
-yeast_imp <- impute_QRILC(yeast_both)
+# impute missing values with bpca method
+yeast_imp <- pcaMethods::pca(yeast_both, method = "bpca")
+yeast_imp <- pcaMethods::completeObs(yeast_imp)
 
 plot_imputation2(yeast_exp, 
                  facet_labels = c(yeast_both = "Before imputation", 

@@ -61,7 +61,7 @@ knitr::opts_chunk$set(collapse = FALSE,
                       comment = "#>")
 
 # check for installation of packages required to knit this vignette
-req_pkgs <- c("BiocStyle", "ggpubr", "stringi", "DT")
+req_pkgs <- c("BiocStyle", "ggpubr", "stringi", "DT", "pcaMethods", "statmod")
 
 check_pkgs <- function(x) {
   if(!requireNamespace(x, quietly = TRUE)) {
@@ -85,8 +85,8 @@ extracellular vesicles (EVs) and whole cell lysates (WCL) by Dawson et
 al. (2019). The tools provided in this package, `r Githubpkg("csdaw/candidaev")`
 , allows the step-by-step reproduction of the results presented in the paper. 
 The manuscript in its submitted form and the `.Rmarkdown` file used to 
-generate it can found 
-[here](https://github.com/csdaw/candidaev/tree/master/manuscript).
+generate the main and supplementary figures can found 
+[here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
 
 The analysis workflow used in this vignette is derived from the excellent 
 **Bioconductor** package `r Biocpkg("DEP")`[^1]. Furthermore, some of the 
@@ -153,90 +153,13 @@ repository with the data set identifier PXD014388.
     
 ## Setup
 
-The packages required for the analyses are loaded and a specific 
-seed is set for the steps requiring random number generation (imputation 
-and clustering).
+The packages required for the analyses are loaded.
 
 ```{r setup, echo=TRUE, warning=FALSE, message=FALSE}
 # load packages
 library(candidaev)
 library(dplyr)
 library(ggplot2)
-
-# set seed for imputation, kmeans, MDS plot
-set.seed(1)
-```
-
-To reproduce the results exactly as they are in Dawson et al. (2019), the 
-following code block is run to perform a specific number of draws from 
-a random distribution before performing the analysis of the `atcc` data. 
-Otherwise, the results will be extremely similar but not identical to Dawson 
-et al. (2019).
-
-```{r randomDraws, echo=TRUE}
-# for results to be reproducible in seperate documents
-# need to use set.seed AND need to perform same number of 
-# 'random' draws in the same order as manuscript.Rmd
-
-# DAY286 yeast
-yeast_lfq <- yeast %>% 
-  filter(Reverse != "+", 
-         Potential.contaminant != "+", 
-         Unique.peptides >= 2) %>% 
-  convert_lfq(., yeast_exp)
-
-yeast_lfq2 <- yeast_lfq[, !colnames(yeast_lfq) %in% c("EV_0", "WCL_0")]
-
-yeast_filt2 <- filter_na2(yeast_lfq2, 
-                          logic = "or", 
-                          op = "<=", 
-                          pat1 = "EV", val1 = 1, 
-                          pat2 = "W", val2 = 1)
-
-yeast_norm2 <- limma::normalizeCyclicLoess(yeast_filt2)
-
-yeast_excl <- filter_na2(yeast_norm2, 
-                         logic = "or", 
-                         op = "==", 
-                         pat1 = "EV", val1 = 3, 
-                         pat2 = "W", val2 = 3)
-
-yeast_both <- filter_na2(yeast_norm2, 
-                         logic = "and", 
-                         op = "<=", 
-                         pat1 = "EV", val1 = 2, 
-                         pat2 = "W", val2 = 2)
-
-yeast_imp <- impute_QRILC(yeast_both) # first set of random draws
-
-# DAY286 biofilm
-biofilm_lfq <- biofilm %>% 
-  filter(Reverse != "+", 
-         Potential.contaminant != "+", 
-         Unique.peptides >= 2) %>% 
-  convert_lfq(., biofilm_exp)
-
-biofilm_filt <- filter_na2(biofilm_lfq, 
-                           logic = "or", 
-                           op = "<=", 
-                           pat1 = "EV", val1 = 1, 
-                           pat2 = "W", val2 = 1)
-
-biofilm_norm <- limma::normalizeCyclicLoess(biofilm_filt)
-
-biofilm_excl <- filter_na2(biofilm_norm, 
-                           logic = "or", 
-                           op = ">=", 
-                           pat1 = "EV", val1 = 4, 
-                           pat2 = "W", val2 = 4)
-
-biofilm_both <- filter_na2(biofilm_norm, 
-                           logic = "and", 
-                           op = "<=", 
-                           pat1 = "EV", val1 = 3, 
-                           pat2 = "W", val2 = 3)
-
-biofilm_imp <- impute_QRILC(biofilm_both) # second set of random draws
 ```
 
 ## Exploring the `atcc` data set
@@ -865,9 +788,7 @@ knitr::kable(sum_table(a9_both),
              digits = 1)
 ```
 
-The patterns of missing values in `a1_both` and `a9_both` seem to be biased to 
-certain samples, especially EV replicate 1 from both strains. Therefore, these 
-proteins may be missing not at random (MNAR). 
+The patterns of missing values in `a1_both` and `a9_both` can be visualised.
 
 ```{r atccMissVal2, fig.cap=missval2_cap , fig.height=8}
 # visualise missing values using a heatmap
@@ -895,16 +816,17 @@ plot_detect2(a9_both)
 detect_cap <- "LFQ intensities of proteins with and without missing values."
 ```
 
-In both cases, these plots show that missing values are biased to proteins 
-with lower average intensities, and are likely MNAR. 
-Hence, a left-censored imputation method is used for imputation of 
-missing values. 
+Missing values are imputed using the `bpca` method in the `pca` function from 
+the **Bioconductor** package `r Biocpkg("pcaMethods")`, which is designed for 
+missing value imputation.
 
 ```{r, echo=TRUE, eval=FALSE}
-# impute missing values with QRILC method
-a1_imp <- impute_QRILC(a1_both)
+# impute missing values with bpca method
+a1_imp <- pcaMethods::pca(a1_both, method = "bpca")
+a1_imp <- pcaMethods::completeObs(a1_imp)
 
-a9_imp <- impute_QRILC(a9_both)
+a9_imp <- pcaMethods::pca(a9_both, method = "bpca")
+a9_imp <- pcaMethods::completeObs(a9_imp)
 ```
 
 The effect of imputation on the distribution of protein intensities is 
@@ -920,13 +842,12 @@ plot_imputation2(exd = atcc_exp,
 ```
 
 ```{r atccImpute, fig.cap=imp_cap, fig.height=7}
-# proteins with missing values tend to have lower intensity
-# therefore proteins are MNAR, close to detection limit
+# impute missing values with bpca method
+a1_imp <- pcaMethods::pca(a1_both, method = "bpca")
+a1_imp <- pcaMethods::completeObs(a1_imp)
 
-# use left censored imputation method
-a1_imp <- impute_QRILC(a1_both)
-
-a9_imp <- impute_QRILC(a9_both)
+a9_imp <- pcaMethods::pca(a9_both, method = "bpca")
+a9_imp <- pcaMethods::completeObs(a9_imp)
 
 plot_imputation2(exd = atcc_exp, 
                  facet_labels = c(a1_both = "ATCC10231 - Before imputation", 
@@ -1230,7 +1151,7 @@ There are two type of heatmaps: one for plotting log<sub>2</sub> LFQ intensity
 data and one for plotting log<sub>2</sub> fold change data. To plot an LFQ 
 intensity heatmap, a numeric matrix must be used as the input.
 
-In this case the `a1_res` data.frame is subset to remove all columns 
+In this case each data.frame is subset to remove all columns 
 except a column with identifiers (e.g. UniProt accessions), 
 log2 LFQ intensity data columns, and a logical significance column. 
 Then the data.frame is 
@@ -1238,13 +1159,6 @@ filtered for significant proteins, the UniProt accession column is converted to
 rownames, the significance column is dropped, and the data.frame is converted 
 to a numeric matrix.
 
-For the `a9_res` data.frame, all columns are dropped except a column with 
-identifiers (e.g. UniProt accessions), 
-log2 LFQ intensity data columns, and the `EV_mean` column. Then the data.frame 
-is filtered for top 100 proteins with the **lowest** mean EV LFQ intensity. 
-Finally, the UniProt accession column is 
-converted to rownames, the `EV_mean` column is dropped, and the data.frame 
-is converted to a numeric matrix.
 ```{r heatmapData, echo=TRUE}
 a1_htmp <- a1_res %>% 
   select(UP_accession, 
@@ -1260,11 +1174,10 @@ a9_htmp <- a9_res %>%
   select(UP_accession, 
          matches("EV[0-9]"), 
          matches("WCL[0-9]"), 
-         EV_mean) %>% 
-  arrange(EV_mean) %>% 
-  top_n(-100) %>% 
+         significant) %>% 
+  filter(significant == TRUE) %>% 
   tibble::column_to_rownames(var = "UP_accession") %>% 
-  select(-EV_mean) %>% 
+  select(-significant) %>% 
   as.matrix()
 ```
 
@@ -1322,8 +1235,7 @@ htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been
              abundance between EV and WCL."
 ```
 
-The `a9_htmp` heatmap is plotted with (must use `cluster_split = FALSE` and 
-`split_type = "cutree"` because data has missing values):
+The `a9_htmp` heatmap is plotted with: 
 
 ```{r, echo=TRUE, eval=FALSE}
 htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"), 
@@ -1335,16 +1247,14 @@ htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"),
                     labels_gp = grid::gpar(colour = "black", fontsize = 16), 
                     at = seq(-5, 5, 1))
 
-# a9_htmp has missing values, therefore must use cluster_split = FALSE and 
-# split_type = "cutree"
 plot_heatmap(a9_htmp, 
              plot = TRUE, 
              data_type = "log2intensity", 
-             clust_fun = "manhattan", 
-             split_type = "cutree", 
+             clust_fun = "euclidean", 
+             split_type = "kmeans", 
              k = 5, 
              legend_pos = "right",
-             cluster_split = FALSE, 
+             cluster_split = TRUE, 
              colour_lims = c(-4,4), 
              row_title_fontsize = 16, 
              col_name_fontsize = 14, 
@@ -1364,19 +1274,19 @@ htmp_params <- list(title = expression("centered"~log[2]~"LFQ intensity"),
 plot_heatmap(a9_htmp, 
              plot = TRUE, 
              data_type = "log2intensity", 
-             clust_fun = "manhattan", 
-             split_type = "cutree", 
+             clust_fun = "euclidean", 
+             split_type = "kmeans", 
              k = 5, 
              legend_pos = "right",
-             cluster_split = FALSE, 
+             cluster_split = TRUE, 
              colour_lims = c(-4,4), 
              row_title_fontsize = 16, 
              col_name_fontsize = 14, 
              heatmap_legend_param = htmp_params)
 
 htmp_cap <- "Protein log<sub>2</sub> LFQ intensity heatmap. Data has been 
-             centred around 0. Top 100 ATCC90028 EV proteins with the 
-             lowest mean LFQ EV LFQ intensity."
+             centred around 0. ATCC90028 proteins significantly different in 
+             abundance between EV and WCL."
 ```
 
 
