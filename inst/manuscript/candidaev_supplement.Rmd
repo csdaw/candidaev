@@ -21,7 +21,7 @@ output:
       toc: no
       keep_tex: no
 bibliography: "components/references.bib" 
-csl: "components/molecular-and-cellular-proteomics.csl"
+csl: "components/taylor-and-francis-acs.csl"
 link-citations: yes
 linkcolor: black
 fontsize: 12pt
