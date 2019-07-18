@@ -74,10 +74,12 @@
 #' my_norm <- limma::normalizeCyclicLoess(my_filt)
 #'
 #' # impute missing values
-#' my_imp <- impute_QRILC(my_norm)
+#' my_imp <- pcaMethods::pca(my_norm, method = "svdImpute")
+#' my_imp <- pcaMethods::completeObs(my_imp)
 #'
 #' # impute missing values with another method
-#' my_imp2 <- imputeLCMD::impute.MinProb(my_norm)
+#' my_imp2 <- pcaMethods::pca(my_norm, method = "ppca")
+#' my_imp2 <- pcaMethods::completeObs(my_imp2)
 #'
 #' # density plot before and after imputations
 #' plot_imputation2(exd = atcc_exp,

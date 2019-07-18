@@ -74,7 +74,8 @@ my_filt <- my_lfq \%>\%
 my_norm <- limma::normalizeCyclicLoess(my_filt)
 
 # impute missing values
-my_imp <- impute_QRILC(my_norm)
+my_imp <- pcaMethods::pca(my_norm, method = "svdImpute")
+my_imp <- pcaMethods::completeObs(my_imp)
 
 # rename columns
 colnames(my_imp) <- stringi::stri_replace_all_regex(colnames(my_imp),
