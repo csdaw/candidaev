@@ -6,12 +6,11 @@
 ^inst/manuscript/supplement_files$
 ^.*\.pdf$
 ^.*\.svg$
-^.*\.docx$
-^inst/manuscript/.*\.eps$
-^inst/manuscript/.*\.docx$
-^inst/manuscript/.*\.pdf$
-^inst/manuscript/.*\.svg$
-^inst/manuscript/.*\.tiff$
+^inst/manuscript/figures/.*\.eps$
+^inst/manuscript/figures/.*\.docx$
+^inst/manuscript/figures/.*\.pdf$
+^inst/manuscript/figures/.*\.svg$
+^inst/manuscript/figures/.*\.tiff$
 ^R/README\.md$
 ^R/README\.Rmd$
 ^LICENSE\.md$
