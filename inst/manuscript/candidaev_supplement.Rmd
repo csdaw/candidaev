@@ -360,7 +360,7 @@ a9_res <- get_results(efit = a9_efit,
                       type = "individual")[[1]]
 
 # arguments for figure S1 export
-fS1_args <- list(tiff = list(type = "cairo"))
+fS1_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 # Supplementary data
@@ -388,7 +388,7 @@ ggplot() +
   background_image(fS1)
 
 # arguments for figure S2 export
-fS2_args <- list(tiff = list(type = "cairo"))
+fS2_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 
