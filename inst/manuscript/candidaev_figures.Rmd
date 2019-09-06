@@ -631,7 +631,7 @@ f1c <- ggpar(f1c,
                               "DAY286" = "Y"))
 
 # arguments for figure 1 export
-f1_args <- list(tiff = list(type = "cairo"))
+f1_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 
@@ -837,7 +837,7 @@ f2b4 <- plot_volcano(data = biofilm_res,
            parse = TRUE, colour = unname(ev_pal[1]))
 
 # arguments for figure 2 export
-f2_args <- list(tiff = list(type = "cairo"))
+f2_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 
@@ -958,7 +958,7 @@ f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:4,6, 31,33:35,45, 49:52), f3_pal) +
   annotate("text", x = 14, y = 70, label = "bold('ATCC10231')", parse = TRUE)
 
 # arguments for figure 3 export
-f3_args <- list(tiff = list(type = "cairo"))
+f3_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 
@@ -1103,7 +1103,7 @@ f4d <- plot_mds(mds_data, mat_labels = mds_labels,
   ylab(label = "Dimension 2")
 
 # arguments for figure 4 export
-f4_args <- list(tiff = list(type = "cairo"))
+f4_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 ```{r figure4, fig.width=7.1, fig.height=5, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'),  dev.args=f4_args, dpi=600}
@@ -1284,7 +1284,7 @@ f5_go7 <- process_fungifun("figures/f5_GO_clust7.csv")
 f5_go8 <- process_fungifun("figures/f5_GO_clust8.csv")
 
 # arguments for figure 5 export
-f5_args <- list(tiff = list(type = "cairo"))
+f5_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 ```{r figure5, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=f5_args, dpi=600}
@@ -1346,7 +1346,7 @@ f6b <- as_ggplot(f6b_venn) +
   theme(plot.margin = unit(c(1.2,0,0,0), "lines"))
 
 # arguments for figure 6 export
-f6_args <- list(tiff = list(type = "cairo"))
+f6_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 ```{r figure6, fig.width=2.5, fig.height=4, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'), dev.args=f6_args, dpi=600}
@@ -1356,7 +1356,7 @@ ggarrange(f6a, f6b,
           nrow = 2)
 
 # arguments for figure 7 export
-f7_args <- list(tiff = list(type = "cairo"))
+f7_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 \newpage
@@ -1370,7 +1370,7 @@ ggplot() +
   background_image(f7)
 
 # arguments for figure 8 export
-f8_args <- list(tiff = list(type = "cairo"))
+f8_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 \newpage
