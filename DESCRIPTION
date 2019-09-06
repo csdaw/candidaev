@@ -46,6 +46,7 @@ Imports:
 Suggests: 
     BiocStyle, 
     bookdown, 
+    Cairo, 
     DT, 
     ggpubr, 
     kableExtra, 

@@ -7,6 +7,11 @@
 ^.*\.pdf$
 ^.*\.svg$
 ^.*\.docx$
+^inst/manuscript/.*\.eps$
+^inst/manuscript/.*\.docx$
+^inst/manuscript/.*\.pdf$
+^inst/manuscript/.*\.svg$
+^inst/manuscript/.*\.tiff$
 ^R/README\.md$
 ^R/README\.Rmd$
 ^LICENSE\.md$
