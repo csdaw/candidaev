@@ -388,11 +388,12 @@ ggplot() +
   background_image(fS1)
 
 # arguments for figure S2 export
-fS2_args <- list(tiff = list(type = "cairo", compression = "lzw"))
+fS2_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
 ```
 
 
-```{r figureS2, fig.cap=fS2_cap, fig.height=5, fig.width=5, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'), dev.args=fS2_args, dpi=600}
+```{r figureS2, fig.cap=fS2_cap, fig.height=5, fig.width=5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS2_args, dpi=600}
 fS2_cap <- c("\\textbf{Size distribution of \\textit{C. albicans} EVs as 
               determined by nanoparticle tracking analysis (NTA).} A line plot 
               for each EV biological replicate from each strain is shown. Each 

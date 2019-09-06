@@ -631,11 +631,12 @@ f1c <- ggpar(f1c,
                               "DAY286" = "Y"))
 
 # arguments for figure 1 export
-f1_args <- list(tiff = list(type = "cairo", compression = "lzw"))
+f1_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
 ```
 
 
-```{r figure1, fig.width=7.1, fig.height=4, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'), dev.args=f1_args, dpi=600}
+```{r figure1, fig.width=7.1, fig.height=4, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=f1_args, dpi=600}
 # draw figure 1
 ggarrange(f1a, 
           ggarrange(f1b, f1c, 
@@ -837,12 +838,13 @@ f2b4 <- plot_volcano(data = biofilm_res,
            parse = TRUE, colour = unname(ev_pal[1]))
 
 # arguments for figure 2 export
-f2_args <- list(tiff = list(type = "cairo", compression = "lzw"))
+f2_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
 ```
 
 
 
-```{r figure2, fig.width=7.1, fig.height=6, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'),  dev.args=f2_args, dpi=600}
+```{r figure2, fig.width=7.1, fig.height=6, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'),  dev.args=f2_args, dpi=600}
 # draw figure 2
 ggarrange(ggarrange(f2a1, f2a2, f2a3, f2a4, 
                     labels = c("A", "", "", ""), 
@@ -958,12 +960,13 @@ f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:4,6, 31,33:35,45, 49:52), f3_pal) +
   annotate("text", x = 14, y = 70, label = "bold('ATCC10231')", parse = TRUE)
 
 # arguments for figure 3 export
-f3_args <- list(tiff = list(type = "cairo", compression = "lzw"))
+f3_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
 ```
 
 
 
-```{r figure3, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'),  dev.args=f3_args, dpi=600}
+```{r figure3, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'),  dev.args=f3_args, dpi=600}
 # draw figure 3
 ggarrange(f3_y, f3_a9, 
           f3_a1, f3_b, 
@@ -1103,10 +1106,11 @@ f4d <- plot_mds(mds_data, mat_labels = mds_labels,
   ylab(label = "Dimension 2")
 
 # arguments for figure 4 export
-f4_args <- list(tiff = list(type = "cairo", compression = "lzw"))
+f4_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
 ```
 
-```{r figure4, fig.width=7.1, fig.height=5, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'),  dev.args=f4_args, dpi=600}
+```{r figure4, fig.width=7.1, fig.height=5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'),  dev.args=f4_args, dpi=600}
 ggarrange(ggarrange(f4a, f4b,
                     labels = c("A", "B"),
                     ncol = 2,
@@ -1346,10 +1350,11 @@ f6b <- as_ggplot(f6b_venn) +
   theme(plot.margin = unit(c(1.2,0,0,0), "lines"))
 
 # arguments for figure 6 export
-f6_args <- list(tiff = list(type = "cairo", compression = "lzw"))
+f6_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
 ```
 
-```{r figure6, fig.width=2.5, fig.height=4, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'), dev.args=f6_args, dpi=600}
+```{r figure6, fig.width=2.5, fig.height=4, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=f6_args, dpi=600}
 ggarrange(f6a, f6b, 
           labels = c("A", "B"), 
           ncol = 1,
