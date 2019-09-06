@@ -480,13 +480,13 @@ tab1_cap <- "\\textbf{Candidate positive protein markers for
              criteria depicted in Supplementary Figure S1."
 
 # draw table 1
-knitr::kable(marker_longlist2[ ,-9],
-             caption = tab1_cap, 
-             format = "latex", 
-             booktabs = TRUE, 
-             longtable = TRUE, 
-             linesep = "", 
-             escape = FALSE)  %>% 
+tab1 <- knitr::kable(marker_longlist2[ ,-9],
+                     caption = tab1_cap, 
+                     format = "latex", 
+                     booktabs = TRUE, 
+                     longtable = TRUE, 
+                     linesep = "", 
+                     escape = FALSE)  %>% 
   row_spec(row = c(1,2, 6,7, 13:15, 18:23, 27, 32, 38:40, 42:45), 
            underline = TRUE) %>% 
   add_header_above(c(" " = 2, 
@@ -511,6 +511,14 @@ knitr::kable(marker_longlist2[ ,-9],
                         was proposed in the present study."), 
            escape = FALSE, 
            threeparttable = TRUE)
+
+# export table 1 LaTeX code with \\ line endings removed in a text file
+tab1_clean <- gsub("\\\\\\\\\n", "\n", tab1)
+
+cat(tab1_clean, file = "tables/table_1.txt", sep = "\n")
+
+# show table 1 in PDF output
+tab1
 ```
 
 \newpage
@@ -621,10 +629,13 @@ f1c <- ggpar(f1c,
                               "ATCC10231" = "A1", 
                               "Biofilm" = "B", 
                               "DAY286" = "Y"))
+
+# arguments for figure 1 export
+f1_args <- list(tiff = list(type = "cairo"))
 ```
 
 
-```{r figure1, fig.width=7.1, fig.height=4}
+```{r figure1, fig.width=7.1, fig.height=4, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'), dev.args=f1_args, dpi=600}
 # draw figure 1
 ggarrange(f1a, 
           ggarrange(f1b, f1c, 
@@ -824,11 +835,14 @@ f2b4 <- plot_volcano(data = biofilm_res,
            parse = TRUE, colour = unname(ev_pal[3])) + 
   annotate("text", x = 0, y = 6, label = "bold('453')", 
            parse = TRUE, colour = unname(ev_pal[1]))
+
+# arguments for figure 2 export
+f2_args <- list(tiff = list(type = "cairo"))
 ```
 
 
 
-```{r figure2, fig.width=7.1, fig.height=6}
+```{r figure2, fig.width=7.1, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'),  dev.args=f2_args, dpi=600}
 # draw figure 2
 ggarrange(ggarrange(f2a1, f2a2, f2a3, f2a4, 
                     labels = c("A", "", "", ""), 
@@ -942,11 +956,14 @@ f3_a9 <- plot_go_bar(f3_a9_go_table, c(1:5, 12,14,17,18,24, 26:29), f3_pal) +
 
 f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:4,6, 31,33:35,45, 49:52), f3_pal) + 
   annotate("text", x = 14, y = 70, label = "bold('ATCC10231')", parse = TRUE)
+
+# arguments for figure 3 export
+f3_args <- list(tiff = list(type = "cairo"))
 ```
 
 
 
-```{r figure3, fig.width=7.2, fig.height=6}
+```{r figure3, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'),  dev.args=f3_args, dpi=600}
 # draw figure 3
 ggarrange(f3_y, f3_a9, 
           f3_a1, f3_b, 
@@ -1084,9 +1101,12 @@ f4d <- plot_mds(mds_data, mat_labels = mds_labels,
   guides(fill = guide_legend(override.aes = list(shape = 21))) + 
   xlab(label = "Dimension 3") + 
   ylab(label = "Dimension 2")
+
+# arguments for figure 4 export
+f4_args <- list(tiff = list(type = "cairo"))
 ```
 
-```{r figure4, fig.width=7.1, fig.height=5}
+```{r figure4, fig.width=7.1, fig.height=5, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'),  dev.args=f4_args, dpi=600}
 ggarrange(ggarrange(f4a, f4b,
                     labels = c("A", "B"),
                     ncol = 2,
@@ -1262,9 +1282,12 @@ f5_go6 <- process_fungifun("figures/f5_GO_clust6.csv") %>%
 f5_go7 <- process_fungifun("figures/f5_GO_clust7.csv")
 
 f5_go8 <- process_fungifun("figures/f5_GO_clust8.csv")
+
+# arguments for figure 5 export
+f5_args <- list(tiff = list(type = "cairo"))
 ```
 
-```{r figure5, fig.height=6}
+```{r figure5, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=f5_args, dpi=600}
 f5 <- png::readPNG("figures/figure5.png")
 
 # draw figure 5
@@ -1321,31 +1344,40 @@ f6b_venn <- plot_venn(vlist = wcl_comp, use_uniprot = FALSE, type = "plot",
 
 f6b <- as_ggplot(f6b_venn) + 
   theme(plot.margin = unit(c(1.2,0,0,0), "lines"))
+
+# arguments for figure 6 export
+f6_args <- list(tiff = list(type = "cairo"))
 ```
 
-```{r figure6, fig.width=2.5, fig.height=4}
+```{r figure6, fig.width=2.5, fig.height=4, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'), dev.args=f6_args, dpi=600}
 ggarrange(f6a, f6b, 
           labels = c("A", "B"), 
           ncol = 1,
           nrow = 2)
+
+# arguments for figure 7 export
+f7_args <- list(tiff = list(type = "cairo"))
 ```
 
 \newpage
 
 ## Figure 7
 
-```{r figure7, fig.width=4, fig.height=3.6}
+```{r figure7, fig.width=4, fig.height=3.6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=f7_args, dpi=600}
 f7 <- png::readPNG("figures/figure7.png")
 
 ggplot() + 
   background_image(f7)
+
+# arguments for figure 8 export
+f8_args <- list(tiff = list(type = "cairo"))
 ```
 
 \newpage
 
 ## Figure 8
 
-```{r figure8, fig.width=7.2, fig.height=6}
+```{r figure8, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=f8_args, dpi=600}
 f8 <- png::readPNG("figures/figure8.png")
 
 ggplot() + 
