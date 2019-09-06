@@ -368,7 +368,7 @@ fS1_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 \beginsupplement
 
 
-```{r figureS1, fig.cap=fS1_cap, fig.width=5.45, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=fS1_args, dpi=600}
+```{r figureS1, fig.cap=fS1_cap, fig.width=5.45, fig.height=6, fig.path='figures/', dev=c('pdf', 'tiff'), dev.args=fS1_args, dpi=600}
 # construct figure 1
 fS1_cap <- "\\textbf{Schematic of the workflow used for the isolation and 
            proteomic analysis of \\textit{C. albicans} EVs and the selection 
@@ -392,7 +392,7 @@ fS2_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 
-```{r figureS2, fig.cap=fS2_cap, fig.height=5, fig.width=5, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'), dev.args=fS2_args, dpi=600}
+```{r figureS2, fig.cap=fS2_cap, fig.height=5, fig.width=5, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'), dev.args=fS2_args, dpi=600}
 fS2_cap <- c("\\textbf{Size distribution of \\textit{C. albicans} EVs as 
               determined by nanoparticle tracking analysis (NTA).} A line plot 
               for each EV biological replicate from each strain is shown. Each 

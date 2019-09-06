@@ -635,7 +635,7 @@ f1_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
 
-```{r figure1, fig.width=7.1, fig.height=4, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'), dev.args=f1_args, dpi=600}
+```{r figure1, fig.width=7.1, fig.height=4, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'), dev.args=f1_args, dpi=600}
 # draw figure 1
 ggarrange(f1a, 
           ggarrange(f1b, f1c, 
@@ -842,7 +842,7 @@ f2_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 
 
 
-```{r figure2, fig.width=7.1, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'),  dev.args=f2_args, dpi=600}
+```{r figure2, fig.width=7.1, fig.height=6, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'),  dev.args=f2_args, dpi=600}
 # draw figure 2
 ggarrange(ggarrange(f2a1, f2a2, f2a3, f2a4, 
                     labels = c("A", "", "", ""), 
@@ -963,7 +963,7 @@ f3_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 
 
 
-```{r figure3, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'),  dev.args=f3_args, dpi=600}
+```{r figure3, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'),  dev.args=f3_args, dpi=600}
 # draw figure 3
 ggarrange(f3_y, f3_a9, 
           f3_a1, f3_b, 
@@ -1106,7 +1106,7 @@ f4d <- plot_mds(mds_data, mat_labels = mds_labels,
 f4_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
-```{r figure4, fig.width=7.1, fig.height=5, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'),  dev.args=f4_args, dpi=600}
+```{r figure4, fig.width=7.1, fig.height=5, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'),  dev.args=f4_args, dpi=600}
 ggarrange(ggarrange(f4a, f4b,
                     labels = c("A", "B"),
                     ncol = 2,
@@ -1287,7 +1287,7 @@ f5_go8 <- process_fungifun("figures/f5_GO_clust8.csv")
 f5_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
-```{r figure5, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=f5_args, dpi=600}
+```{r figure5, fig.height=6, fig.path='figures/', dev=c('pdf', 'tiff'), dev.args=f5_args, dpi=600}
 f5 <- png::readPNG("figures/figure5.png")
 
 # draw figure 5
@@ -1349,7 +1349,7 @@ f6b <- as_ggplot(f6b_venn) +
 f6_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 ```
 
-```{r figure6, fig.width=2.5, fig.height=4, fig.path='figures/', dev=c('CairoPDF', 'CairoPS', 'tiff'), dev.args=f6_args, dpi=600}
+```{r figure6, fig.width=2.5, fig.height=4, fig.path='figures/', dev=c('pdf', 'CairoPS', 'tiff'), dev.args=f6_args, dpi=600}
 ggarrange(f6a, f6b, 
           labels = c("A", "B"), 
           ncol = 1,
@@ -1363,7 +1363,7 @@ f7_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 
 ## Figure 7
 
-```{r figure7, fig.width=4, fig.height=3.6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=f7_args, dpi=600}
+```{r figure7, fig.width=4, fig.height=3.6, fig.path='figures/', dev=c('pdf', 'tiff'), dev.args=f7_args, dpi=600}
 f7 <- png::readPNG("figures/figure7.png")
 
 ggplot() + 
@@ -1377,7 +1377,7 @@ f8_args <- list(tiff = list(type = "cairo", compression = "lzw"))
 
 ## Figure 8
 
-```{r figure8, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('CairoPDF', 'tiff'), dev.args=f8_args, dpi=600}
+```{r figure8, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('pdf', 'tiff'), dev.args=f8_args, dpi=600}
 f8 <- png::readPNG("figures/figure8.png")
 
 ggplot() + 
