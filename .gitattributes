@@ -1,1 +1,2 @@
 inst/manuscript/components/references.bib linguist-documentation
+*.eps linguist-detectable=false
