@@ -80,6 +80,11 @@ library(dplyr)
 library(ggplot2)
 library(ggpubr)
 library(kableExtra)
+
+# define colour palette to distinguish between strains
+# colours = yellow, blue, green, pink
+# levels = yeast, ATCC90028, ATCC10231, biofilm
+st_pal <- c("#E69F00", "#56B4E9", "#009E73", "#CC79A7")
 ```
 
 
@@ -460,10 +465,10 @@ nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3",
                                            rep(150, 3), 
                                            rep(1000, 5), 
                                            rep(300, 3)), 
-                           protein_yield = c(19.2, 28.2, 28.7, 
-                                             42.4, 71.6, 58.4, 
-                                             20.4, 19.8, 29.7, 19.3, 41.6, 
-                                             21.9, 18.0, 22.4), 
+                           ev_vol = c(100, 100, 100, 
+                                      100, 100, 100, 
+                                      100, 100, 100, 100, 100, 
+                                      50, 50, 50), 
                            protein_conc = c(0.192, 0.282, 0.287, 
                                             0.424, 0.716, 0.584, 
                                             0.204, 0.198, 0.297, 0.193, 0.416, 
@@ -498,7 +503,10 @@ nta_metadata <- data.frame(id = c("ATCC10231_1", "ATCC10231_2", "ATCC10231_3",
                                    320.4, 308.0, 290.9),
                            sort_order = c(rep(3, 3), rep(2, 3), 
                                           rep(4, 5), rep(1, 3)), 
-                           stringsAsFactors = FALSE)
+                           stringsAsFactors = FALSE) %>% 
+  mutate(protein_yield = ev_vol * protein_conc) %>% 
+  select(id, strain, replicate, OD600, culture_vol, ev_vol, 
+         protein_yield, everything())
 
 # determine the total particle concentration for each biological replicate
 nta_total <- nta_techavg %>% 
@@ -507,8 +515,8 @@ nta_total <- nta_techavg %>%
   tidyr::unite("id", Strain, Bio_rep) %>% 
   inner_join(., nta_metadata, by = "id") %>% 
   arrange(sort_order) %>% 
-  select(strain, replicate, OD600, culture_vol, protein_yield, protein_conc, 
-         Particle_count, mean, mode, sd) %>% 
+  select(strain, replicate, OD600, culture_vol, ev_vol, protein_yield, 
+         protein_conc, Particle_count, mean, mode, sd) %>% 
   mutate(OD600 = case_when(is.na(OD600) == TRUE ~ "NA", 
                            TRUE ~ as.character(OD600)), 
          Particle_count = signif(Particle_count, digits = 3))
@@ -533,7 +541,7 @@ tabS1_cap <- "\\textbf{Metadata for each EV isolation analysed in this study.}
 
 # construct a table of metadata for each EV biological replicate
 tabS1 <- nta_total %>% 
-  select(-strain) %>% 
+  select(-strain, -ev_vol) %>% 
   mutate_all(linebreak) %>% 
   knitr::kable(caption = tabS1_cap, 
                format = "latex", 
@@ -558,6 +566,100 @@ cat(tabS1_clean, file = "tables/table_S1.txt", sep = "\n")
 # show table S1 in PDF output
 tabS1
 ```
+
+\newpage
+
+```{r figureS3data}
+## Compare mode size of EVs from each strain
+# Use ANOVA for comparison
+mode_aov <- aov(mode ~ strain, data = nta_total)
+
+# Check assumptions of normality and homogeneous variances
+# Plot residuals vs fitted values. Variances seem homogeneous
+# plot(mode_aov, 1) 
+
+# Check assumption of normality with Shapiro-Wilk test
+# Non-significant result indicates data is normal
+# shapiro.test(x = residuals(object = mode_aov))
+
+# Check ANOVA is significant (it is) and do TukeyHSD post-hoc
+mode_result <- mode_aov %>% 
+  tukey_hsd()
+
+# Plot mode size comparison
+fs3a <- nta_total %>% 
+  ggboxplot(x = "strain", y = "mode", 
+            color = "strain", palette = st_pal, add = "jitter", 
+            add.params = list(color = "black"), 
+            shape = 15, 
+            ylab = "Mode particle size (nm)") + 
+  scale_y_continuous(expand = c(0, 0), 
+                     limits = c(0, 210)) + 
+  theme(axis.title.x = element_blank(), 
+        legend.position = "none") + 
+  stat_compare_means(method = "anova", 
+                     label.x = 0.7, 
+                     label.y = 205) + 
+  stat_pvalue_manual(mode_result[c(2:5), ], label = "p.adj", 
+                     y.position = c(180, 190, 205, 170)) + 
+  coord_cartesian(clip = "off")
+
+
+## Compare EV concentration from each strain
+# Use ANOVA for comparison
+conc_aov <- aov(mode ~ strain, data = nta_total)
+
+# Check assumptions of normality and homogeneous variances
+# Plot residuals vs fitted values. Variances seem homogeneous
+# plot(conc_aov, 1) 
+
+# Check assumption of normality with Shapiro-Wilk test
+# Data is non-normal. Therefore use Kruskall-Wallis instead.
+# shapiro.test(x = residuals(object = mode_aov))
+
+# Check Kruskall-Wallis is significant (it is) and do Dunn's test post-hoc
+conc_kruskall <- kruskal.test(Particle_count ~ strain, data = nta_total)
+conc_dunns <- FSA::dunnTest(Particle_count ~ strain, data = nta_total, 
+                            method = "bh")[[2]] %>% 
+  tidyr::separate(col = Comparison, 
+                  into = c("group1", "group2"), 
+                  sep = " - ") %>% 
+  mutate(p.adj = round(P.adj, digits = 3))
+
+fs3b <- nta_total %>% 
+  ggboxplot(x = "strain", y = "Particle_count", 
+            color = "strain", palette = st_pal, add = "jitter", 
+            add.params = list(color = "black"), 
+            shape = 15, 
+            ylab = "Total particle concentration / mL") + 
+  scale_y_continuous(expand = c(0, 0), 
+                     limits = c(0, 1e13)) + 
+  theme(axis.title.x = element_blank(), 
+        legend.position = "none") + 
+  stat_compare_means(method = "kruskal.test", 
+                     label.x = 0.82, 
+                     label.y = 9.7e12) +
+  stat_pvalue_manual(conc_dunns[c(2), ], label = "p.adj", 
+                     y.position = 8.8e12) + 
+  coord_cartesian(clip = "off")
+
+# arguments for figure S3 export
+fS3_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
+```
+
+
+```{r figureS3, fig.cap=fS3_cap, fig.height=7, fig.width=5.5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS3_args, dpi=600}
+fS3_cap <- c("\\textbf{MAIN} Sub.")
+
+ggarrange(fs3a, fs3b, 
+          labels = c("A", "B"), 
+          nrow = 2, 
+          ncol = 1, 
+          heights = c(1,1), 
+          align = "v")
+```
+
 
 \newpage
 
