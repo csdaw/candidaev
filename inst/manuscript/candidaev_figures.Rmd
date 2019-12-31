@@ -587,14 +587,6 @@ nta_binned <- nta_techavg %>%
   nanocount(Strain, Bio_rep, bin, 
             param_var = Tech_rep_mean)
 
-test <- nta_binned %>% 
-  mutate(bin = as.factor(bin))
-
-test2 <- aov(Particle_count ~ Strain * bin, data = test)
-summary(test2)
-
-TukeyHSD(test2, which = "Strain")
-
 nta_binned_bio <- nta_binned %>% 
   nanolyze(Strain, bin, 
            name = "Bio_rep", 
@@ -632,37 +624,35 @@ f1b <- ggplot(data = nta_percent, aes(x = as.factor(bin),
         axis.text = element_text(colour = "black"), 
         legend.title = element_blank())
 
-# construct figure 2c
+# construct figure 1c
 nta_total$Strain <- factor(nta_total$Strain, 
                            levels = c("DAY286", "ATCC90028", 
                                       "ATCC10231", "Biofilm"))
 
-f1c <- nta_total %>% 
-  ggboxplot(x = "Strain", y = "part_per_prot", 
-            color = "Strain", palette = st_pal, add = "jitter", 
-            add.params = list(color = "black"), 
+f1c <- nta_total %>%
+  ggboxplot(x = "Strain", y = "part_per_prot",
+            color = "Strain", palette = st_pal, add = "jitter",
+            add.params = list(color = "black"),
             shape = 15,
             ylab = expression("Particles /"~paste(mu,g)~"protein"))
-f1c <- ggpar(f1c, 
-             yscale = "log10", 
-             format.scale = TRUE, 
+f1c <- ggpar(f1c,
+             yscale = "log10",
+             format.scale = TRUE,
              ylim = c(8e8, 8e10),
-             font.y = 10, 
-             legend = "none") + 
-  stat_pvalue_manual(nta_total_tukey[c(2,4,6), ], label = "p.adj", 
-                     y.position = c(10.45, 10.65, 10.85), 
-                     tip.length = 1e-2, 
-                     label.size = 3) + 
-  theme(axis.title.x = element_blank(), 
-        plot.margin = margin(t = 0.2, l = 0.2, r = 0, b = 0.15, 
-                             unit = "inches")) + 
-  scale_x_discrete(labels = c("ATCC90028" = "A9", 
-                              "ATCC10231" = "A1", 
-                              "Biofilm" = "B", 
-                              "DAY286" = "Y")) + 
+             font.y = 10,
+             legend = "none") +
+  stat_pvalue_manual(nta_total_tukey[c(2,4,6), ], label = "p.adj",
+                     y.position = c(10.45, 10.65, 10.85),
+                     tip.length = 1e-2,
+                     label.size = 3) +
+  theme(axis.title.x = element_blank(),
+        plot.margin = margin(t = 0.2, l = 0.2, r = 0, b = 0.15,
+                             unit = "inches")) +
+  scale_x_discrete(labels = c("ATCC90028" = "A9",
+                              "ATCC10231" = "A1",
+                              "Biofilm" = "B",
+                              "DAY286" = "Y")) +
   coord_cartesian(clip = "off")
-
-
 
 # arguments for figure 1 export
 f1_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
