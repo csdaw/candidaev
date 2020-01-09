@@ -660,7 +660,6 @@ ggarrange(fs3a, fs3b,
           align = "v")
 ```
 
-
 \newpage
 
 ```{r tableS2Data}
@@ -818,6 +817,277 @@ cat(tabS2_clean, file = "tables/table_S2.txt", sep = "\n")
 
 # show table S2 in PDF output
 tabS2
+```
+
+\newpage
+
+
+```{r figureS4Data}
+#### DAY286 yeast EV proteins ####
+# filter for proteins quantified in min 2/3 reps of yeast EV or WCL
+# then convert to a data.frame and extract protein acessions from row names
+yeast_filt3 <- filter_na2(yeast_lfq2, logic = "or", op = "<=",
+                          pat1 = "EV", val1 = 1,
+                          pat2 = "W", val2 = 1) %>%
+  as.data.frame() %>%
+  mutate(id = stringr::str_extract(rownames(.), "[^;]+")) %>%
+  select(id, everything())
+
+#### DAY286 biofilm EV proteins ####
+# filter for proteins quantified in min 4/5 reps of biofilm EV or WCL
+# then convert to a data.frame and extract protein acessions from row names
+biofilm_filt2 <- filter_na2(biofilm_lfq, logic = "or", op = "<=",
+                           pat1 = "EV", val1 = 1,
+                           pat2 = "W", val2 = 1) %>%
+  as.data.frame() %>%
+  mutate(id = stringr::str_extract(rownames(.), "[^;]+")) %>%
+  select(id, everything())
+
+#### Combine yeast EV and biofilm EV data ####
+# Combine the yeast and biofilm datasets by matching Uniprot accessions
+# Remove the WCL columns
+# Filter for proteins with at least 1 valid LFQ value
+# Convert to numeric matrix
+ev_comb <- full_join(yeast_filt3, biofilm_filt2, by = "id") %>%
+  select(id, contains("EV")) %>%
+  tibble::column_to_rownames(var = "id") %>%
+  filter_na(op = "<=", pat = "EV", val = 7) %>%
+  as.matrix()
+
+# Rename the columns to something useful
+colnames(ev_comb) <- c("Y_EV1", "Y_EV2", "Y_EV3",
+                       "B_EV1", "B_EV2", "B_EV3", "B_EV4", "B_EV5")
+
+# Check the yeast EV and biofilm EV proteins match the counts in Figure 2A
+b_ev2 <- filter_na(ev_comb, op = "<=", pat = "B_EV", val = 4)
+y_ev2 <- filter_na(ev_comb, op = "<=", pat = "Y_EV", val = 2)
+
+# check_venn <- plot_venn(list("Y_EV" = y_ev, "B_EV" = b_ev),
+#                         use_uniprot = TRUE, type = "plot",
+#                         fontfamily = "sans",
+#                         cex = 0.8,
+#                         cat.fontfamily = "sans",
+#                         cat.just = list(c(0.5,1.7), c(0.5,1.5)),
+#                         margin = 0.05)
+
+# Import the yeast EV vs biofilm EV experimental design required for limma
+ev_exp <- read.table("supplementary_data/Y_EV_vs_B_EV_expdesign.txt",
+                     sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+
+#### Data processing ####
+# Normalise log2 LFQ data
+ev_norm <- normalizeCyclicLoess(ev_comb)
+
+# Won't impute with so many missing values
+# Separate EV/WCL exclusive proteins (don't impute) from
+# EV/WCL common proteins (impute)
+ev_excl <- filter_na2(ev_norm, logic = "or", op = "==",
+                      pat1 = "Y_EV", val1 = 3,
+                      pat2 = "B_EV", val2 = 5)
+
+ev_both <- filter_na2(ev_norm, logic = "and", op = "<=",
+                      pat1 = "Y_EV", val1 = 2,
+                      pat2 = "B_EV", val2 = 4)
+
+# Use bpca method from pcaMethods for missing value imputation
+ev_imp <- pcaMethods::pca(ev_both, method = "bpca")
+ev_imp <- pcaMethods::completeObs(ev_imp)
+
+
+ev_de <- rbind(ev_excl, ev_imp)
+
+
+# see limma user guide section 9.2 for more info about DE
+# create design matrix
+ev_samp <- data.frame(T = c(rep("Y_EV", 3), rep("B_EV", 5)))
+
+ev_design <- stats::model.matrix(~ 0 + T, data = ev_samp)
+colnames(ev_design) <- c("B_EV", "Y_EV")
+
+# define sample comparisons of interest
+ev_contrasts <- c("Y_EV - B_EV")
+
+# make all pair-wise comparisons between EV and WCL
+# and perform limma::eBayes()
+ev_efit <- limma_eBayes(ev_de, design = ev_design, contrasts = ev_contrasts)
+
+# extract DE results
+# adj.p.val cutoff is 0.01, log2FC cutoff is 1
+ev_res <- get_results(efit = ev_efit,
+                      mat = ev_de,
+                      p_val = 0.01,
+                      lfc = 1,
+                      type = "individual")[[1]]
+
+## Construct figure S4 components
+# Fig S4A = compare DAY286 yeast EV and biofilm EV proteins via venn diagram
+fS4_a <- plot_venn(list("DAY286\nYeast EV" = y_ev2, 
+                             "DAY286\nBiofilm EV" = b_ev2),
+                        use_uniprot = TRUE, type = "plot",
+                        fontfamily = "sans",
+                        cex = 0.8,
+                        cat.fontfamily = "sans",
+                        cat.just = list(c(0.5,1.7), c(0.5,1.5)),
+                        margin = 0.05) %>% 
+  as_ggplot() + 
+  theme(plot.margin = unit(c(0,1.5,0,1.5), "cm"))
+
+# Fig S4B = compare compare enrichment of common proteins to DAYY286 yeast EVs
+# and DAY286 biofilm EVs via volcano plot
+fS4_b <- plot_volcano(data = ev_res, 
+                        p_val = adj.P.Val, 
+                        log2fc = logFC,
+                        group = group, 
+                        use_labels = TRUE,
+                        label_fun = ifelse(logFC >= 5 | logFC <= -5, 
+                                           CGD_gene_name, ""), 
+                        point_size = 0.6, 
+                        label_size = 2, 
+                        x_lim = c(-8, 8), 
+                        y_lim = c(0, 8), 
+                        legend_params = c("left", 11, 8), 
+                        axis_params = c("black", 10)) + 
+  scale_colour_manual(labels = c("Yeast EV enriched", 
+                                 "Biofilm EV enriched", 
+                                 "Not significant"), 
+                      values = c("#0072B2", 
+                                 "#999999", 
+                                 "#D55E00"), 
+                      breaks = c("Y_EV up", "B_EV up", "not sig"), 
+                      name = element_blank()) + 
+  annotate("text", x = 5.5, y = 0.5, label = "bold('DAY286')", parse = TRUE) + 
+  annotate("text", x = 3.5, y = 7, label = "bold('136')", 
+           parse = TRUE, colour = "#D55E00") + 
+  annotate("text", x = -3.5, y = 7, label = "bold('129')", parse = TRUE, 
+           colour = "#0072B2") + 
+  annotate("text", x = 0, y = 6, label = "bold('168')", parse = TRUE, 
+           colour = "#999999") + 
+  theme(legend.position = "right")
+
+# arguments for figure S4 export
+fS4_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
+```
+
+```{r figureS4, fig.cap=fS4_cap, fig.height=6, fig.width=5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS4_args, dpi=600}
+fS4_cap <- c("\\textbf{MAIN} Sub.")
+
+# draw figure S4
+ggarrange(fS4_a, fS4_b, 
+          labels = c("A", "B"), 
+          ncol = 1, 
+          nrow = 2)
+```
+
+\newpage
+
+```{r figureS5Data}
+#### Fig S5A = DAY286 yeast EV enr and ex proteins GO enrichment ####
+# Copy protein names for pasting into FungiFun2 online GO enrichment tool
+# FungiFun2 parameters:
+# 1. Strain = Candida albicans (strain SC5314/ATCC MYA-2876)
+# 2. Classification ontology = GO
+# 3. Input IDs = paste protein names here
+# 4. Advanced options = default except significance level = 0.01
+
+# Yeast EV exclusive proteins
+# Write to clipboard, paste into FungiFun2, and submit
+yev_ex <- ev_res %>%
+  filter(group == "Y_EV ex") %>%
+  pull(CGD_gene_name)
+
+# Yeast EV enriched proteins
+# Write to clipboard, paste into FungiFun2, and submit
+yev_up <- ev_res %>%
+  filter(group == "Y_EV up") %>%
+  pull(CGD_gene_name) %>%
+  stringi::stri_replace_all_regex(.,
+                                  c("MDH1"),
+                                  c("CaO19.7481"),
+                                  vectorize_all = FALSE)
+
+# Import FungiFun2 functional (GO) enrichment results
+
+# Yeast EV exclusive and enriched proteins
+yev_go <- process_fungifun("supplementary_data/GO_supplementary/yev_ex_up.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.7481"),
+                                                      c("MDH1"),
+                                                      vectorize_all = FALSE))
+
+# define the colour palette
+fS5_pal <- c("#6D2077", "#E4002B", "#FFB81C")
+
+# define figure S5A
+fs5_a <- plot_go_bar(yev_go, c(1:10, 17:26, 31:40), fS5_pal) + 
+  facet_grid(rows = vars(GO.type), scales = "free") + 
+  theme(legend.position = "none")
+
+#### Fig S5B = DAY286 biofilm EV enr and ex proteins GO enrichment ####
+# Copy protein names for pasting into FungiFun2 online GO enrichment tool
+# FungiFun2 parameters:
+# 1. Strain = Candida albicans (strain SC5314/ATCC MYA-2876)
+# 2. Classification ontology = GO
+# 3. Input IDs = paste protein names here
+# 4. Advanced options = default except significance level = 0.01
+
+# Biofilm EV exclusive proteins
+# Write to clipboard, paste into FungiFun2, and submit
+bev_ex <- ev_res %>%
+  filter(group == "B_EV ex") %>%
+  pull(CGD_gene_name) %>%
+  stringi::stri_replace_all_regex(.,
+                                  c("ALS3", "ARO2", "HOM3",
+                                    "OSM1", "PLB3", "FBP1",
+                                    "PST2", "STE23"),
+                                  c("CaO19.1816", "CaO19.1986", "CaO19.1235",
+                                    "CaO19.6882", "CaO19.6594", "CaO19.6178",
+                                    "CaO19.3612", "CaO19.5561"),
+                                  vectorize_all = FALSE)
+
+# Biofilm EV enriched proteins
+# Write to clipboard, paste into FungiFun2, and submit
+bev_up <- ev_res %>%
+  filter(group == "B_EV up") %>%
+  pull(CGD_gene_name) %>%
+  stringi::stri_replace_all_regex(.,
+                                  c("PEP1"),
+                                  c("CaO19.3767"),
+                                  vectorize_all = FALSE)
+
+# Import FungiFun2 functional (GO) enrichment results
+
+# Biofilm EV exclusive and enriched proteins
+bev_go <- process_fungifun("supplementary_data/GO_supplementary/bev_ex_up.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.1816", "CaO19.1986", "CaO19.1235",
+                                                        "CaO19.6882", "CaO19.6594", "CaO19.6178",
+                                                        "CaO19.3612", "CaO19.5561", "CaO19.3767"),
+                                                      c("ALS3", "ARO2", "HOM3",
+                                                        "OSM1", "PLB3", "FBP1",
+                                                        "PST2", "STE23", "PEP1"),
+                                                      vectorize_all = FALSE))
+
+# define figure S5B
+fs5_b <- plot_go_bar(bev_go, c(1:10, 35:44, 54:63), fS5_pal) + 
+  facet_grid(rows = vars(GO.type), scales = "free") + 
+  theme(legend.position = "none")
+
+# arguments for figure S5 export
+fS5_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
+                postscript = list(bg = "white", fonts = "sans"))
+```
+
+```{r figureS5, fig.cap=fS5_cap, fig.height=7, fig.width=7, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS5_args, dpi=600}
+fS5_cap <- c("\\textbf{MAIN} Sub.")
+
+# draw figure S5
+ggarrange(fs5_a, fs5_b, 
+          labels = c("A\nYeast EV", 
+                     "B\nBiofilm EV"), 
+          ncol = 1, 
+          nrow = 2, 
+          align = "hv")
 ```
 
 \newpage

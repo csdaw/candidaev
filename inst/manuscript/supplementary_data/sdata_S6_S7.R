@@ -83,7 +83,7 @@ check_venn <- plot_venn(list("Y_EV" = y_ev, "B_EV" = b_ev),
                         margin = 0.05)
 
 # Import the yeast EV vs biofilm EV experimental design required for limma
-ev_exp <- read.table("inst/manuscript/supplementary_data/yEV_vs_bEV_expdesign",
+ev_exp <- read.table("inst/manuscript/supplementary_data/Y_EV_vs_B_EV_expdesign",
                      sep = "\t", header = TRUE, stringsAsFactors = FALSE)
 
 #### Data processing ####
@@ -192,18 +192,75 @@ yev_ex <- ev_res %>%
 # Write to clipboard, paste into FungiFun2, and submit
 yev_up <- ev_res %>%
   filter(group == "Y_EV up") %>%
-  pull(CGD_gene_name)
+  pull(CGD_gene_name) %>%
+  stringi::stri_replace_all_regex(.,
+                                  c("MDH1"),
+                                  c("CaO19.7481"),
+                                  vectorize_all = FALSE)
 
 # Biofilm EV exclusive proteins
 # Write to clipboard, paste into FungiFun2, and submit
 bev_ex <- ev_res %>%
   filter(group == "B_EV ex") %>%
-  pull(CGD_gene_name)
+  pull(CGD_gene_name) %>%
+  stringi::stri_replace_all_regex(.,
+                                  c("ALS3", "ARO2", "HOM3",
+                                    "OSM1", "PLB3", "FBP1",
+                                    "PST2", "STE23"),
+                                  c("CaO19.1816", "CaO19.1986", "CaO19.1235",
+                                    "CaO19.6882", "CaO19.6594", "CaO19.6178",
+                                    "CaO19.3612", "CaO19.5561"),
+                                  vectorize_all = FALSE)
 
 # Biofilm EV enriched proteins
 # Write to clipboard, paste into FungiFun2, and submit
 bev_up <- ev_res %>%
   filter(group == "B_EV up") %>%
-  pull(CGD_gene_name)
+  pull(CGD_gene_name) %>%
+  stringi::stri_replace_all_regex(.,
+                                  c("PEP1"),
+                                  c("CaO19.3767"),
+                                  vectorize_all = FALSE)
+
+# Define function to rename FungiFun2 columns
+rnm_cols <- function(df) {
+  df <- df %>%
+    rename("GO ID" = GO.ID,
+           "GO term" = GO.term,
+           "GO domain" = GO.type,
+           "Proteins found" = Prot.found,
+           "p-values" = p.val,
+           "Adjusted p-value" = adj.p.val,
+           "N protein found" = N.prot.found,
+           "N protein GO term" = N.prot.cat,
+           "N protein input" = N.prot.input,
+           "GO term coverage ratio" = Cat.ratio,
+           "Input coverage ratio" = Input.ratio)
+}
 
 # Import FungiFun2 functional (GO) enrichment results
+
+# Yeast EV exclusive and enriched proteins
+yev_go <- process_fungifun("inst/manuscript/supplementary_data/GO_supplementary/yev_ex_up.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.7481"),
+                                                      c("MDH1"),
+                                                      vectorize_all = FALSE))
+  rnm_cols()
+
+# Biofilm EV exclusive and enriched proteins
+bev_go <- process_fungifun("inst/manuscript/supplementary_data/GO_supplementary/bev_ex_up.csv") %>%
+  mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
+                                                      c("CaO19.1816", "CaO19.1986", "CaO19.1235",
+                                                        "CaO19.6882", "CaO19.6594", "CaO19.6178",
+                                                        "CaO19.3612", "CaO19.5561", "CaO19.3767"),
+                                                      c("ALS3", "ARO2", "HOM3",
+                                                        "OSM1", "PLB3", "FBP1",
+                                                        "PST2", "STE23", "PEP1"),
+                                                      vectorize_all = FALSE))
+  rnm_cols()
+
+sheets <- list("Fig S5 DAY286 yeast" = yev_go,
+                  "Fig S6 DAY286 biofilm" = bev_go)
+writexl::write_xlsx(sheets,
+                    "inst/manuscript/supplementary_data/supplementary_data_S7.xlsx")
