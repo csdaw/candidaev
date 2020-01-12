@@ -960,6 +960,7 @@ f3_a1_go <- marker_comp[4] %>%
 ```{r figure3Plots, include=FALSE}
 # import FungiFun2 GO enrichment results
 f3_y_go_table <- process_fungifun("figures/f3_GO_DAY_Y.csv")
+f3_y_go_table[43,2] <- "d-p-m-protein mannosyltransferase activity"
 f3_b_go_table <- process_fungifun("figures/f3_GO_DAY_B.csv")
 f3_a1_go_table <- process_fungifun("figures/f3_GO_ATCC10231.csv")
 f3_a9_go_table <- process_fungifun("figures/f3_GO_ATCC90028.csv")
@@ -968,20 +969,21 @@ f3_a9_go_table <- process_fungifun("figures/f3_GO_ATCC90028.csv")
 f3_pal <- c("#6D2077", "#E4002B", "#FFB81C")
 
 # GO term bar plots
-f3_y <- plot_go_bar(f3_y_go_table, c(1:4,6, 23,26:28,30, 42,44:46), f3_pal) + 
-  annotate("text", x = 14, y = 65, label = "bold('DAY286 Y')", parse = TRUE) + 
-  labs(fill = "GO domain") + 
-  theme(legend.text = element_text(size = 10), 
-        legend.title = element_text(size = 10))
+f3_y <- plot_go_bar(f3_y_go_table, c(1:8, 23:30, 42:49), f3_pal) +
+  theme(legend.position = "none") + 
+  facet_grid(rows = vars(GO.type), scales = "free")
 
-f3_b <- plot_go_bar(f3_b_go_table, c(1:4,6, 54:57,67, 73,75,77,87), f3_pal) + 
-  annotate("text", x = 14, y = 60, label = "bold('DAY286 B')", parse = TRUE)
+f3_b <- plot_go_bar(f3_b_go_table, c(1:8, 53:60, 73:80), f3_pal) +
+  theme(legend.position = "none") + 
+  facet_grid(rows = vars(GO.type), scales = "free")
 
-f3_a9 <- plot_go_bar(f3_a9_go_table, c(1:5, 12,14,17,18,24, 26:29), f3_pal) + 
-  annotate("text", x = 14, y = 70, label = "bold('ATCC90028')", parse = TRUE)
+f3_a9 <- plot_go_bar(f3_a9_go_table, c(1:8, 12:19, 26:29), f3_pal) +
+  theme(legend.position = "none") + 
+  facet_grid(rows = vars(GO.type), scales = "free")
 
-f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:4,6, 31,33:35,45, 49:52), f3_pal) + 
-  annotate("text", x = 14, y = 70, label = "bold('ATCC10231')", parse = TRUE)
+f3_a1 <- plot_go_bar(f3_a1_go_table, c(1:8, 31:38, 48:55), f3_pal) +
+  theme(legend.position = "none") + 
+  facet_grid(rows = vars(GO.type), scales = "free")
 
 # arguments for figure 3 export
 f3_args <- list(tiff = list(type = "cairo", compression = "lzw"), 
@@ -990,15 +992,13 @@ f3_args <- list(tiff = list(type = "cairo", compression = "lzw"),
 
 
 
-```{r figure3, fig.width=7.2, fig.height=6, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'),  dev.args=f3_args, dpi=600}
+```{r figure3, fig.width=7.2, fig.height=7, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'),  dev.args=f3_args, dpi=600}
 # draw figure 3
 ggarrange(f3_y, f3_a9, 
           f3_a1, f3_b, 
-          labels = NULL, 
+          labels = c("A", "B", "C", "D"), 
           ncol = 2, 
           nrow = 2, 
-          common.legend = TRUE, 
-          legend = "bottom", 
           align = "hv")
 ```
 

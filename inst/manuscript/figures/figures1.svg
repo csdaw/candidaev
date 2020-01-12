@@ -16,8 +16,8 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
-   sodipodi:docname="figures1.svg"
-   inkscape:export-filename="C:\Rprojects\candidaev\inst\manuscript\figures\figures1.png"
+   sodipodi:docname="figureS1.svg"
+   inkscape:export-filename="C:\Rprojects\candidaev\inst\manuscript\figures\figureS1.png"
    inkscape:export-xdpi="500"
    inkscape:export-ydpi="500">
   <defs
@@ -420,9 +420,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="126.71323"
-     inkscape:cy="253.15454"
+     inkscape:zoom="5.6"
+     inkscape:cx="140.49883"
+     inkscape:cy="318.41428"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -437,10 +437,10 @@
      inkscape:snap-bbox-midpoints="false"
      inkscape:snap-grids="true"
      inkscape:object-paths="true"
-     inkscape:window-width="1838"
-     inkscape:window-height="1051"
-     inkscape:window-x="73"
-     inkscape:window-y="-9"
+     inkscape:window-width="1854"
+     inkscape:window-height="1057"
+     inkscape:window-x="58"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:snap-smooth-nodes="false"
      inkscape:snap-midpoints="true"
@@ -477,7 +477,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -922,21 +922,15 @@
          style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
          id="tspan1164">100,000 g</tspan><tspan
          sodipodi:role="line"
-         x="51.812859"
+         x="52.217449"
          y="210.66029"
          style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
-         id="tspan1160">1 h</tspan></text>
-    <text
-       id="text1172"
-       y="213.74005"
-       x="51.783367"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0.02645833px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       xml:space="preserve"><tspan
-         id="tspan1170"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.26458332"
-         y="213.74005"
-         x="51.796597"
-         sodipodi:role="line">2x</tspan></text>
+         id="tspan1160">1 h + </tspan><tspan
+         sodipodi:role="line"
+         x="51.812859"
+         y="214.18808"
+         style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan5266">120,000 g 1 h</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0.02645833px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -965,7 +959,7 @@
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker1851)"
-       d="m 51.815999,214.16006 1e-6,2.54"
+       d="m 51.815999,216.27674 1e-6,2.54"
        id="path2819"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
@@ -973,11 +967,11 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0.02645833px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        x="51.783367"
-       y="219.71846"
+       y="221.8351"
        id="text2835"><tspan
          sodipodi:role="line"
          x="51.796597"
-         y="219.71846"
+         y="221.8351"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;stroke-width:0.26458332"
          id="tspan2833">EVs</tspan></text>
     <path

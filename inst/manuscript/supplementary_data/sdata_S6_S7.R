@@ -83,7 +83,7 @@ check_venn <- plot_venn(list("Y_EV" = y_ev, "B_EV" = b_ev),
                         margin = 0.05)
 
 # Import the yeast EV vs biofilm EV experimental design required for limma
-ev_exp <- read.table("inst/manuscript/supplementary_data/Y_EV_vs_B_EV_expdesign",
+ev_exp <- read.table("inst/manuscript/supplementary_data/Y_EV_vs_B_EV_expdesign.txt",
                      sep = "\t", header = TRUE, stringsAsFactors = FALSE)
 
 #### Data processing ####
@@ -133,8 +133,8 @@ ev_res <- get_results(efit = ev_efit,
 
 
 s6 <- ev_res %>%
-  mutate(group = case_when(group == "EV up" ~ "EV sig",
-                           group == "WCL up" ~ "WCL sig",
+  mutate(group = case_when(group == "Y_EV up" ~ "Y_EV sig",
+                           group == "B_EV up" ~ "B_EV sig",
                            TRUE ~ as.character(group)),
          CGDID = match_id(UP_accession, uniprot,
                           "UP_accession", "CGDID"),
@@ -260,7 +260,7 @@ bev_go <- process_fungifun("inst/manuscript/supplementary_data/GO_supplementary/
                                                       vectorize_all = FALSE))
   rnm_cols()
 
-sheets <- list("Fig S5 DAY286 yeast" = yev_go,
-                  "Fig S6 DAY286 biofilm" = bev_go)
+sheets <- list("Fig S5A DAY286 yeast" = yev_go,
+                  "Fig S5B DAY286 biofilm" = bev_go)
 writexl::write_xlsx(sheets,
                     "inst/manuscript/supplementary_data/supplementary_data_S7.xlsx")

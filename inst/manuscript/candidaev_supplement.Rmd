@@ -650,7 +650,16 @@ fS3_args <- list(tiff = list(type = "cairo", compression = "lzw"),
 
 
 ```{r figureS3, fig.cap=fS3_cap, fig.height=7, fig.width=5.5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS3_args, dpi=600}
-fS3_cap <- c("\\textbf{MAIN} Sub.")
+fS3_cap <- c("\\textbf{Statistical comparisons of \\textit{C. albicans} EV 
+              isolations.} \\textit{(A)} Boxplot showing EV mode diameter 
+              measured using NTA. Differences in average EV mode diameters
+              were compared using One-way ANOVA followed by Tukey's HSD 
+              \\textit{post-hoc} test. Adjusted p-values indicating 
+              significant differences are shown. \\textit{(B)} Boxplot showing 
+              total particle concentration for each EV preparation as measured 
+              by NTA. Differences in average total particle concentration 
+              were compared by Kruskal-Wallis test followed by Dunn's Test.
+              Adjusted p-values indicating significant differences are shown.")
 
 ggarrange(fs3a, fs3b, 
           labels = c("A", "B"), 
@@ -930,7 +939,7 @@ fS4_a <- plot_venn(list("DAY286\nYeast EV" = y_ev2,
                         cat.just = list(c(0.5,1.7), c(0.5,1.5)),
                         margin = 0.05) %>% 
   as_ggplot() + 
-  theme(plot.margin = unit(c(0,1.5,0,1.5), "cm"))
+  theme(plot.margin = unit(c(0,2,0,2), "cm"))
 
 # Fig S4B = compare compare enrichment of common proteins to DAYY286 yeast EVs
 # and DAY286 biofilm EVs via volcano plot
@@ -969,8 +978,25 @@ fS4_args <- list(tiff = list(type = "cairo", compression = "lzw"),
                 postscript = list(bg = "white", fonts = "sans"))
 ```
 
+(ref:limma) [@cox2014; @ritchie2015]
+
 ```{r figureS4, fig.cap=fS4_cap, fig.height=6, fig.width=5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS4_args, dpi=600}
-fS4_cap <- c("\\textbf{MAIN} Sub.")
+fS4_cap <- c("\\textbf{Differential abundance analysis of proteins identified 
+              in EVs isolated from two different morphologies of the DAY286 
+              \\textit{C. albicans} strain.} \\textit{(A)} Venn diagram 
+              comparing the biofilm EV and yeast EV proteome data sets shown 
+              in Figure 2A. \\textit{(B)} Volcano plot depicting significantly 
+              enriched biofilm EV or yeast EV proteins. Differential abundance 
+              analysis was performed by comparing the mean normalised LFQ
+              intensities of common DAY286 EV proteins (i.e. proteins in the 
+              Venn overlap) using the package \\textit{limma} (ref:limma). 
+              Significantly enriched proteins were identified using a 
+              Benjamini-Hochberg adjusted p-value cut-off of 0.01 and a 
+              log\\textsubscript{2}(FC) cut-off of 1. Counts of significant and 
+              non-significant proeins are indicated. Proteins with a
+              log\\textsubscript{2}(FC) greater than 5 or less than -5 are 
+              labelled. Data underlying this plot are provided in 
+              Supplementary Data S6.")
 
 # draw figure S4
 ggarrange(fS4_a, fS4_b, 
@@ -1078,8 +1104,21 @@ fS5_args <- list(tiff = list(type = "cairo", compression = "lzw"),
                 postscript = list(bg = "white", fonts = "sans"))
 ```
 
-```{r figureS5, fig.cap=fS5_cap, fig.height=7, fig.width=7, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS5_args, dpi=600}
-fS5_cap <- c("\\textbf{MAIN} Sub.")
+(ref:fungifun) [@priebe2015]
+
+```{r figureS5, fig.cap=fS5_cap, fig.height=7, fig.width=5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS5_args, dpi=600}
+fS5_cap <- c("\\textbf{Functional enrichment analyses of EVs from two DAY286 
+              morphologies.} Top 10 signficantly enriched biological process 
+              (BP), cellular component (CC), and molecular function (MF) GO 
+              terms for the \\textit{(A)} yeast EV enriched and exclusive proteins or
+              \\textit{(B)} biofilm EV enriched or exclusive proteins shown in 
+              Supplementary Figure S4. GO analyses were performed using 
+              the online tool FungiFun2 (elbe.hki-jena.de/fungifun) 
+              (Hypergeometric distribution, Benjamini-Hochberg adjusted 
+              p-value < 0.01)
+              (ref:fungifun). The GO terms are presented top to bottom in order 
+              of increasing adjusted p-value. Full lists of enriched GO terms
+              can be found in Supplementary Data S7.")
 
 # draw figure S5
 ggarrange(fs5_a, fs5_b, 
