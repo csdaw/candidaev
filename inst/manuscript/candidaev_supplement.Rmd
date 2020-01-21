@@ -1,11 +1,11 @@
 ---
 title: | 
    **Supplement to: Protein markers for *Candida albicans* EVs include
-   claudin-like Sur7 family proteins and GTPases**
+   claudin-like Sur7 family proteins**
 author: | 
    | Charlotte Dawson^a^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
      Pierre Faou^b^,
-   | Marilyn Anderson^a^, Mark Bleackley^a^
+   | Mark Bleackley^a^, Marilyn Anderson^a^
 date: | 
    | *^a^Department of Biochemistry and Genetics, La Trobe Institute for 
      Molecular Science, La Trobe University, 
@@ -56,7 +56,7 @@ header-includes:
   - \usepackage{threeparttable}
 ---
 
-**Corresponding author:** Mark Bleackley, m.bleackley@latrobe.edu.au
+**Corresponding author:** Marilyn Anderson, m.anderson@latrobe.edu.au
 
 \newpage
 
