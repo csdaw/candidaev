@@ -19,9 +19,9 @@ knitr::opts_chunk$set(collapse = TRUE,
 
 This repository contains the research compendium for our paper:
 
-> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson, M. A., 
-Bleackley, M. R. (2019) Protein markers for _Candida albicans_ EVs include 
-claudin-like Sur7 family proteins and GTPases. _Journal of Extracellular_ 
+> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Bleackley, M. R., 
+Anderson, M. A. (2019) Protein markers for _Candida albicans_ EVs include 
+claudin-like Sur7 family proteins. _Journal of Extracellular_ 
 _Vesicles_, submitted.
 
 It has been permanently archived at Zenodo with the DOI shown above. The raw 
@@ -43,9 +43,9 @@ in the production of this compendium.
 
 Please cite this compendium as:
 
-> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson, M. A., 
-Bleackley, M. R. (2019) Research compendium for "Protein markers for 
-_Candida albicans_ EVs include claudin-like Sur7 family proteins and GTPases". 
+> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Bleackley, M. R., 
+Anderson, M. A. (2019) Research compendium for "Protein markers for 
+_Candida albicans_ EVs include claudin-like Sur7 family proteins". 
 version x.x.x. Zenodo. URL.
 
 ### Contents

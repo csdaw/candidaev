@@ -27,9 +27,9 @@ commit](https://img.shields.io/github/last-commit/csdaw/candidaev.svg?style=popo
 
 This repository contains the research compendium for our paper:
 
-> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
-> M. A., Bleackley, M. R. (2019) Protein markers for *Candida albicans*
-> EVs include claudin-like Sur7 family proteins and GTPases. *Journal of
+> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Bleackley,
+> M. R., Anderson, M. A. (2019) Protein markers for *Candida albicans*
+> EVs include claudin-like Sur7 family proteins. *Journal of
 > Extracellular* *Vesicles*, submitted.
 
 It has been permanently archived at Zenodo with the DOI shown above. The
@@ -51,10 +51,10 @@ was used in the production of this compendium.
 
 Please cite this compendium as:
 
-> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Anderson,
-> M. A., Bleackley, M. R. (2019) Research compendium for “Protein
-> markers for *Candida albicans* EVs include claudin-like Sur7 family
-> proteins and GTPases”. version x.x.x. Zenodo. URL.
+> Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Bleackley,
+> M. R., Anderson, M. A. (2019) Research compendium for “Protein markers
+> for *Candida albicans* EVs include claudin-like Sur7 family proteins”.
+> version x.x.x. Zenodo. URL.
 
 ### Contents
 
@@ -211,7 +211,7 @@ rmarkdown::render(system.file("manuscript", "candidaev_supplement.Rmd",
 ### R session information
 
 The system on which this document was compiled was running pandoc
-v2.7.1. Here is output of `sessionInfo()`.
+v2.7.3. Here is output of `sessionInfo()`.
 
     #> - Session info ----------------------------------------------------------
     #>  setting  value                       
@@ -222,20 +222,21 @@ v2.7.1. Here is output of `sessionInfo()`.
     #>  language (EN)                        
     #>  collate  English_Australia.1252      
     #>  ctype    English_Australia.1252      
-    #>  tz       Australia/Sydney            
-    #>  date     2019-07-18                  
+    #>  tz       Europe/London               
+    #>  date     2020-01-21                  
     #> 
     #> - Packages --------------------------------------------------------------
     #>  package     * version date       lib source                            
     #>  assertthat    0.2.1   2019-03-21 [1] CRAN (R 3.6.0)                    
-    #>  backports     1.1.4   2019-04-10 [1] CRAN (R 3.6.0)                    
+    #>  backports     1.1.5   2019-10-02 [1] CRAN (R 3.6.1)                    
     #>  callr         3.3.0   2019-07-04 [1] CRAN (R 3.6.1)                    
-    #>  cli           1.1.0   2019-03-19 [1] CRAN (R 3.6.0)                    
+    #>  cli           2.0.0   2019-12-09 [1] CRAN (R 3.6.0)                    
     #>  crayon        1.3.4   2017-09-16 [1] CRAN (R 3.6.0)                    
     #>  desc          1.2.0   2018-05-01 [1] CRAN (R 3.6.0)                    
     #>  devtools      2.1.0   2019-07-06 [1] CRAN (R 3.6.1)                    
-    #>  digest        0.6.20  2019-07-04 [1] CRAN (R 3.6.1)                    
+    #>  digest        0.6.23  2019-11-23 [1] CRAN (R 3.6.1)                    
     #>  evaluate      0.14    2019-05-28 [1] CRAN (R 3.6.0)                    
+    #>  fansi         0.4.0   2018-10-05 [1] CRAN (R 3.6.0)                    
     #>  fs            1.3.1   2019-05-06 [1] CRAN (R 3.6.0)                    
     #>  glue          1.3.1   2019-03-12 [1] CRAN (R 3.6.0)                    
     #>  htmltools     0.3.6   2017-04-28 [1] CRAN (R 3.6.0)                    
@@ -247,10 +248,10 @@ v2.7.1. Here is output of `sessionInfo()`.
     #>  prettyunits   1.0.2   2015-07-13 [1] CRAN (R 3.6.0)                    
     #>  processx      3.4.0   2019-07-03 [1] CRAN (R 3.6.0)                    
     #>  ps            1.3.0   2018-12-21 [1] CRAN (R 3.6.0)                    
-    #>  R6            2.4.0   2019-02-14 [1] CRAN (R 3.6.0)                    
-    #>  Rcpp          1.0.1   2019-03-17 [1] CRAN (R 3.6.0)                    
+    #>  R6            2.4.1   2019-11-12 [1] CRAN (R 3.6.1)                    
+    #>  Rcpp          1.0.3   2019-11-08 [1] CRAN (R 3.6.1)                    
     #>  remotes       2.1.0   2019-06-24 [1] CRAN (R 3.6.0)                    
-    #>  rlang         0.4.0   2019-06-25 [1] CRAN (R 3.6.0)                    
+    #>  rlang         0.4.2   2019-11-23 [1] CRAN (R 3.6.1)                    
     #>  rmarkdown     1.13.6  2019-07-03 [1] Github (rstudio/rmarkdown@5335b69)
     #>  rprojroot     1.3-2   2018-01-03 [1] CRAN (R 3.6.0)                    
     #>  sessioninfo   1.1.1   2018-11-05 [1] CRAN (R 3.6.0)                    
