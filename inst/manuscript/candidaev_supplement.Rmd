@@ -3,7 +3,7 @@ title: |
    **Supplement to: Protein markers for *Candida albicans* EVs include
    claudin-like Sur7 family proteins**
 author: | 
-   | Charlotte Dawson^a^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
+   | Charlotte Dawson^ac^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
      Pierre Faou^b^,
    | Mark Bleackley^a^, Marilyn Anderson^a^
 date: | 
@@ -13,6 +13,9 @@ date: |
    | *^b^La Trobe Comprehensive Proteomics Platform, La Trobe Institute for 
      Molecular Science, La Trobe University, Melbourne, 
      3086, Victoria, Australia*
+   | *^c^Cambridge Centre for Proteomics, Milner Therapeutics Institute, 
+     Jeffrey Cheah Biomedical Centre, University of Cambridge, 
+     Puddicombe Way, Cambridge CB2 0AW, United Kingdom*
 output: 
     bookdown::pdf_document2:
       latex_engine: xelatex
@@ -631,7 +634,8 @@ fs3b <- nta_total %>%
             color = "strain", palette = st_pal, add = "jitter", 
             add.params = list(color = "black"), 
             shape = 15, 
-            ylab = "Total particle concentration / mL") + 
+            ylab = "Total particle concentration / mL", 
+            outlier.shape = NA) + 
   scale_y_continuous(expand = c(0, 0), 
                      limits = c(0, 1e13)) + 
   theme(axis.title.x = element_blank(), 
@@ -753,7 +757,6 @@ wcl_longlist2 <- match_id_multi(df = wcl_longlist,
 (ref:footnote1) [@arnaud2005; @skrzypek2017]
 
 (ref:footnote2) [@theuniprotconsortium2019]
-
 
 ```{r tableS2}
 tabs2_cap <- "\\textbf{Candidate negative protein markers for 
@@ -959,9 +962,9 @@ fS4_b <- plot_volcano(data = ev_res,
   scale_colour_manual(labels = c("Yeast EV enriched", 
                                  "Biofilm EV enriched", 
                                  "Not significant"), 
-                      values = c("#0072B2", 
-                                 "#999999", 
-                                 "#D55E00"), 
+                      values = c("#D55E00", 
+                                 "#0072B2", 
+                                 "#999999"), 
                       breaks = c("Y_EV up", "B_EV up", "not sig"), 
                       name = element_blank()) + 
   annotate("text", x = 5.5, y = 0.5, label = "bold('DAY286')", parse = TRUE) + 

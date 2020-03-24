@@ -7,7 +7,7 @@
               results for each biological replicate are also shown.}
 \centering
 \resizebox{\linewidth}{!}{
-\begin{tabular}{lllllllll}
+\begin{tabular}[t]{lllllllll}
 \toprule
 \multicolumn{6}{c}{ } & \multicolumn{3}{c}{Particle diameter (nm)} 
 \cmidrule(l{3pt}r{3pt}){7-9}

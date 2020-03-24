@@ -13,7 +13,7 @@
                          the Candida Genome Database or UniProt reference 
                         proteome.
 \end{TableNotes}
-\begin{longtable}{lllllllll}
+\begin{longtable}[t]{lllllllll}
 \caption{(\#tab:tableS2)\textbf{Candidate negative protein markers for 
               \textit{C. albicans} EVs.} This list of proteins consists of 
               those that were found to be exclusive to whole cell lysate (WCL) 
@@ -44,7 +44,7 @@ Name & Function & DAY Y & A9 & A1 & DAY B & TM & SP & VDM
 \midrule
 \addlinespace[0.3em]
 \multicolumn{9}{l}{\textbf{Cytoplasm}}
-\hspace{1em}ARO3 & Phospho-2-dehydro-3-deoxyheptonate aldolase\textsuperscript{b} & -1.28 & -2.55 & -1.51 & -1.46 &  &  & 
+\hspace{1em}ARO3 & Phospho-2-dehydro-3-deoxyheptonate aldolase\textsuperscript{b} & -1.28 & -2.55 & -1.51 & -1.46 &  &  & 
 \hspace{1em}ARO8 & Aromatic transaminase of the Ehrlich fusel oil pathway\textsuperscript{a} & -2.37 & -1.81 & ex & -2.36 &  &  & 
 \hspace{1em}GDB1 & Putative glycogen debranching enzyme & ex & ex & ex & -1.99 &  &  & 
 \hspace{1em}HOM2 & Aspartate-semialdehyde dehydrogenase\textsuperscript{b} & ex & -3.41 & ex & ex &  &  & 

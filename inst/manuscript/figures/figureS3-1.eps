@@ -59,48 +59,11 @@
            >>
          ] setcolorspace } bind def
 /srgb { setcolor } bind def
-% begin encoding
-/WinAnsiEncoding [
- /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
- /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
- /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
- /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
- /space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quoteright
- /parenleft /parenright /asterisk /plus /comma /minus /period /slash
- /zero /one /two /three /four /five /six /seven
- /eight /nine /colon /semicolon /less /equal /greater /question
- /at /A /B /C /D /E /F /G
- /H /I /J /K /L /M /N /O
- /P /Q /R /S /T /U /V /W
- /X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore
- /grave /a /b /c /d /e /f /g
- /h /i /j /k /l /m /n /o
- /p /q /r /s /t /u /v /w
- /x /y /z /braceleft /bar /braceright /asciitilde /.notdef
- /Euro /.notdef /quotesinglbase /florin /quotedblbase /ellipsis /dagger /daggerdbl
- /circumflex /perthousand /Scaron /guilsinglleft /OE /.notdef /Zcaron /.notdef
- /.notdef /quoteleft /quoteright /quotedblleft /quotedblright /bullet /endash /emdash
- /tilde /trademark /scaron /guilsinglright /oe /.notdef /zcaron /Ydieresis
- /space /exclamdown /cent /sterling /currency /yen /brokenbar /section
- /dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron
- /degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /periodcentered
- /cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown
- /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla
- /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis
- /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply
- /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls
- /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla
- /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis
- /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide
- /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis
-]
- def
-% end encoding
 %%IncludeResource: font Helvetica
 /Helvetica findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font1 exch definefont pop
@@ -108,7 +71,7 @@ dup length dict begin
 /Helvetica-Bold findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font2 exch definefont pop
@@ -116,7 +79,7 @@ dup length dict begin
 /Helvetica-Oblique findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font3 exch definefont pop
@@ -124,7 +87,7 @@ dup length dict begin
 /Helvetica-BoldOblique findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font4 exch definefont pop
@@ -139,7 +102,7 @@ dup length dict begin
 /Helvetica findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font6 exch definefont pop
@@ -147,7 +110,7 @@ dup length dict begin
 /Helvetica-Bold findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font7 exch definefont pop
@@ -155,7 +118,7 @@ dup length dict begin
 /Helvetica-Oblique findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font8 exch definefont pop
@@ -163,7 +126,7 @@ dup length dict begin
 /Helvetica-BoldOblique findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding WinAnsiEncoding def
+  /Encoding ISOLatin1Encoding def
   currentdict
   end
 /Font9 exch definefont pop
@@ -405,8 +368,8 @@ cp p2
 [] 0 setdash
 1 setlinecap
 np
-267.84 460.65 m
-0 5.46 l
+267.84 462.59 m
+0 3.52 l
 o
 np
 267.84 466.11 m
@@ -414,12 +377,12 @@ np
 o
 np
 344.21 466.11 m
-0 -5.46 l
+0 -3.52 l
 o
 191.48 478.98 (0.00015) .5 0 t
 np
-267.84 471.29 m
-0 5.46 l
+267.84 473.23 m
+0 3.52 l
 o
 np
 267.84 476.75 m
@@ -427,12 +390,12 @@ np
 o
 np
 115.12 476.75 m
-0 -5.46 l
+0 -3.52 l
 o
 267.84 494.94 (0.00036) .5 0 t
 np
-191.48 487.25 m
-0 5.45 l
+191.48 489.18 m
+0 3.52 l
 o
 np
 191.48 492.70 m
@@ -440,12 +403,12 @@ np
 o
 np
 344.21 492.70 m
-0 -5.45 l
+0 -3.52 l
 o
 153.30 457.70 (0.0013) .5 0 t
 np
-191.48 450.01 m
-0 5.46 l
+191.48 451.95 m
+0 3.52 l
 o
 np
 191.48 455.47 m
@@ -453,7 +416,7 @@ np
 o
 np
 115.12 455.47 m
-0 -5.46 l
+0 -3.52 l
 o
 0.00 0.00 396.00 504.00 cl
 0.00 0.00 396.00 504.00 cl
@@ -701,15 +664,9 @@ np
 241.12 33.25 m
 53.45 0 l
 o
-/bg { 0.8000 0.4745 0.6549 srgb } def
 0.8000 0.4745 0.6549 srgb
-0.71 setlinewidth
-[] 0 setdash
-1 setlinecap
-344.21 200.00 1.95 c p3
 1.07 setlinewidth
 [] 0 setdash
-0 setlinecap
 np
 344.21 88.97 m
 0 0 l
@@ -718,7 +675,6 @@ np
 344.21 59.48 m
 0 -7.82 l
 o
-/bg { 1 1 1 srgb } def
 1 setlinecap
 np
  317.48 88.97 m
@@ -830,8 +786,8 @@ cp p2
 [] 0 setdash
 1 setlinecap
 np
-267.84 213.89 m
-0 5.32 l
+267.84 213.45 m
+0 5.76 l
 o
 np
 267.84 219.21 m
@@ -839,7 +795,7 @@ np
 o
 np
 344.21 219.21 m
-0 -5.32 l
+0 -5.76 l
 o
 0.00 0.00 396.00 504.00 cl
 0.00 0.00 396.00 504.00 cl
