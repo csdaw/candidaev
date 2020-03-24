@@ -14,13 +14,10 @@ knitr::opts_chunk$set(collapse = TRUE,
 
 # candidaev
 
-![GitHub last commit](https://img.shields.io/github/last-commit/csdaw/candidaev.svg?style=popout)
-
-
 This repository contains the research compendium for our paper:
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Bleackley, M. R., 
-Anderson, M. A. (2019) Protein markers for _Candida albicans_ EVs include 
+Anderson, M. A. (2020) Protein markers for _Candida albicans_ EVs include 
 claudin-like Sur7 family proteins. _Journal of Extracellular_ 
 _Vesicles_, submitted.
 
@@ -44,7 +41,7 @@ in the production of this compendium.
 Please cite this compendium as:
 
 > Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Bleackley, M. R., 
-Anderson, M. A. (2019) Research compendium for "Protein markers for 
+Anderson, M. A. (2020) Research compendium for "Protein markers for 
 _Candida albicans_ EVs include claudin-like Sur7 family proteins". 
 version x.x.x. Zenodo. URL.
 
