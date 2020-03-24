@@ -3,7 +3,7 @@ title: |
    **Protein markers for *Candida albicans* EVs include claudin-like Sur7 
    family proteins**
 author: | 
-   | Charlotte Dawson^a^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
+   | Charlotte Dawson^ac^, Donovan Garcia Ceron^a^, Harinda Rajapaksha^b^, 
      Pierre Faou^b^,
    | Mark Bleackley^a^, Marilyn Anderson^a^
 date: | 
@@ -13,6 +13,9 @@ date: |
    | *^b^La Trobe Comprehensive Proteomics Platform, La Trobe Institute for 
      Molecular Science, La Trobe University, Melbourne, 
      3086, Victoria, Australia*
+   | *^c^Cambridge Centre for Proteomics, Milner Therapeutics Institute, 
+     Jeffrey Cheah Biomedical Centre, University of Cambridge, 
+     Puddicombe Way, Cambridge CB2 0AW, United Kingdom*
 output: 
     bookdown::pdf_document2:
       latex_engine: xelatex
@@ -710,7 +713,7 @@ f2b1 <- plot_volcano(data = yeast_res,
   scale_colour_manual(labels = c("EV enriched", 
                                  "WCL enriched", 
                                  "Not significant"), 
-                      values = unname(ev_pal[c(2,1,3)]), 
+                      values = unname(ev_pal[c(2,3,1)]), 
                       breaks = c("EV up", "WCL up", "not sig"), 
                       name = element_blank()) + 
   annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 Y')", parse = TRUE) + 
@@ -851,7 +854,7 @@ f2b4 <- plot_volcano(data = biofilm_res,
                      axis_params = c("black", 10)) + 
   scale_colour_manual(labels = c("EV enriched", "WCL enriched", 
                                  "Not significant"), 
-                      values = unname(ev_pal[c(2,1,3)]), 
+                      values = unname(ev_pal[c(2,3,1)]), 
                       breaks = c("EV up", "WCL up", "not sig")) + 
   annotate("text", x = 8.5, y = 0.5, label = "bold('DAY286 B')", parse = TRUE) + 
   annotate("text", x = 3.5, y = 7, label = "bold('105')", 

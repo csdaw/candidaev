@@ -13,7 +13,7 @@
 \item[d] The name Evp1 for the protein encoded by orf19.6741 
                         was proposed in the present study.
 \end{TableNotes}
-\begin{longtable}{lllllllll}
+\begin{longtable}[t]{lllllllll}
 \caption{(\#tab:table1)\textbf{Candidate positive protein markers for 
              \textit{C. albicans} EVs.} This list of proteins consists of 
              those that were found to be exclusive to EVs or significantly 
