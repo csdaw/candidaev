@@ -383,7 +383,7 @@ fS1_cap <- "\\textbf{Schematic of the workflow used for the isolation and
            of EV protein markers.} Steps 1 to 6 were performed for each of the 
            four strains examined in this study: DAY286 yeast, ATCC90028 yeast, 
            ATCC10231 yeast, and DAY286 biofilm. The results from the four 
-           seperate analyses were combined (step 7) to identify proteins which 
+           separate analyses were combined (step 7) to identify proteins which 
            commonly appeared as EV marker candidates. The MISEV2018 criteria 
            for protein content-based EV characterisation and other 
            considerations were used to select the best \\textit{C. albicans} 
@@ -560,11 +560,6 @@ tabS1 <- nta_total %>%
   pack_rows("ATCC90028", 4, 6) %>% 
   pack_rows("ATCC10231", 7, 9) %>% 
   pack_rows("DAY286 biofilm", 10, 14)
-
-# export table S2 LaTeX code with \\ line endings removed in a text file
-tabS1_clean <- gsub("\\\\\\\\\n", "\n", tabS1)
-
-cat(tabS1_clean, file = "tables/table_S1.txt", sep = "\n")
 
 # show table S1 in PDF output
 tabS1
@@ -822,10 +817,8 @@ tabS2 <- knitr::kable(wcl_longlist2[, -9],
            threeparttable = TRUE)
 
 
-# export table S2 LaTeX code with \\ line endings removed in a text file
-tabS2_clean <- gsub("\\\\\\\\\n", "\n", tabS2)
-
-cat(tabS2_clean, file = "tables/table_S2.txt", sep = "\n")
+# export table S2 LaTeX code (to be converted to docx with Pandoc)
+cat(tabS2, file = "tables/table_S2.tex", sep = "\n")
 
 # show table S2 in PDF output
 tabS2
@@ -996,7 +989,7 @@ fS4_cap <- c("\\textbf{Differential abundance analysis of proteins identified
               Significantly enriched proteins were identified using a 
               Benjamini-Hochberg adjusted p-value cut-off of 0.01 and a 
               log\\textsubscript{2}(FC) cut-off of 1. Counts of significant and 
-              non-significant proeins are indicated. Proteins with a
+              non-significant proteins are indicated. Proteins with a
               log\\textsubscript{2}(FC) greater than 5 or less than -5 are 
               labelled. Data underlying this plot are provided in 
               Supplementary Data S6.")
@@ -1111,7 +1104,7 @@ fS5_args <- list(tiff = list(type = "cairo", compression = "lzw"),
 
 ```{r figureS5, fig.cap=fS5_cap, fig.height=7, fig.width=5, fig.path='figures/', dev=c('pdf', 'postscript', 'tiff'), dev.args=fS5_args, dpi=600}
 fS5_cap <- c("\\textbf{Functional enrichment analyses of EVs from two DAY286 
-              morphologies.} Top 10 signficantly enriched biological process 
+              morphologies.} Top 10 significantly enriched biological process 
               (BP), cellular component (CC), and molecular function (MF) GO 
               terms for the \\textit{(A)} yeast EV enriched and exclusive proteins or
               \\textit{(B)} biofilm EV enriched or exclusive proteins shown in 
