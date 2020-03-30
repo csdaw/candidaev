@@ -467,7 +467,7 @@ tab1_cap <- "\\textbf{Candidate positive protein markers for
              enriched in EVs across the four \\textit{C. albicans} strains 
              examined in this study. Proteins are grouped according to their 
              subcellular localisation as annotated in the Candida Genome 
-             Database (candidagenome.org) (ref:footnote1) unless otherwise 
+             Database (candidagenome.org) (48, 49) unless otherwise 
              indicated. The log\\textsubscript{2} ratio of the abundance 
              (mean MaxQuant LFQ intensity) of each protein in EVs compared to 
              whole cell lysate (WCL) for each strain is listed. \`\`ex\" 
@@ -515,10 +515,8 @@ tab1 <- knitr::kable(marker_longlist2[ ,-9],
            escape = FALSE, 
            threeparttable = TRUE)
 
-# export table 1 LaTeX code with \\ line endings removed in a text file
-tab1_clean <- gsub("\\\\\\\\\n", "\n", tab1)
-
-cat(tab1_clean, file = "tables/table_1.txt", sep = "\n")
+# export table 1 LaTeX code (to be converted to docx with Pandoc)
+cat(tab1, file = "tables/table_1.tex", sep = "\n")
 
 # show table 1 in PDF output
 tab1
@@ -1096,7 +1094,7 @@ f4c <- plot_mds(mds_data, mat_labels = mds_labels,
   scale_y_continuous(limits = c(-2, 1.5), 
                      expand = c(0,0)) + 
   scale_fill_manual(breaks = c("Y", "A9", "A1", "B"), 
-                    values = st_pal[c(3, 2, 4, 1)], 
+                    values = st_pal[c(1, 2, 3, 4)], 
                     labels = c("DAY Y", "A90028", "A10231", "DAY B"), 
                     guide = "legend") + 
   scale_shape_manual(values = c(22,24)) + 
@@ -1117,7 +1115,7 @@ f4d <- plot_mds(mds_data, mat_labels = mds_labels,
   scale_y_continuous(limits = c(-2, 1.5), 
                      expand = c(0,0)) + 
   scale_fill_manual(breaks = c("Y", "A9", "A1", "B"), 
-                    values = st_pal[c(3, 2, 4, 1)], 
+                    values = st_pal[c(1, 2, 3, 4)], 
                     labels = c("DAY Y", "A90028", "A10231", "DAY B"), 
                     guide = "legend") + 
   scale_shape_manual(values = c(22,24)) + 
