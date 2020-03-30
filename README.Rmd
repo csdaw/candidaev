@@ -19,7 +19,7 @@ This repository contains the research compendium for our paper:
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Bleackley, M. R., 
 Anderson, M. A. (2020) Protein markers for _Candida albicans_ EVs include 
 claudin-like Sur7 family proteins. _Journal of Extracellular_ 
-_Vesicles_, submitted.
+_Vesicles_, in press.
 
 It has been permanently archived at Zenodo with the DOI shown above. The raw 
 MS data has been deposited in the ProteomeXchange Consortium database via 
