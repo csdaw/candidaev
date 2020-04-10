@@ -245,7 +245,7 @@ yev_go <- process_fungifun("inst/manuscript/supplementary_data/GO_supplementary/
   mutate(Prot.found = stringi::stri_replace_all_regex(.$Prot.found,
                                                       c("CaO19.7481"),
                                                       c("MDH1"),
-                                                      vectorize_all = FALSE))
+                                                      vectorize_all = FALSE)) %>%
   rnm_cols()
 
 # Biofilm EV exclusive and enriched proteins
@@ -257,7 +257,7 @@ bev_go <- process_fungifun("inst/manuscript/supplementary_data/GO_supplementary/
                                                       c("ALS3", "ARO2", "HOM3",
                                                         "OSM1", "PLB3", "FBP1",
                                                         "PST2", "STE23", "PEP1"),
-                                                      vectorize_all = FALSE))
+                                                      vectorize_all = FALSE)) %>%
   rnm_cols()
 
 sheets <- list("Fig S5A DAY286 yeast" = yev_go,
