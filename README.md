@@ -1,23 +1,4 @@
 
-  - [candidaev](#candidaev)
-      - [Citation](#citation)
-      - [Contents](#contents)
-      - [References](#references)
-      - [Accessing the compendium](#accessing-the-compendium)
-          - [1. Installing the package using R and
-            `devtools`](#installing-the-package-using-r-and-devtools)
-          - [2. Cloning via `git`](#cloning-via-git)
-          - [3. Downloading directly from
-            GitHub](#downloading-directly-from-github)
-      - [Using the `candidaev` package after
-        installation](#using-the-candidaev-package-after-installation)
-          - [Accessing included MS data](#accessing-included-ms-data)
-          - [Viewing the vignettes](#viewing-the-vignettes)
-          - [Viewing the manuscript](#viewing-the-manuscript)
-          - [Building the figures from
-            scratch](#building-the-figures-from-scratch)
-      - [R session information](#r-session-information)
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # candidaev
@@ -228,8 +209,8 @@ v2.9.2. Here is output of `sessionInfo()`.
     #> ─ Packages ───────────────────────────────────────────────────────────────────
     #>  package     * version date       lib source        
     #>  assertthat    0.2.1   2019-03-21 [1] CRAN (R 3.6.0)
-    #>  backports     1.1.5   2019-10-02 [1] CRAN (R 3.6.0)
-    #>  callr         3.4.2   2020-02-12 [1] CRAN (R 3.6.0)
+    #>  backports     1.1.6   2020-04-05 [1] CRAN (R 3.6.2)
+    #>  callr         3.4.3   2020-03-28 [1] CRAN (R 3.6.2)
     #>  cli           2.0.2   2020-02-28 [1] CRAN (R 3.6.0)
     #>  crayon        1.3.4   2017-09-16 [1] CRAN (R 3.6.0)
     #>  desc          1.2.0   2018-05-01 [1] CRAN (R 3.6.0)
@@ -239,7 +220,7 @@ v2.9.2. Here is output of `sessionInfo()`.
     #>  evaluate      0.14    2019-05-28 [1] CRAN (R 3.6.0)
     #>  fansi         0.4.1   2020-01-08 [1] CRAN (R 3.6.0)
     #>  fs            1.3.2   2020-03-05 [1] CRAN (R 3.6.0)
-    #>  glue          1.3.2   2020-03-12 [1] CRAN (R 3.6.0)
+    #>  glue          1.4.0   2020-04-03 [1] CRAN (R 3.6.2)
     #>  htmltools     0.4.0   2019-10-04 [1] CRAN (R 3.6.0)
     #>  knitr         1.28    2020-02-06 [1] CRAN (R 3.6.0)
     #>  magrittr      1.5     2014-11-22 [1] CRAN (R 3.6.0)
@@ -250,7 +231,7 @@ v2.9.2. Here is output of `sessionInfo()`.
     #>  processx      3.4.2   2020-02-09 [1] CRAN (R 3.6.0)
     #>  ps            1.3.2   2020-02-13 [1] CRAN (R 3.6.0)
     #>  R6            2.4.1   2019-11-12 [1] CRAN (R 3.6.0)
-    #>  Rcpp          1.0.4   2020-03-17 [1] CRAN (R 3.6.2)
+    #>  Rcpp          1.0.4.6 2020-04-09 [1] CRAN (R 3.6.2)
     #>  remotes       2.1.1   2020-02-15 [1] CRAN (R 3.6.0)
     #>  rlang         0.4.5   2020-03-01 [1] CRAN (R 3.6.0)
     #>  rmarkdown     2.1     2020-01-20 [1] CRAN (R 3.6.0)
