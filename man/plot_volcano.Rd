@@ -4,10 +4,20 @@
 \alias{plot_volcano}
 \title{Visualise log2 fold change data with volcano plot}
 \usage{
-plot_volcano(data, p_val, log2fc, group, use_labels = FALSE,
-  label_fun = " ", point_size = 1, label_size = 2, x_lim = c(-10,
-  10), y_lim = c(0, 10), legend_params = c("left", 11, 10),
-  axis_params = c("black", 11, 10))
+plot_volcano(
+  data,
+  p_val,
+  log2fc,
+  group,
+  use_labels = FALSE,
+  label_fun = " ",
+  point_size = 1,
+  label_size = 2,
+  x_lim = c(-10, 10),
+  y_lim = c(0, 10),
+  legend_params = c("left", 11, 10),
+  axis_params = c("black", 11, 10)
+)
 }
 \arguments{
 \item{data}{data.frame: contains p-values and fold changes for proteins,

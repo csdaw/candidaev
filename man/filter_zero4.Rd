@@ -4,8 +4,19 @@
 \alias{filter_zero4}
 \title{Filter rows based on 4 sets of columns which contain \code{zero} values}
 \usage{
-filter_zero4(data, logic = c("and", "or"), op = c("==", ">=", "<="),
-  pat1, val1, pat2, val2, pat3, val3, pat4, val4)
+filter_zero4(
+  data,
+  logic = c("and", "or"),
+  op = c("==", ">=", "<="),
+  pat1,
+  val1,
+  pat2,
+  val2,
+  pat3,
+  val3,
+  pat4,
+  val4
+)
 }
 \arguments{
 \item{data}{data.frame or matrix: has rows you want to filter out}

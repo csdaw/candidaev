@@ -4,8 +4,15 @@
 \alias{filter_na2}
 \title{Filter rows based on 2 sets of columns which contain \code{NA} values}
 \usage{
-filter_na2(data, logic = c("and", "or"), op = c("==", ">=", "<="),
-  pat1, val1, pat2, val2)
+filter_na2(
+  data,
+  logic = c("and", "or"),
+  op = c("==", ">=", "<="),
+  pat1,
+  val1,
+  pat2,
+  val2
+)
 }
 \arguments{
 \item{data}{data.frame or matrix: has rows you want to filter out}

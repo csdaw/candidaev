@@ -4,10 +4,18 @@
 \alias{plot_venn}
 \title{Plot venn diagram}
 \usage{
-plot_venn(vlist, use_uniprot = FALSE, type = c("df", "plot", "save"),
-  output = c("tiff", "png", "svg"), output_file = NULL,
-  output_dim = c(1000, 1000), output_units = "px", output_res = 300,
-  output_pts = 14, ...)
+plot_venn(
+  vlist,
+  use_uniprot = FALSE,
+  type = c("df", "plot", "save"),
+  output = c("tiff", "png", "svg"),
+  output_file = NULL,
+  output_dim = c(1000, 1000),
+  output_units = "px",
+  output_res = 300,
+  output_pts = 14,
+  ...
+)
 }
 \arguments{
 \item{vlist}{list of vectors: can be integers or characters. Contains the

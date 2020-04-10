@@ -4,8 +4,13 @@
 \alias{get_results}
 \title{Extract differential abundance analysis results table}
 \usage{
-get_results(efit, mat, p_val = 0.01, lfc = 0, type = c("individual",
-  "overall"))
+get_results(
+  efit,
+  mat,
+  p_val = 0.01,
+  lfc = 0,
+  type = c("individual", "overall")
+)
 }
 \arguments{
 \item{efit}{an object of class \code{MArrayLM} produced by \code{\link{limma_eBayes}}}

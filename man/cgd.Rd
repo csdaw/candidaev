@@ -4,7 +4,9 @@
 \name{cgd}
 \alias{cgd}
 \title{Candida Genome Database reference table}
-\format{An object of class \code{data.frame} with 13281 observations (rows) and 20 variables (columns).}
+\format{
+An object of class \code{data.frame} with 13281 observations (rows) and 20 variables (columns).
+}
 \source{
 Arnaud, M.B., Costanzo, M. C., Skrzypek, M. S., Binkley, G., Lane, C., Miyasato, S. R., & Sherlock, G.
 (2005). The Candida Genome Database (CGD), a community resource for \emph{Candida albicans} gene and

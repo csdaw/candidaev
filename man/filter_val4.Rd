@@ -4,8 +4,19 @@
 \alias{filter_val4}
 \title{Filter rows based on the sums of values across 4 sets of columns}
 \usage{
-filter_val4(data, logic = c("and", "or"), op = c("==", ">=", "<="),
-  pat1, val1, pat2, val2, pat3, val3, pat4, val4)
+filter_val4(
+  data,
+  logic = c("and", "or"),
+  op = c("==", ">=", "<="),
+  pat1,
+  val1,
+  pat2,
+  val2,
+  pat3,
+  val3,
+  pat4,
+  val4
+)
 }
 \arguments{
 \item{data}{data.frame or matrix: has rows you want to filter out}

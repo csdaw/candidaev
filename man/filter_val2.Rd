@@ -4,8 +4,15 @@
 \alias{filter_val2}
 \title{Filter rows based on the sums of values across 2 sets of columns}
 \usage{
-filter_val2(data, logic = c("and", "or"), op = c("==", "<=", ">="),
-  pat1, val1, pat2, val2)
+filter_val2(
+  data,
+  logic = c("and", "or"),
+  op = c("==", "<=", ">="),
+  pat1,
+  val1,
+  pat2,
+  val2
+)
 }
 \arguments{
 \item{data}{data.frame or matrix: has rows you want to filter out}

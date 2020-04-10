@@ -4,8 +4,10 @@
 \name{uniprot}
 \alias{uniprot}
 \title{UniProt \emph{C. albicans} reference table}
-\format{An object of class \code{data.frame} with 6035 observations
-(rows) and 22 variables (columns).}
+\format{
+An object of class \code{data.frame} with 6035 observations
+(rows) and 22 variables (columns).
+}
 \source{
 The UniProt Consortium (2019). UniProt: a worldwide hub of protein
 knowledge. \emph{Nucleic Acids Research, 47}(D1), D506-D515.
