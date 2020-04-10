@@ -87,7 +87,7 @@ my_imp2 <- pcaMethods::completeObs(my_imp2)
 
 # density plot before and after imputations
 plot_imputation2(exd = atcc_exp,
-                 facet_labels = FALSE
+                 facet_labels = FALSE,
                  my_norm,
                  my_imp,
                  my_imp2)

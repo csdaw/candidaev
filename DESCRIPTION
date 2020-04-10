@@ -10,7 +10,7 @@ Description: This R package repository is a research compendium for
   Dawson et al. (2020). The compendium includes all the data, code, and text 
   associated with the publication. It also includes some HTML vignettes which 
   detail the analyses used and an Rmarkdown file to reproduce the manuscript
-  in its submitted form.
+  in its accepted form.
 Depends: R (>= 2.10)
 License: MIT + file LICENSE
 ByteCompile: true

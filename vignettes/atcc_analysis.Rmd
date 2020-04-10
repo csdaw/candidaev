@@ -31,7 +31,7 @@ author:
                La Trobe Institute for Molecular Science, 
                La Trobe University, Melbourne, 3086, 
                Victoria, Australia
-date: '`r format(Sys.Date(), "%d %B %Y")`'
+date: "10 April 2020"
 output:
   BiocStyle::html_document:
     toc: true
@@ -252,7 +252,7 @@ total number of proteins quantified in each sample.
 ```{r atccInit2, fig.cap=atccInit2_cap, fig.wide=TRUE}
 freq1 <- plot_frequency2(atcc_lfq) + 
   scale_y_continuous(limits = c(0,600), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   theme(plot.title = element_text(size = 16))
 
 numb1 <- plot_numbers2(atcc_lfq, atcc_exp) + 
@@ -262,7 +262,7 @@ numb1 <- plot_numbers2(atcc_lfq, atcc_exp) +
         legend.text = element_text(size = 12), 
         legend.box.margin = margin(t = 0, r = 0, b = 0, l = -15, unit = "pt")) +  
   scale_y_continuous(limits = c(0, 2250), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   scale_x_discrete(labels = c(rep(1:3, 4))) + 
   labs(title = "Proteins per biological replicate") + 
   xlab("Biological replicate") + 
@@ -294,7 +294,7 @@ percentages of missing values than the ATCC90028 samples.
 
 ```{r atccInit3}
 knitr::kable(sum_table(atcc_lfq), 
-             caption = "Descriptive statistics for each LC-MS/MS sample.", 
+             caption = "Descriptive statistics for each LC-MS/MS sample.",
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -331,7 +331,7 @@ though.
 ```{r atccFilt2, fig.cap=atccFilt2_cap, fig.wide=TRUE}
 freq2 <- plot_frequency2(atcc_filt) + 
   scale_y_continuous(limits = c(0,400), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   theme(plot.title = element_text(size = 16))
 
 numb2 <- plot_numbers2(atcc_filt, atcc_exp) + 
@@ -341,7 +341,7 @@ numb2 <- plot_numbers2(atcc_filt, atcc_exp) +
         legend.text = element_text(size = 12), 
         legend.box.margin = margin(t = 0, r = 0, b = 0, l = -15, unit = "pt")) +  
   scale_y_continuous(limits = c(0, 1750), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   scale_x_discrete(labels = c(rep(1:3, 4))) + 
   labs(title = "Proteins per biological replicate") + 
   xlab("Biological replicate") + 
@@ -388,9 +388,9 @@ mds1_labels <- c(rep("EV", 3),
 plot_mds(atcc_filt, mat_labels = mds1_labels, 
          shape_size = 4) + 
   scale_y_continuous(limits = c(-1.5, 0.75), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   scale_x_continuous(limits = c(-4, 2), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   theme(legend.position = "bottom", 
         legend.title = element_blank()) + 
   scale_fill_manual(values = c("orange", "red")) + 
@@ -452,9 +452,9 @@ mds2_labels <- c(rep("EV", 3),
 plot_mds(atcc_norm, mat_labels = mds2_labels, 
          shape_size = 4) + 
   scale_y_continuous(limits = c(-0.8, 0.8), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   scale_x_continuous(limits = c(-1, 1), 
-                     expand = expand_scale(mult = c(0, 0))) + 
+                     expand = c(0, 0)) + 
   theme(legend.position = "bottom", 
         legend.title = element_blank()) + 
   scale_fill_manual(values = c("orange", "red")) + 
@@ -679,7 +679,7 @@ values in each sample is explored again with `sum_table`.
 # explore percentage missing values in each ATCC10231 sample
 knitr::kable(sum_table(a1_norm), 
              caption = "Descriptive statistics for each ATCC10231 LC-MS/MS 
-                        sample. After normalisation.", 
+                        sample. After normalisation.",
              col.names = c("Sample", "Mean LFQ intensity", 
                            "Median LFQ intensity", "SD", "CV", 
                            "Min LFQ intensity", "Max LFQ intensity", 
@@ -1108,20 +1108,20 @@ a9_vol <- plot_volcano(a9_res,
 ```{r atccVolcanoData, include=FALSE}
 a1_volcano <- a1_vol + 
   scale_colour_manual(values = c("#D55E00",
-                                 "#999999",
-                                 "#0072B2"), 
+                                 "#0072B2",
+                                 "#999999"), 
                       labels = c("EV enriched", 
-                                 "Not significant", 
-                                 "WCL enriched")) + 
+                                 "WCL enriched", 
+                                 "Not significant")) + 
   theme(legend.title = element_blank())
 
 a9_volcano <- a9_vol + 
   scale_colour_manual(values = c("#D55E00",
-                                 "#999999",
-                                 "#0072B2"), 
+                                 "#0072B2", 
+                                 "#999999"), 
                       labels = c("EV enriched", 
-                                 "Not significant", 
-                                 "WCL enriched")) + 
+                                 "WCL enriched", 
+                                 "Not significant")) + 
   theme(legend.title = element_blank())
 ```
 

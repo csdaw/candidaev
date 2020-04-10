@@ -65,5 +65,6 @@ sum_table <- function(data) {
   result <- tibble::as_tibble(do.call(rbind, sum_list), rownames = "label")
 
   # unnest the tibble columns
-  tidyr::unnest(result)
+  tidyr::unnest(result, cols = c(mean, median, std.dev, coeff.var, min, max,
+                                 range, n.valid.val, n.na.val, prcnt.na))
 }

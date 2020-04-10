@@ -38,7 +38,12 @@
 
         # tukey_hsd.R
         "comparison", "comparison2", "p.adj", "term", "group1", "group2",
-        "adj.p.value")
+        "adj.p.value",
+
+        # sum_table.R
+        "median", "std.dev", "coeff.var", "n.valid.val", "n.na.val",
+        "prcnt.na"
+        )
       )
   invisible()
 }
