@@ -24,12 +24,13 @@
 
 This repository contains the research compendium for our paper:
 
-> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Bleackley,
-> M. R., Anderson, M. A. (2020) Protein markers for *Candida albicans*
+> Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
+> M. A., Bleackley, M. R. (2020) Protein markers for *Candida albicans*
 > EVs include claudin-like Sur7 family proteins. *Journal of
-> Extracellular* *Vesicles*, in press.
+> Extracellular* *Vesicles*, x(x): 1750810. DOI:
+> [10.1080/20013078.2020.1750810](https://doi.org/10.1080/20013078.2020.1750810)
 
-It has been permanently archived at Zenodo with the DOI shown above. The
+It has been permanently archived at Zenodo with the DOI shown below. The
 raw MS data has been deposited in the ProteomeXchange Consortium
 database via the PRIDE partner repository with the data set identifiers
 PXD014367, PXD014388, and PXD014389. The analysis techniques and
@@ -56,13 +57,13 @@ Please cite this compendium as:
 ### Contents
 
 ``` 
-    .
-    ├── /R                   # Script files for functions and included data
-    ├── /data-raw            # Raw data used (but not modified) in analyses
-    ├── /data                # Data tables installed with package
-    ├── /inst/manuscript     # Final submitted manuscript, figures, and supplementary data
-    ├── /man                 # Auto-generated documentation for functions and included data
-    ├── /vignettes           # Detailed examples of how analyses were performed
+    ./
+    ├── R                    # Script files for functions and included datasets
+    ├── data-raw             # Raw data used (but not modified) in analyses
+    ├── data                 # Datasets included with package
+    ├── inst/manuscript      # Final accepted manuscript, figures, and supplementary data
+    ├── man                  # Auto-generated documentation for functions and included data
+    ├── vignettes            # Detailed examples of how analyses were performed
     ├── .Rbuildignore        # List of files and directories to ignore during R package build
     ├── .gitattributes       # List of files for github/linguist to ignore
     ├── .gitignore           # List of files to ignore during git commit
@@ -96,18 +97,20 @@ functions and data included in the package as well as some HTML
 vignettes, the manuscript text, the figures `.Rmd` file which can be
 used to reproduce the analysis and figures as submitted.
 
-A partial installation will only install functions and data, which can
-be used to analyse other MaxQuant `.txt` files.
+A partial installation will only install functions, datasets, which can
+be used to analyse other MaxQuant `.txt` files with *Candida albicans*
+LFQ data. The manuscript will also be installed, but the vignettes won’t
+be available.
 
 ``` r
 # install the devtools package from CRAN if not already installed
 # install.packages("devtools")
 
-# install partial compendium (functions, data)
+# install partial compendium (functions, datasets, manuscript)
 devtools::install_github("csdaw/candidaev", 
                          INSTALL_opts = "--no-inst")
 
-# install full compendium (functions, data, vignettes, manuscript) 
+# install full compendium (functions, datasets, manuscript, vignettes) 
 # and other packages required to build vignettes and manuscript
 devtools::install_github("csdaw/candidaev", 
                          build_opts = c("--no-resave-data", "--no-manual"), 
@@ -175,7 +178,7 @@ browseVignettes("candidaev")
 
 #### Viewing the manuscript
 
-The manuscript `.docx` file, as submitted, can be downloaded
+The manuscript `.docx` file, as accepted, can be downloaded
 [here](https://github.com/csdaw/candidaev/tree/master/inst/manuscript).
 
 The figures for the manuscript were produced using the
@@ -220,7 +223,7 @@ v2.9.2. Here is output of `sessionInfo()`.
     #>  collate  en_AU.UTF-8                 
     #>  ctype    en_AU.UTF-8                 
     #>  tz       Europe/London               
-    #>  date     2020-03-30                  
+    #>  date     2020-04-10                  
     #> 
     #> ─ Packages ───────────────────────────────────────────────────────────────────
     #>  package     * version date       lib source        

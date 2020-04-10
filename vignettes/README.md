@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# /vignettes
+# vignettes
 
 ## Description
 
@@ -9,16 +9,24 @@ This directory contains Rmarkdown files used to generate HTML vignettes
 that detail the proteomic analyses used in our paper:
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
-> M. A., Bleackley, M. R. (2019) Protein markers for *Candida albicans*
-> EVs include claudin-like Sur7 family proteins and GTPases. *Journal of
-> Extracellular* *Vesicles*, submitted.
+> M. A., Bleackley, M. R. (2020) Protein markers for *Candida albicans*
+> EVs include claudin-like Sur7 family proteins. *Journal of
+> Extracellular* *Vesicles*, x(x): 1750810. DOI:
+> [10.1080/20013078.2020.1750810](https://doi.org/10.1080/20013078.2020.1750810)
+
+If the `candidaev` package has been installed you can view the vignettes
+with:
+
+``` r
+browseVignettes("candidaev")
+```
 
 ## Contents
 
 ``` 
     .
     ├── ...
-    ├── /vignettes
+    ├── vignettes
     │    ├── atcc_analysis.Rmd         # Describes ATCC90028 and ATCC10231 EV analyses
     │    ├── biofilm_analysis.Rmd      # Describes DAY286 biofilm EV analysis
     │    └── yeast_analysis.Rmd        # Describes DAY286 yeast EV analysis

@@ -9,9 +9,10 @@ knitr::opts_chunk$set(collapse = TRUE,
                       comment = "#>")
 ```
 
-# /data-raw
+# data-raw
 
 ## Description
+
 This directory contains all of the raw data files used in this project. 
 These files are *not* included when the package is installed using 
 `devtools::install_github()`. Rather *'clean'* versions of the `.csv` and 
@@ -35,12 +36,12 @@ download as a `.zip`.
 ```
     .
     ├── ...
-    ├── /data-raw
-    │    ├── /lcms           # proteinGroups.txt files output by MaxQuant
-    │    ├── /nta            # Nanosight NS300 .csv summary tables
-    │    ├── /reference      # UniProt and Candida Genome Database reference tables
+    ├── data-raw
+    │    ├── lcms            # proteinGroups.txt files output by MaxQuant
+    │    ├── nta             # Nanosight NS300 .csv summary tables
+    │    ├── reference       # UniProt and Candida Genome Database reference tables
     │    ├── README.Rmd      # R markdown file to produce README.md
-    │    └── README.md       # Description of /data-raw directory
+    │    └── README.md       # Description of data-raw directory
     └── ...
 
 ```

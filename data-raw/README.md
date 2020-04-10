@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# /data-raw
+# data-raw
 
 ## Description
 
@@ -30,11 +30,11 @@ Some different ways to access these raw files include:
 ``` 
     .
     ├── ...
-    ├── /data-raw
-    │    ├── /lcms           # proteinGroups.txt files output by MaxQuant
-    │    ├── /nta            # Nanosight NS300 .csv summary tables
-    │    ├── /reference      # UniProt and Candida Genome Database reference tables
+    ├── data-raw
+    │    ├── lcms            # proteinGroups.txt files output by MaxQuant
+    │    ├── nta             # Nanosight NS300 .csv summary tables
+    │    ├── reference       # UniProt and Candida Genome Database reference tables
     │    ├── README.Rmd      # R markdown file to produce README.md
-    │    └── README.md       # Description of /data-raw directory
+    │    └── README.md       # Description of data-raw directory
     └── ...
 ```
