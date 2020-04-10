@@ -3,6 +3,8 @@
 
 # candidaev
 
+[![DOI](https://zenodo.org/badge/166642718.svg)](https://zenodo.org/badge/latestdoi/166642718)
+
 This repository contains the research compendium for our paper:
 
 > Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
