@@ -35,7 +35,8 @@ Please cite this compendium as:
 > Dawson, C. S., Garcia-Ceron, D.,. Rajapaksha, H., Faou, P., Bleackley,
 > M. R., Anderson, M. A. (2020) Research compendium for “Protein markers
 > for *Candida albicans* EVs include claudin-like Sur7 family proteins”.
-> version x.x.x. Zenodo. URL.
+> version 2.2.1. Zenodo. DOI:
+> [10.5281/zenodo.3747549](https://www.doi.org/10.5281/zenodo.3747549).
 
 ### Contents
 
@@ -206,7 +207,7 @@ v2.9.2. Here is output of `sessionInfo()`.
     #>  collate  en_AU.UTF-8                 
     #>  ctype    en_AU.UTF-8                 
     #>  tz       Europe/London               
-    #>  date     2020-04-10                  
+    #>  date     2020-04-12                  
     #> 
     #> ─ Packages ───────────────────────────────────────────────────────────────────
     #>  package     * version date       lib source        
