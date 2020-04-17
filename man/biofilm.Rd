@@ -12,7 +12,7 @@ An object of class \code{data.frame} with 1709 observations (rows) and 113 varia
 Dawson, C. S., Garcia-Ceron, D., Rajapaksha, H., Faou, P., Anderson,
 M. A., Bleackley, M. R. (2020) Protein markers for \emph{Candida albicans}
 EVs include claudin-like Sur7 family proteins.
-\emph{Journal of Extracellular Vesicles}, x(x): 1750810. DOI:
+\emph{Journal of Extracellular Vesicles}, 9(1): 1750810. DOI:
 \href{https://doi.org/10.1080/20013078.2020.1750810}{10.1080/20013078.2020.1750810}
 }
 \usage{
